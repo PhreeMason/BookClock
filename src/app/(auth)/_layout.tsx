@@ -1,0 +1,22 @@
+import { Loader } from "@/components/Loader";
+import { useAuth } from "@clerk/clerk-expo";
+import { Redirect, Slot } from "expo-router";
+
+export default function AuthLayout() {
+    const { isLoaded, isSignedIn } = useAuth();
+    console.log({
+        isLoaded,
+        isSignedIn,
+    })
+    if (!isLoaded) { 
+        // If Clerk is still loading, show a loader
+        return <Loader />;
+    }
+    if (isSignedIn) {
+        // If the user is signed in, redirect them to the home screen
+        return <Redirect href="/" />;
+    }
+  return (
+    <Slot />
+  );
+}

@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "r-r-books",
-    "slug": "r-r-books",
+    "name": "bookClock",
+    "slug": "bookClock",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "rrbooks",
+    "scheme": "bookclock",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.grizzylabs.rrbooks"
+      "bundleIdentifier": "com.grizzylabs.bookclock"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.grizzylabs.rrbooks"
+      "package": "com.grizzylabs.bookclock"
     },
     "web": {
       "bundler": "metro",

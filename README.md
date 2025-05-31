@@ -1,50 +1,35 @@
-# Welcome to your Expo app 👋
+## Custom Reusable Components
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+### HapticTab
+**API:** Extends `BottomTabBarButtonProps` from React Navigation  
+**Use Case:** Enhanced tab bar button that provides haptic feedback on iOS devices when pressed. Automatically adds light impact feedback for better user experience in tab navigation.
 
-## Get started
+### SignInWith
+**API:**
+- Props: `{ strategy: 'oauth_google' | 'oauth_apple' }`
+- Exports: `useWarmUpBrowser()` hook
 
-1. Install dependencies
+**Use Case:** OAuth authentication component for Google and Apple sign-in. Handles the complete SSO flow with Clerk authentication, includes browser warm-up optimization for Android, and displays provider-specific icons.
 
-   ```bash
-   npm install
-   ```
+### SignOutButton
+**API:** No props required  
+**Use Case:** Simple sign-out button that handles user authentication logout via Clerk and redirects to the home page. Displays themed text with touch interaction.
 
-2. Start the app
+### ThemedKeyboardAvoidingView
+**API:** Extends `KeyboardAvoidingViewProps` with optional `lightColor` and `darkColor` props  
+**Use Case:** Theme-aware keyboard avoiding view that automatically adjusts behavior based on platform (iOS: padding, Android: height) and applies theme colors.
 
-   ```bash
-   npx expo start
-   ```
+### ThemedScrollView
+**API:** Extends `ScrollViewProps` with optional `lightColor` and `darkColor` props  
+**Use Case:** Theme-aware scroll view that automatically applies background colors based on the current theme (light/dark mode) with bouncing enabled by default.
 
-In the output, you'll find options to open the app in a
+### ThemedView
+**API:** Extends `ViewProps` with optional `lightColor` and `darkColor` props  
+**Use Case:** Basic theme-aware container view that automatically applies background colors based on the current theme context.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### ThemedText
+**API:**
+- Extends `TextProps` with optional `lightColor`, `darkColor`, and `type` props
+- Types: `'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link'`
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Use Case:** Theme-aware text component with predefined typography styles. Automatically applies theme colors and provides consistent text styling across the app with multiple preset variants.
