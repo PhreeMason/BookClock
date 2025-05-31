@@ -1,4 +1,5 @@
 ## Custom Reusable Components
+> **Note:** All components can be imported using `@/components/COMPONENT_NAME`
 
 ### HapticTab
 **API:** Extends `BottomTabBarButtonProps` from React Navigation  
