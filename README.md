@@ -12,6 +12,12 @@
 
 **Use Case:** OAuth authentication component for Google and Apple sign-in. Handles the complete SSO flow with Clerk authentication, includes browser warm-up optimization for Android, and displays provider-specific icons.
 
+### Collapsible
+**API:**
+- Props: `{children: React.Node, title: string}
+
+**User Case:** Creates an accordion container that opens and closes on user click.
+`
 ### SignOutButton
 **API:** No props required  
 **Use Case:** Simple sign-out button that handles user authentication logout via Clerk and redirects to the home page. Displays themed text with touch interaction.
