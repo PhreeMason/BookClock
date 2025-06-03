@@ -1,25 +1,15 @@
 import { useSSO } from '@clerk/clerk-expo';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
+// @ts-ignore
 import appleButton from '@/assets/social-providers/apple.png';
+// @ts-ignore
 import googleButton from '@/assets/social-providers/google.png';
 
+import { useWarmUpBrowser } from '@/hooks/useWarmUpBrowser';
 import { Image, TouchableOpacity } from 'react-native';
-
-export const useWarmUpBrowser = () => {
-    useEffect(() => {
-        // Preloads the browser for Android devices to reduce authentication load time
-        // See: https://docs.expo.dev/guides/authentication/#improving-user-experience
-        void WebBrowser.warmUpAsync();
-        return () => {
-            // Cleanup: closes browser when component unmounts
-            void WebBrowser.coolDownAsync();
-        };
-    }, []);
-};
-
 // Handle any pending authentication sessions
 WebBrowser.maybeCompleteAuthSession();
 

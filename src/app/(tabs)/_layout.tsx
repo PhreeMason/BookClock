@@ -7,18 +7,18 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useEnsureProfile } from '@/hooks/useEnsureUser';
 import { useAuth } from '@clerk/clerk-expo';
+
+
 export default function TabLayout() {
     const colorScheme = useColorScheme();
     const { isSignedIn } = useAuth();
-    const { mutate: ensureProfile } = useEnsureProfile();
+
     // If the user is not signed in, redirect them to the sign-in screen
     if (!isSignedIn) {
         return <Redirect href="/sign-in" />;
     }
     // Ensure the user profile is created
-    ensureProfile();
     return (
         <Tabs
             screenOptions={{
