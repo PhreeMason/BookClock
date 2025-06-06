@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   statsContainer: {
     alignItems: 'center',
     backgroundColor: 'hsla(0, 0.00%, 0.00%, 0.50)',
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 12,
     borderWidth: 1,
@@ -283,6 +283,7 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
     letterSpacing: 0.2,
+    lineHeight: 22,
   },
 });
 
