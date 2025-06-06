@@ -236,9 +236,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   formatBadgeText: {
-    color: '#333',
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 14,
   },
   titleContainer: {
     flex: 1,
