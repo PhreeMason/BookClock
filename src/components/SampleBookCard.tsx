@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)'
+    backgroundColor: 'rgba(0, 0, 0, 0.2)'
   },
   placeholderText: {
     fontSize: 48,
