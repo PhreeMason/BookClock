@@ -20,6 +20,7 @@ export function ThemedText({
   return (
     <Text
       style={[
+        { fontFamily: 'Inter' },
         { color },
         type === 'default' ? styles.default : undefined,
         type === 'title' ? styles.title : undefined,
