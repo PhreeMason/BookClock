@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   daysLeftContainer: {
     alignItems: 'center',
-    backgroundColor: 'hsla(0, 0.00%, 0.00%, 0.50)',
+    backgroundColor: 'hsla(0, 0.00%, 0.00%, 0.45)',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 10,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   formatBadge: {
-    backgroundColor: 'hsla(0, 0.00%, 0.00%, 0.50)',
+    backgroundColor: 'hsla(0, 0.00%, 0.00%, 0.45)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 7,
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     alignItems: 'center',
-    backgroundColor: 'hsla(0, 0.00%, 0.00%, 0.50)',
+    backgroundColor: 'hsla(0, 0.00%, 0.00%, 0.45)',
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 12,
