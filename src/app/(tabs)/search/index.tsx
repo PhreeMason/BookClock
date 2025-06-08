@@ -1,83 +1,72 @@
-import { ThemedScrollView } from "@/components/ThemedScrollView"
+import { BookList } from "@/components/BookList"
+import { BookData } from "@/components/BookListItem"
+import { SearchBar } from "@/components/SearchBar"
 import { ThemedText } from "@/components/ThemedText"
 import { ThemedView } from "@/components/ThemedView"
-import { IconSymbol } from "@/components/ui/IconSymbol"
+import { useSearchBooks } from '@/hooks/useBooks'
+import { useDebounce } from '@/hooks/useUtils'
 import { useState } from "react"
-import { StyleSheet, TextInput, TouchableOpacity } from "react-native"
+import { StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 export default function SearchScreen() {
-    const [searchQuery, setSearchQuery] = useState('')
+    const [searchQuery, setSearchQuery] = useState('');
+    const debouncedSearch = useDebounce(searchQuery, 300);
 
-    const handleSearch = () => {
-        if (searchQuery.trim()) {
-            // Implement your search logic here
-            console.log('Searching for:', searchQuery)
-        }
+    const { data, error } = useSearchBooks(debouncedSearch)
+
+    let searchResults: BookData[] = [];
+
+    if (data && data.bookList) {
+        searchResults = data.bookList;
     }
 
-    const handleClear = () => {
-        setSearchQuery('')
-    }
+    const handleBookPress = (book: BookData) => {
+        // TODO: Navigate to book details or handle book selection
+        console.log('Book pressed:', book.title);
+    };
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <ThemedScrollView>
-                <ThemedView style={styles.container}>
-                    <ThemedText type="title" style={styles.title}>Search</ThemedText>
-                    
-                    <ThemedView style={styles.searchContainer}>
-                        <ThemedView style={styles.searchBar}>
-                            <IconSymbol 
-                                name="magnifyingglass" 
-                                size={20} 
-                                color="#666" 
-                                style={styles.searchIcon} 
-                            />
-                            <TextInput
-                                style={styles.searchInput}
-                                placeholder="Search for books..."
-                                value={searchQuery}
-                                onChangeText={setSearchQuery}
-                                onSubmitEditing={handleSearch}
-                                returnKeyType="search"
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                            />
-                            {searchQuery.length > 0 && (
-                                <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-                                    <IconSymbol name="xmark.circle.fill" size={20} color="#666" />
-                                </TouchableOpacity>
-                            )}
-                        </ThemedView>
-                        
-                        <TouchableOpacity 
-                            style={styles.searchButton} 
-                            onPress={handleSearch}
-                            disabled={!searchQuery.trim()}
-                        >
-                            <ThemedText style={styles.searchButtonText}>Search</ThemedText>
-                        </TouchableOpacity>
-                    </ThemedView>
+            <ThemedView style={styles.container}>
+                <ThemedText type="title" style={styles.title}>Search</ThemedText>
 
-                    {searchQuery.length > 0 && (
-                        <ThemedView style={styles.resultsContainer}>
-                            <ThemedText type="subtitle">
-                                Search results for "{searchQuery}"
-                            </ThemedText>
-                            <ThemedText type="default">
-                                No results found. Implement your search functionality here.
-                            </ThemedText>
-                        </ThemedView>
-                    )}
+                <ThemedView style={styles.searchContainer}>
+                    <SearchBar
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        placeholder="Search for books..."
+                    />
                 </ThemedView>
-            </ThemedScrollView>
+
+                {searchQuery.length > 0 && (
+                    <ThemedView style={styles.resultsContainer}>
+                        <ThemedText type="subtitle" style={styles.resultsTitle}>
+                            Search results for "{searchQuery}"
+                        </ThemedText>
+
+                        {error && (
+                            <ThemedText style={styles.errorText}>
+                                Error loading search results. Please try again.
+                            </ThemedText>
+                        )}
+
+                        <BookList
+                            books={searchResults}
+                            onBookPress={handleBookPress}
+                            emptyMessage="No books found for your search"
+                            showEmptyState={!error}
+                        />
+                    </ThemedView>
+                )}
+            </ThemedView>
         </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         padding: 20,
         gap: 20,
     },
@@ -88,46 +77,17 @@ const styles = StyleSheet.create({
     searchContainer: {
         gap: 12,
     },
-    searchBar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-        borderRadius: 12,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-    },
-    searchIcon: {
-        marginRight: 8,
-    },
-    searchInput: {
-        flex: 1,
-        fontSize: 16,
-        paddingVertical: 8,
-        color: '#333',
-    },
-    clearButton: {
-        padding: 4,
-    },
-    searchButton: {
-        backgroundColor: '#0a7ea4',
-        borderRadius: 8,
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        alignItems: 'center',
-        alignSelf: 'center',
-    },
-    searchButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
-    },
     resultsContainer: {
+        flex: 1,
         marginTop: 20,
-        padding: 16,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 8,
-        gap: 8,
+        gap: 12,
+    },
+    resultsTitle: {
+        marginBottom: 8,
+    },
+    errorText: {
+        color: '#DC2626',
+        textAlign: 'center',
+        marginBottom: 16,
     },
 })

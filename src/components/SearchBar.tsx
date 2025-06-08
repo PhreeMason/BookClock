@@ -1,58 +1,52 @@
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { ThemedView } from "@/components/ThemedView"
+import { IconSymbol } from "@/components/ui/IconSymbol"
+import { StyleSheet, TextInput, TouchableOpacity } from "react-native"
 
-type SearchBarProps = {
-    onSearch: (query: string) => void;
-    placeholder?: string;
-};
+interface SearchBarProps {
+    value: string
+    onChangeText: (text: string) => void
+    placeholder?: string
+    onClear?: () => void
+}
 
-export default function SearchBar({ onSearch, placeholder = "Search..." }: SearchBarProps) {
-    const [searchQuery, setSearchQuery] = useState('');
-
-    const handleSearch = () => {
-        if (searchQuery.trim()) {
-            onSearch(searchQuery.trim());
-        }
-    };
-
+export function SearchBar({ 
+    value, 
+    onChangeText, 
+    placeholder = "Search...", 
+    onClear 
+}: SearchBarProps) {
     const handleClear = () => {
-        setSearchQuery('');
-    };
+        onChangeText('')
+        onClear?.()
+    }
 
     return (
-        <View style={styles.searchContainer}>
-            <View style={styles.searchBar}>
-                <IconSymbol 
-                    name="magnifyingglass" 
-                    size={20} 
-                    color="#666" 
-                    style={styles.searchIcon} 
-                />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder={placeholder}
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    onSubmitEditing={handleSearch}
-                    returnKeyType="search"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                />
-                {searchQuery.length > 0 && (
-                    <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-                        <IconSymbol name="xmark.circle.fill" size={20} color="#666" />
-                    </TouchableOpacity>
-                )}
-            </View>
-        </View>
-    );
+        <ThemedView style={styles.searchBar}>
+            <IconSymbol
+                name="magnifyingglass"
+                size={20}
+                color="#666"
+                style={styles.searchIcon}
+            />
+            <TextInput
+                style={styles.searchInput}
+                placeholder={placeholder}
+                value={value}
+                onChangeText={onChangeText}
+                returnKeyType="search"
+                autoCapitalize="none"
+                autoCorrect={false}
+            />
+            {value.length > 0 && (
+                <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
+                    <IconSymbol name="xmark.circle.fill" size={20} color="#666" />
+                </TouchableOpacity>
+            )}
+        </ThemedView>
+    )
 }
 
 const styles = StyleSheet.create({
-    searchContainer: {
-        gap: 12,
-    },
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -75,4 +69,4 @@ const styles = StyleSheet.create({
     clearButton: {
         padding: 4,
     },
-});
+}) 
