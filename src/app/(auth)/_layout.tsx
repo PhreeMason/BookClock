@@ -4,10 +4,7 @@ import { Redirect, Slot } from "expo-router";
 
 export default function AuthLayout() {
     const { isLoaded, isSignedIn } = useAuth();
-    console.log({
-        isLoaded,
-        isSignedIn,
-    })
+
     if (!isLoaded) { 
         // If Clerk is still loading, show a loader
         return <Loader />;

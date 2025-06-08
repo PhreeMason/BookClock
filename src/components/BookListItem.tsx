@@ -158,22 +158,19 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 16,
-    marginBottom: 4,
   },
   author: {
     fontSize: 14,
     opacity: 0.7,
-    marginBottom: 4,
   },
   series: {
     fontSize: 12,
     opacity: 0.6,
     fontStyle: 'italic',
-    marginBottom: 8,
   },
   detailsRow: {
     flexDirection: 'row',
