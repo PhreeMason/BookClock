@@ -1,5 +1,6 @@
 import { BookList } from "@/components/BookList"
 import { BookData } from "@/components/BookListItem"
+import { Loader } from "@/components/Loader"
 import { SearchBar } from "@/components/SearchBar"
 import { ThemedText } from "@/components/ThemedText"
 import { ThemedView } from "@/components/ThemedView"
@@ -13,7 +14,7 @@ export default function SearchScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const debouncedSearch = useDebounce(searchQuery, 300);
 
-    const { data, error } = useSearchBooks(debouncedSearch)
+    const { data, error, isLoading } = useSearchBooks(debouncedSearch)
 
     let searchResults: BookData[] = [];
 
@@ -45,18 +46,24 @@ export default function SearchScreen() {
                             Search results for "{searchQuery}"
                         </ThemedText>
 
-                        {error && (
+                        {isLoading && (
+                            <Loader text="Searching for books..." />
+                        )}
+
+                        {error && !isLoading && (
                             <ThemedText style={styles.errorText}>
                                 Error loading search results. Please try again.
                             </ThemedText>
                         )}
 
-                        <BookList
-                            books={searchResults}
-                            onBookPress={handleBookPress}
-                            emptyMessage="No books found for your search"
-                            showEmptyState={!error}
-                        />
+                        {!isLoading && (
+                            <BookList
+                                books={searchResults}
+                                onBookPress={handleBookPress}
+                                emptyMessage="No books found for your search"
+                                showEmptyState={!error}
+                            />
+                        )}
                     </ThemedView>
                 )}
             </ThemedView>

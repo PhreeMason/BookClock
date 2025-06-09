@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, Text } from 'react-native';
 import { BookData, BookListItem } from './BookListItem';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
@@ -23,12 +23,12 @@ export function BookList({
     
     return (
       <ThemedView style={styles.emptyContainer}>
-        <ThemedText style={styles.emptyText}>📚</ThemedText>
+        <Text style={styles.emptyText}>📚</Text>
         <ThemedText type="subtitle" style={styles.emptyTitle}>
           {emptyMessage}
         </ThemedText>
         <ThemedText style={styles.emptySubtitle}>
-          Try searching for different keywords
+          Search should be at least 4 characters long
         </ThemedText>
       </ThemedView>
     );
@@ -76,6 +76,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 32,
     paddingVertical: 64,
+    borderColor: 'red',
+    borderWidth: 1,
   },
   emptyText: {
     fontSize: 64,
