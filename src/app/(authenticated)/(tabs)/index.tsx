@@ -2,15 +2,9 @@ import { SampleBookCard } from '@/components/SampleBookCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { UserAvatar } from '@/components/UserAvatar';
-import {
-  ArcBookWithDetails,
-  getActiveArcBooks,
-  getCompletedArcBooks,
-  getPendingArcBooks
-} from '@/constants/mockData';
 import { useUser } from "@clerk/clerk-expo";
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type FilterTab = 'Active' | 'Pending' | 'Done';
@@ -18,31 +12,6 @@ type FilterTab = 'Active' | 'Pending' | 'Done';
 export default function HomeScreen() {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState<FilterTab>('Active');
-
-  const getFilteredBooks = (): ArcBookWithDetails[] => {
-    switch (activeTab) {
-      case 'Active':
-        return getActiveArcBooks();
-      case 'Pending':
-        return getPendingArcBooks();
-      case 'Done':
-        return getCompletedArcBooks();
-      default:
-        return getActiveArcBooks();
-    }
-  };
-
-  const filteredBooks = getFilteredBooks();
-  const allActiveBooks = getActiveArcBooks();
-  const totalBooks = allActiveBooks.length;
-  const booksThisMonth = allActiveBooks.filter(book => {
-    const bookDate = new Date(book.book.date_added || '');
-    const currentMonth = new Date().getMonth();
-    return bookDate.getMonth() === currentMonth;
-  }).length;
-
-
-
 
   // Helper function to get greeting with user's name
   const getGreeting = () => {
@@ -70,11 +39,11 @@ export default function HomeScreen() {
               <ThemedText type="title" style={styles.greeting}>{getGreeting()}</ThemedText>
               <ThemedView style={styles.statsRow}>
                 <ThemedView style={styles.stat}>
-                  <ThemedText style={styles.statNumber}>{totalBooks}</ThemedText>
+                  <ThemedText style={styles.statNumber}>2</ThemedText>
                   <ThemedText style={styles.statLabel}>Active ARCs</ThemedText>
                 </ThemedView>
                 <ThemedView style={styles.stat}>
-                  <ThemedText style={styles.statNumber}>{booksThisMonth}</ThemedText>
+                  <ThemedText style={styles.statNumber}>6</ThemedText>
                   <ThemedText style={styles.statLabel}>This Month</ThemedText>
                 </ThemedView>
               </ThemedView>
@@ -101,6 +70,7 @@ export default function HomeScreen() {
           ))}
         </ThemedView>
 
+        {/* Content */}
         <SampleBookCard />
         <SampleBookCard bookData={{
           title: 'Playground: A Novel',
@@ -111,18 +81,6 @@ export default function HomeScreen() {
           format: 'Book',
           coverUrl: 'https://m.media-amazon.com/images/I/91rnexU88KL._SL1500_.jpg'
         }} />
-        {/* Content */}
-        <View style={styles.content}>
-
-
-          {filteredBooks.length === 0 && (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>
-                No {activeTab.toLowerCase()} books found
-              </Text>
-            </View>
-          )}
-        </View>
       </ScrollView>
     </SafeAreaView>
   );

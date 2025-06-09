@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/ThemedText"
 import { ThemedView } from "@/components/ThemedView"
 import { useSearchBooks } from '@/hooks/useBooks'
 import { useDebounce } from '@/hooks/useUtils'
+import { router } from "expo-router"
 import { useState } from "react"
 import { StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -25,6 +26,7 @@ export default function SearchScreen() {
     const handleBookPress = (book: BookData) => {
         // TODO: Navigate to book details or handle book selection
         console.log('Book pressed:', book.title);
+        router.push(`/book/${book.api_id}`);
     };
 
     return (
