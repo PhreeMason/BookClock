@@ -21,6 +21,7 @@ const MAPPING = {
   'books.vertical': 'library-books',
   'magnifyingglass': 'search',
   'xmark.circle.fill': 'cancel',
+  'arrow.left': 'arrow-left',
 } as IconMapping;
 
 /**
