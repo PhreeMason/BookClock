@@ -76,8 +76,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 32,
     paddingVertical: 64,
-    borderColor: 'red',
-    borderWidth: 1,
   },
   emptyText: {
     fontSize: 64,
