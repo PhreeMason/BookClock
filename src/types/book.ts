@@ -1,5 +1,23 @@
-// Book-related TypeScript interfaces and types
+import {
+    TablesInsert
+} from '@/types/supabase';
 
+export type StatusEnum = "tbr" | "current" | "completed" | "dnf" | 'pause';
+
+export type BookInsert = TablesInsert<'books'>
+export type UserBookInsert = TablesInsert<'user_books'>
+export type BookAndUserBookInsert = UserBookInsert & BookInsert &
+{
+    status: StatusEnum;
+    currentHours: number;
+    currentMinutes: number;
+    currentPage: number;
+    hours: number;
+    minutes: number;
+    currentPercentage: number;
+    note: string;
+    start_date: string;
+};
 export interface BookMetadata {
   extraction_method?: string;
   authors: string[];
@@ -37,13 +55,4 @@ export interface BookData {
   epub_url?: string;
 }
 
-// Additional utility types
-export type BookSource = 'goodreads' | 'openlibrary' | 'google' | string;
 export type BookFormat = 'physical' | 'digital' | 'audiobook' | string;
-
-// For API responses
-export interface BookApiResponse {
-  data: BookData | null;
-  error?: Error | null;
-  isLoading: boolean;
-} 
