@@ -30,6 +30,7 @@ interface BookListItemProps {
 
 export function BookListItem({ book, onPress }: BookListItemProps) {
   const formatRating = (rating: number) => {
+    if (rating === null) return 'N/A';
     return rating.toFixed(2);
   };
 
@@ -46,6 +47,7 @@ export function BookListItem({ book, onPress }: BookListItemProps) {
   };
 
   const formatRatingsCount = (count: number) => {
+    if (count === null) return 'N/A';
     if (count >= 1000000) {
       return `${(count / 1000000).toFixed(1)}M`;
     } else if (count >= 1000) {
