@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookClock MVP Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #1a1a1a;
+            border-radius: 30px;
+            border: 3px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .header {
+            background: #2d2d2d;
+            padding: 15px 20px;
+            border-bottom: 1px solid #404040;
+        }
+
+        .date-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .date {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .settings-icon {
+            font-size: 20px;
+            color: #b0b0b0;
+            cursor: pointer;
+        }
+
+        .status-summary {
+            font-size: 14px;
+            color: #b0b0b0;
+        }
+
+        .tabs {
+            background: #2d2d2d;
+            display: flex;
+            padding: 0 20px;
+            border-bottom: 1px solid #404040;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #ffffff;
+            border-bottom: 2px solid #ffffff;
+        }
+
+        .tab.inactive {
+            color: #666666;
+        }
+
+        .tab-badge {
+            background: #ef4444;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 12px;
+            margin-left: 5px;
+            display: inline-block;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+        }
+
+        .card.green {
+            border: 3px solid #4ade80;
+        }
+
+        .card.orange {
+            border: 3px solid #fb923c;
+        }
+
+        .card.red {
+            border: 3px solid #ef4444;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+        }
+
+        .countdown {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-right: 16px;
+            min-width: 80px;
+        }
+
+        .countdown-number {
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+        }
+
+        .countdown-number.green {
+            color: #4ade80;
+        }
+
+        .countdown-number.orange {
+            color: #fb923c;
+        }
+
+        .countdown-number.red {
+            color: #ef4444;
+        }
+
+        .countdown-label {
+            font-size: 12px;
+            color: #ffffff;
+            margin-top: 4px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+        }
+
+        .book-info {
+            flex: 1;
+        }
+
+        .book-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+        }
+
+        .book-progress {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .pages-needed {
+            font-size: 14px;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .status-message {
+            font-size: 12px;
+        }
+
+        .status-message.green {
+            color: #4ade80;
+        }
+
+        .status-message.orange {
+            color: #fb923c;
+        }
+
+        .status-message.red {
+            color: #ef4444;
+        }
+
+        .section-header {
+            color: #b0b0b0;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 24px 0 12px 0;
+            padding: 0 4px;
+        }
+
+        .section-header:first-child {
+            margin-top: 0;
+        }
+
+        .waiting-card {
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .waiting-icon {
+            font-size: 24px;
+            margin-right: 16px;
+            opacity: 0.7;
+        }
+
+        .waiting-info {
+            flex: 1;
+        }
+
+        .waiting-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .waiting-status {
+            font-size: 14px;
+            color: #b0b0b0;
+        }
+
+        .source-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px;
+            border-radius: 8px;
+            z-index: 3;
+        }
+
+        .add-button {
+            background: #ffffff;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 12px;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .phone-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>3:27</span>
+            <span>📶 📶 🔋</span>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="date-row">
+                <div class="date">Tuesday, Dec 17</div>
+                <div class="settings-icon">⚙️</div>
+            </div>
+            <div class="status-summary">2 active • 1 needs attention</div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active">Active</div>
+            <div class="tab inactive">
+                Overdue
+                <span class="tab-badge">2</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Active Deadlines Section -->
+            <div class="section-header">Active Deadlines</div>
+
+            <!-- Card 1 - Orange (Behind pace) -->
+            <div class="card orange">
+                <div class="source-icon">📚</div>
+                <div class="card-content">
+                    <div class="countdown">
+                        <div class="countdown-number orange">10</div>
+                        <div class="countdown-label">Days Left</div>
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">Playground: A Novel</div>
+                        <div class="book-progress">
+                            <div class="pages-needed">20 pages/day needed</div>
+                            <div class="status-message orange">A bit more daily</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 - Green (On track) -->
+            <div class="card green">
+                <div class="source-icon">📖</div>
+                <div class="card-content">
+                    <div class="countdown">
+                        <div class="countdown-number green">40</div>
+                        <div class="countdown-label">Days Left</div>
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">The Seven Moons of Maali Almeida</div>
+                        <div class="book-progress">
+                            <div class="pages-needed">5 pages/day needed</div>
+                            <div class="status-message green">You're doing great</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Waiting Section -->
+            <div class="section-header">Waiting</div>
+
+            <!-- Waiting Card 1 - ARC Request -->
+            <div class="waiting-card">
+                <div class="waiting-icon">📋</div>
+                <div class="waiting-info">
+                    <div class="waiting-title">The Atlas Six</div>
+                    <div class="waiting-status">ARC requested • Awaiting approval</div>
+                </div>
+            </div>
+
+            <!-- Waiting Card 2 - Library Hold -->
+            <div class="waiting-card">
+                <div class="waiting-icon">📚</div>
+                <div class="waiting-info">
+                    <div class="waiting-title">Fourth Wing</div>
+                    <div class="waiting-status">Library hold • 3rd in queue</div>
+                </div>
+            </div>
+
+            <!-- Add Button -->
+            <button class="add-button">+ Add New Book</button>
+        </div>
+    </div>
+</body>
+
+</html>

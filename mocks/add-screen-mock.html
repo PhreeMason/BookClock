@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookClock Add Book Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #1a1a1a;
+            border-radius: 30px;
+            border: 3px solid #333;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .header {
+            background: #2d2d2d;
+            padding: 15px 20px;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-button {
+            font-size: 18px;
+            color: #ffffff;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .header-action {
+            font-size: 16px;
+            color: #4ade80;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            min-width: 44px;
+            opacity: 0.5;
+        }
+
+        .header-action.enabled {
+            opacity: 1;
+            font-weight: 600;
+        }
+
+        .content {
+            flex: 1;
+            padding: 24px 20px;
+            overflow-y: auto;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Section Dividers for Better Breathing Room */
+        .section-divider {
+            height: 1px;
+            background: #404040;
+            margin: 32px 0;
+            opacity: 0.5;
+        }
+
+        /* Source Selection - Header Style */
+        .source-header {
+            background: #2d2d2d;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 32px;
+            border: 1px solid #404040;
+        }
+
+        .source-header .form-label {
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        /* Improved Section Spacing */
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .form-section.compact {
+            margin-bottom: 24px;
+        }
+
+        .form-section.primary {
+            margin-bottom: 40px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #2d2d2d;
+            border: 2px solid #404040;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            color: #ffffff;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: #4ade80;
+        }
+
+        .form-input::placeholder {
+            color: #666666;
+        }
+
+        .page-count-container {
+            display: flex;
+            gap: 12px;
+        }
+
+        .page-input {
+            flex: 1;
+        }
+
+        .format-selector {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .format-chip {
+            background: #404040;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #b0b0b0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .format-chip.selected {
+            background: #4ade80;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        /* Date Picker */
+        .date-input {
+            position: relative;
+        }
+
+        .date-input input[type="date"] {
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .date-input input[type="date"]::-webkit-calendar-picker-indicator {
+            background: transparent;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        /* Priority Section */
+        .priority-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .priority-option {
+            flex: 1;
+            background: #2d2d2d;
+            border: 2px solid #404040;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .priority-option.selected {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .priority-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .priority-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: #404040;
+            border-radius: 4px;
+            height: 4px;
+            margin: 0 20px 20px 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #4ade80;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Helper Text */
+        .helper-text {
+            font-size: 13px;
+            color: #666666;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .estimate-text {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid #4ade80;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #4ade80;
+            line-height: 1.4;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            padding: 20px;
+            border-top: 1px solid #404040;
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-button.secondary {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        .nav-button.primary {
+            background: #4ade80;
+            color: #1a1a1a;
+        }
+
+        /* .nav-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        } */
+
+        /* Step Indicators */
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #404040;
+        }
+
+        .step {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #404040;
+            transition: background-color 0.2s ease;
+        }
+
+        .step.active {
+            background: #4ade80;
+        }
+
+        .step.completed {
+            background: #4ade80;
+        }
+
+        /* Screen-specific styling */
+        .intro-text {
+            color: #b0b0b0;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>3:27</span>
+            <span>📶 📶 🔋</span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 25%"></div>
+        </div>
+
+        <!-- Step Indicators -->
+        <div class="steps">
+            <div class="step active" id="step1"></div>
+            <div class="step" id="step2"></div>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <button class="back-button" onclick="goBack()">←</button>
+            <div class="header-title" id="headerTitle">Add New Book</div>
+            <button class="header-action" id="skipButton" onclick="skipStep()" style="display: none;">Skip</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Step 1: Essential Book Info - Reordered -->
+            <div class="screen active" id="screen1">
+                <div class="intro-text">
+                    Add a book with a deadline to track your reading progress.
+                </div>
+                
+                <!-- Primary Book Identity - Most Prominent -->
+                <div class="form-section primary">
+                    <label class="form-label" for="bookTitle">Book Title *</label>
+                    <input type="text" id="bookTitle" class="form-input" placeholder="Enter the book title" oninput="validateForm()" style="font-size: 18px; font-weight: 500;">
+                </div>
+
+                <!-- Format Selection - Critical for Calculations -->
+                <div class="form-section">
+                    <label class="form-label">Format</label>
+                    <div class="format-selector">
+                        <button class="format-chip selected" onclick="selectFormat('physical')">Physical</button>
+                        <button class="format-chip" onclick="selectFormat('ebook')">E-book</button>
+                        <button class="format-chip" onclick="selectFormat('audio')">Audio</button>
+                    </div>
+                    <div class="helper-text">This affects how we calculate your reading pace</div>
+                </div>
+
+                <!-- Source Selection - Less Prominent -->
+                <div class="form-section compact">
+                    <label class="form-label">Where is this book from?</label>
+                    <div class="format-selector">
+                        <button class="format-chip selected" onclick="selectSource('arc')" data-source="arc">
+                            📚 ARC
+                        </button>
+                        <button class="format-chip" onclick="selectSource('library')" data-source="library">
+                            📖 Library
+                        </button>
+                        <button class="format-chip" onclick="selectSource('personal')" data-source="personal">
+                            📗 Personal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Quantity Based on Format -->
+                <div class="form-section">
+                    <label class="form-label" for="bookQuantity" id="quantityLabel">Total Pages</label>
+                    <input type="number" id="bookQuantity" class="form-input" placeholder="How many pages total?" oninput="calculateEstimate()">
+                    <div class="helper-text" id="quantityHelper">We'll use this to calculate your daily reading pace</div>
+                </div>
+
+                <div id="readingEstimate" class="estimate-text" style="display: none;">
+                    📖 About 5 hours of reading time
+                </div>
+            </div>
+
+            <!-- Step 2: Deadline & Details -->
+            <div class="screen" id="screen2">
+                <div class="intro-text">
+                    When do you need to finish, and what are the details?
+                </div>
+
+                <!-- Critical Deadline Info First -->
+                <div class="form-section primary">
+                    <label class="form-label" for="deadline">Deadline Date *</label>
+                    <div class="date-input">
+                        <input type="date" id="deadline" class="form-input" oninput="calculatePace()">
+                    </div>
+                    <div class="helper-text">When do you need to finish reading this book?</div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Secondary Details -->
+                <div class="form-section compact">
+                    <label class="form-label" for="bookAuthor">Author</label>
+                    <input type="text" id="bookAuthor" class="form-input" placeholder="Author name (optional)">
+                </div>
+
+                <div class="form-section compact">
+                    <label class="form-label" for="currentProgress" id="progressLabel">Pages Already Read</label>
+                    <input type="number" id="currentProgress" class="form-input" placeholder="0" value="0" oninput="calculatePace()">
+                    <div class="helper-text" id="progressHelper">How many pages have you already finished?</div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Deadline Flexibility -->
+                <div class="form-section">
+                    <label class="form-label">Deadline Flexibility</label>
+                    <div class="priority-options">
+                        <div class="priority-option selected" onclick="selectPriority('flexible')">
+                            <div class="priority-icon">🕐</div>
+                            <div class="priority-label">Flexible</div>
+                        </div>
+                        <div class="priority-option" onclick="selectPriority('fixed')">
+                            <div class="priority-icon">⚡</div>
+                            <div class="priority-label">Must Meet</div>
+                        </div>
+                    </div>
+                    <div class="helper-text">Can this deadline be adjusted if needed?</div>
+                </div>
+
+                <div id="paceEstimate" class="estimate-text" style="display: none;">
+                    📅 You'll need to read 15 pages/day to finish on time
+                </div>
+
+                <!-- Enhanced Summary Card -->
+                <div style="background: #2d2d2d; border-radius: 16px; padding: 20px; margin-top: 32px; border: 2px solid #404040;" id="summaryCard">
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #4ade80; display: flex; align-items: center;">
+                        <span style="margin-right: 8px;">✓</span>
+                        <span>Ready to Add</span>
+                    </div>
+                    <div style="font-size: 14px; color: #b0b0b0; line-height: 1.5;" id="summaryText">Complete the deadline above to see your reading plan</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+            <button class="nav-button secondary" id="backBtn" onclick="goBack()" style="display: none;">Back</button>
+            <button class="nav-button primary" id="nextBtn" onclick="nextStep()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedSource = 'arc';
+        let selectedFormat = 'physical';
+        let selectedPriority = 'flexible';
+        let formData = {};
+
+        function updateUI() {
+            // Update progress bar
+            const progress = (currentStep / 2) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Update step indicators
+            for (let i = 1; i <= 2; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.className = 'step';
+                if (i < currentStep) step.classList.add('completed');
+                if (i === currentStep) step.classList.add('active');
+            }
+
+            // Update header
+            const titles = ['Book Details', 'Set Deadline'];
+            document.getElementById('headerTitle').textContent = titles[currentStep - 1];
+
+            // Show/hide screens
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(`screen${currentStep}`).classList.add('active');
+
+            // Update navigation buttons
+            const backBtn = document.getElementById('backBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            backBtn.style.display = currentStep === 1 ? 'none' : 'block';
+            
+            if (currentStep === 2) {
+                nextBtn.textContent = 'Add Book';
+                nextBtn.className = 'nav-button primary';
+            } else {
+                nextBtn.textContent = 'Continue';
+                nextBtn.className = 'nav-button primary';
+            }
+
+            validateForm();
+            updateSummary();
+        }
+
+        function selectSource(source) {
+            selectedSource = source;
+            document.querySelectorAll('[data-source]').forEach(chip => {
+                chip.classList.remove('selected');
+            });
+            document.querySelector(`[data-source="${source}"]`).classList.add('selected');
+            validateForm();
+        }
+
+        function selectFormat(format) {
+            selectedFormat = format;
+            document.querySelectorAll('.format-selector .format-chip').forEach(chip => {
+                if (chip.onclick && chip.onclick.toString().includes('selectFormat')) {
+                    chip.classList.remove('selected');
+                }
+            });
+            event.target.classList.add('selected');
+            
+            // Update labels and placeholders based on format
+            updateFormatDependentUI();
+            calculateEstimate();
+        }
+
+        function updateFormatDependentUI() {
+            const quantityLabel = document.getElementById('quantityLabel');
+            const quantityInput = document.getElementById('bookQuantity');
+            const quantityHelper = document.getElementById('quantityHelper');
+            const progressLabel = document.getElementById('progressLabel');
+            const progressInput = document.getElementById('currentProgress');
+            const progressHelper = document.getElementById('progressHelper');
+
+            // Only update if elements exist
+            if (!quantityLabel || !quantityInput || !quantityHelper) return;
+
+            switch(selectedFormat) {
+                case 'physical':
+                    quantityLabel.textContent = 'Total Pages';
+                    quantityInput.placeholder = 'How many pages total?';
+                    quantityHelper.textContent = 'We\'ll use this to calculate your daily reading pace';
+                    if (progressLabel && progressInput && progressHelper) {
+                        progressLabel.textContent = 'Pages Already Read';
+                        progressInput.placeholder = '0';
+                        progressHelper.textContent = 'How many pages have you already finished?';
+                    }
+                    break;
+                case 'ebook':
+                    quantityLabel.textContent = 'Total Pages';
+                    quantityInput.placeholder = 'How many pages or % total?';
+                    quantityHelper.textContent = 'Page count or percentage - we\'ll calculate your daily progress';
+                    if (progressLabel && progressInput && progressHelper) {
+                        progressLabel.textContent = 'Progress Already Made';
+                        progressInput.placeholder = '0';
+                        progressHelper.textContent = 'Pages read or percentage completed';
+                    }
+                    break;
+                case 'audio':
+                    quantityLabel.textContent = 'Total Hours';
+                    quantityInput.placeholder = 'How many hours total?';
+                    quantityHelper.textContent = 'Total audiobook length - we\'ll calculate daily listening time';
+                    if (progressLabel && progressInput && progressHelper) {
+                        progressLabel.textContent = 'Hours Already Listened';
+                        progressInput.placeholder = '0';
+                        progressHelper.textContent = 'How many hours have you already listened?';
+                    }
+                    break;
+            }
+        }
+
+        function selectPriority(priority) {
+            selectedPriority = priority;
+            document.querySelectorAll('.priority-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function calculateEstimate() {
+            const pageCount = parseInt(document.getElementById('pageCount').value) || 0;
+            const currentPage = parseInt(document.getElementById('currentPage').value) || 0;
+            const remainingPages = pageCount - currentPage;
+            
+            if (remainingPages > 0) {
+                const hours = Math.ceil(remainingPages / 60); // Assuming 60 pages per hour
+                document.getElementById('readingEstimate').style.display = 'block';
+                document.getElementById('readingEstimate').textContent = `📖 About ${hours} hours of reading remaining`;
+            } else {
+                document.getElementById('readingEstimate').style.display = 'none';
+            }
+            
+            calculatePace();
+        }
+
+        function calculatePace() {
+            const deadline = document.getElementById('deadline').value;
+            const pageCount = parseInt(document.getElementById('pageCount').value) || 0;
+            const currentPage = parseInt(document.getElementById('currentPage').value) || 0;
+            const remainingPages = pageCount - currentPage;
+            
+            if (deadline && remainingPages > 0) {
+                const today = new Date();
+                const deadlineDate = new Date(deadline);
+                const daysLeft = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
+                
+                if (daysLeft > 0) {
+                    const pagesPerDay = Math.ceil(remainingPages / daysLeft);
+                    document.getElementById('paceEstimate').style.display = 'block';
+                    document.getElementById('paceEstimate').textContent = `📅 You'll need to read ${pagesPerDay} pages/day to finish on time`;
+                } else {
+                    document.getElementById('paceEstimate').style.display = 'block';
+                    document.getElementById('paceEstimate').textContent = `⚠️ This deadline has already passed`;
+                }
+            } else {
+                document.getElementById('paceEstimate').style.display = 'none';
+            }
+            
+            updateSummary();
+        }
+
+        function updateSummary() {
+            if (currentStep !== 2) return;
+            
+            const title = document.getElementById('bookTitle').value.trim();
+            const author = document.getElementById('bookAuthor').value.trim();
+            const deadline = document.getElementById('deadline').value;
+            const pageCount = parseInt(document.getElementById('pageCount').value) || 0;
+            const currentPage = parseInt(document.getElementById('currentPage').value) || 0;
+            const remainingPages = pageCount - currentPage;
+            
+            const summaryCard = document.getElementById('summaryCard');
+            const summaryText = document.getElementById('summaryText');
+            
+            if (title && deadline && pageCount > 0) {
+                const deadlineDate = new Date(deadline);
+                const today = new Date();
+                const daysLeft = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
+                const pagesPerDay = daysLeft > 0 ? Math.ceil(remainingPages / daysLeft) : 0;
+                const deadlineText = deadlineDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const formatText = selectedFormat.charAt(0).toUpperCase() + selectedFormat.slice(1);
+                const sourceIcons = { arc: '📚', library: '📖', personal: '📗' };
+                const flexibilityText = selectedPriority === 'flexible' ? 'Flexible deadline' : 'Fixed deadline';
+                
+                summaryCard.style.borderColor = '#4ade80';
+                summaryText.innerHTML = `
+                    <strong>${title}</strong>${author ? ` by ${author}` : ''}<br>
+                    ${sourceIcons[selectedSource]} ${formatText} • ${pageCount} pages • Due ${deadlineText}<br>
+                    <span style="color: #4ade80; font-weight: 500;">${pagesPerDay} pages/day needed</span> • ${flexibilityText}
+                `;
+            } else {
+                summaryCard.style.borderColor = '#404040';
+                summaryText.textContent = 'Complete the deadline above to see your reading plan';
+            }
+        }
+
+        function validateForm() {
+            const nextBtn = document.getElementById('nextBtn');
+            if (!nextBtn) return;
+            
+            switch(currentStep) {
+                case 1:
+                    const titleInput = document.getElementById('bookTitle');
+                    const quantityInput = document.getElementById('bookQuantity');
+                    const title = titleInput ? titleInput.value.trim() : '';
+                    const quantity = quantityInput ? (parseInt(quantityInput.value) || 0) : 0;
+                    // nextBtn.disabled = !title || quantity <= 0;
+                    break;
+                case 2:
+                    const deadlineInput = document.getElementById('deadline');
+                    const deadline = deadlineInput ? deadlineInput.value : '';
+                    // nextBtn.disabled = !deadline;
+                    break;
+            }
+        }
+
+        function nextStep() {
+            if (currentStep === 2) {
+                // Add book logic here
+                alert('Book added successfully!');
+                return;
+            }
+
+            currentStep++;
+            updateUI();
+        }
+
+        function goBack() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        }
+
+        function skipStep() {
+            // Skip logic if needed
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUI();
+            updateFormatDependentUI();
+            
+            // Set default date to one week from now
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            const deadlineInput = document.getElementById('deadline');
+            if (deadlineInput) {
+                deadlineInput.value = nextWeek.toISOString().split('T')[0];
+            }
+        });
+
+        // Also run immediately in case DOMContentLoaded already fired
+        if (document.readyState === 'loading') {
+            // DOM not ready yet
+        } else {
+            // DOM is ready
+            updateUI();
+            updateFormatDependentUI();
+            
+            // Set default date
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            const deadlineInput = document.getElementById('deadline');
+            if (deadlineInput) {
+                deadlineInput.value = nextWeek.toISOString().split('T')[0];
+            }
+        }
+    </script>
+</body>
+</html>
