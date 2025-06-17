@@ -47,11 +47,12 @@ export function UserAvatar({
   };
 
   return (
-    <ThemedView style={avatarStyle}>
+    <ThemedView style={avatarStyle} testID="user-avatar-container">
       {user?.hasImage && user.imageUrl ? (
         <Image 
           source={{ uri: user.imageUrl }} 
           style={imageStyle}
+          testID="user-avatar-image"
         />
       ) : (
         <ThemedText style={textStyle}>{getUserInitials()}</ThemedText>
