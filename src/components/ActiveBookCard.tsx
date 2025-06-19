@@ -3,7 +3,7 @@
 // color code the countdown number instead of the card border
 import { ThemedText } from '@/components/ThemedText';
 import React from 'react';
-import { Dimensions, ImageBackground, StyleSheet, View } from 'react-native';
+import { ImageBackground, StyleSheet, View } from 'react-native';
 
 interface BookData {
   title: string;
@@ -153,17 +153,11 @@ export function SampleBookCard({ bookData }: SampleBookCardProps) {
   );
 }
 
-const { width } = Dimensions.get('window');
-const cardWidth = width - 32; // 16px margin on each side
-
 const styles = StyleSheet.create({
   card: {
-    width: cardWidth,
     height: 200,
     borderRadius: 16,
     borderWidth: 3,
-    marginVertical: 8,
-    marginHorizontal: 16,
     overflow: 'hidden',
   },
   backgroundImage: {
