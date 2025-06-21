@@ -441,7 +441,7 @@ const NewDeadLine = () => {
                     type: 'success',
                     text1: 'Deadline added successfully!',
                     autoHide: true,
-                    visibilityTime: 1000,
+                    visibilityTime: 2000,
                     position: 'top',
                     onHide: () => {
                         router.back();
