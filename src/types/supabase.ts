@@ -433,19 +433,25 @@ export type Database = {
             }
             reading_deadline_progress: {
                 Row: {
+                    created_at: string | null
                     current_progress: number | null
                     id: string
                     reading_deadline_id: string
+                    updated_at: string | null
                 }
                 Insert: {
+                    created_at?: string | null
                     current_progress?: number | null
                     id: string
                     reading_deadline_id: string
+                    updated_at?: string | null
                 }
                 Update: {
+                    created_at?: string | null
                     current_progress?: number | null
                     id?: string
                     reading_deadline_id?: string
+                    updated_at?: string | null
                 }
                 Relationships: [
                     {
@@ -461,34 +467,40 @@ export type Database = {
                 Row: {
                     author: string | null
                     book_title: string
+                    created_at: string | null
                     deadline_date: string
                     flexibility: Database["public"]["Enums"]["deadline_flexibility"]
                     format: Database["public"]["Enums"]["book_format_enum"]
                     id: string
                     source: string
                     total_quantity: number
+                    updated_at: string | null
                     user_id: string
                 }
                 Insert: {
                     author?: string | null
                     book_title: string
+                    created_at?: string | null
                     deadline_date: string
                     flexibility: Database["public"]["Enums"]["deadline_flexibility"]
                     format: Database["public"]["Enums"]["book_format_enum"]
                     id: string
                     source: string
                     total_quantity: number
+                    updated_at?: string | null
                     user_id: string
                 }
                 Update: {
                     author?: string | null
                     book_title?: string
+                    created_at?: string | null
                     deadline_date?: string
                     flexibility?: Database["public"]["Enums"]["deadline_flexibility"]
                     format?: Database["public"]["Enums"]["book_format_enum"]
                     id?: string
                     source?: string
                     total_quantity?: number
+                    updated_at?: string | null
                     user_id?: string
                 }
                 Relationships: [
