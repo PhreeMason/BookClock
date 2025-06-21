@@ -1,5 +1,5 @@
 import { useSupabase } from "@/lib/supabase";
-import { ReadingDeadlineInsert, ReadingDeadlineProgressInsert } from "@/types/deadline";
+import { ReadingDeadlineInsert, ReadingDeadlineProgressInsert, ReadingDeadlineWithProgress } from "@/types/deadline";
 import { useUser } from "@clerk/clerk-expo";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -54,7 +54,7 @@ export const useGetDeadlines = () => {
     const user = useUser();
     const userId = user?.user?.id;
 
-    return useQuery({
+    return useQuery<ReadingDeadlineWithProgress[]>({
         queryKey: ['deadlines', userId],
         queryFn: async () => {
             if (!userId) throw new Error("User not authenticated");
@@ -68,7 +68,7 @@ export const useGetDeadlines = () => {
                 .order('created_at', { ascending: false });
 
             if (error) throw new Error(error.message);
-            return data;
+            return data as ReadingDeadlineWithProgress[];
         },
         enabled: !!userId,
         refetchOnWindowFocus: false,
