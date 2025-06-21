@@ -1,42 +1,43 @@
-## Custom Reusable Components
-> **Note:** All components can be imported using `@/components/COMPONENT_NAME`
+# R-R-Books
 
-### HapticTab
-**API:** Extends `BottomTabBarButtonProps` from React Navigation  
-**Use Case:** Enhanced tab bar button that provides haptic feedback on iOS devices when pressed. Automatically adds light impact feedback for better user experience in tab navigation.
+A React Native app for tracking reading deadlines and progress.
 
-### SignInWith
-**API:**
-- Props: `{ strategy: 'oauth_google' | 'oauth_apple' }`
-- Exports: `useWarmUpBrowser()` hook
+## Quick Start
 
-**Use Case:** OAuth authentication component for Google and Apple sign-in. Handles the complete SSO flow with Clerk authentication, includes browser warm-up optimization for Android, and displays provider-specific icons.
+```bash
+# Install dependencies
+npm install
 
-### Collapsible
-**API:**
-- Props: `{children: React.Node, title: string}
+# Start the development server
+npm start
+```
 
-**User Case:** Creates an accordion container that opens and closes on user click.
-`
-### SignOutButton
-**API:** No props required  
-**Use Case:** Simple sign-out button that handles user authentication logout via Clerk and redirects to the home page. Displays themed text with touch interaction.
+## Project Structure
 
-### ThemedKeyboardAvoidingView
-**API:** Extends `KeyboardAvoidingViewProps` with optional `lightColor` and `darkColor` props  
-**Use Case:** Theme-aware keyboard avoiding view that automatically adjusts behavior based on platform (iOS: padding, Android: height) and applies theme colors.
+```
+src/
+├── app/                    # Expo Router app directory
+├── components/            # Reusable UI components
+├── lib/                   # Utility functions
+├── hooks/                 # Custom React hooks
+├── types/                 # TypeScript definitions
+└── constants/             # App constants
+```
 
-### ThemedScrollView
-**API:** Extends `ScrollViewProps` with optional `lightColor` and `darkColor` props  
-**Use Case:** Theme-aware scroll view that automatically applies background colors based on the current theme (light/dark mode) with bouncing enabled by default.
+## Key Features
 
-### ThemedView
-**API:** Extends `ViewProps` with optional `lightColor` and `darkColor` props  
-**Use Case:** Basic theme-aware container view that automatically applies background colors based on the current theme context.
+- Reading deadline tracking
+- Progress monitoring
+- Multi-format support (physical, ebook, audio)
+- Theme-aware components
+- OAuth authentication
 
-### ThemedText
-**API:**
-- Extends `TextProps` with optional `lightColor`, `darkColor`, and `type` props
-- Types: `'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link'`
+## Development
 
-**Use Case:** Theme-aware text component with predefined typography styles. Automatically applies theme colors and provides consistent text styling across the app with multiple preset variants.
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for detailed guidelines.
+
+## Documentation
+
+- [Component API Reference](docs/COMPONENTS.md)
+- [Form Architecture](docs/FORMS.md)
+- [Development Guidelines](docs/DEVELOPMENT.md)

@@ -1,13 +1,14 @@
 import { useSupabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 
+
 export const useSearchBooks = (query: string) => {
-    const client = useSupabase();
+    const supabase = useSupabase();
     return useQuery({
         queryKey: ['searchBooks', query],
         queryFn: async () => {
             if (query.length < 4) return null;
-            const { data, error } = await client.functions.invoke('search-books-v2', {
+            const { data, error } = await supabase.functions.invoke('search-books-v2', {
                 body: { query },
             });
             if (error) throw new Error(error.message);
@@ -20,11 +21,11 @@ export const useSearchBooks = (query: string) => {
 }
 
 export const useGetBookData = (api_id: string) => {
-    const client = useSupabase();
+    const supabase = useSupabase();
     return useQuery({
         queryKey: ['bookData', api_id],
         queryFn: async () => {
-            const { data, error } = await client.functions.invoke('book-data', {
+            const { data, error } = await supabase.functions.invoke('book-data', {
                 body: { api_id },
             });
 
@@ -33,6 +34,6 @@ export const useGetBookData = (api_id: string) => {
         },
         enabled: !!api_id,
         refetchOnWindowFocus: false,
-       // staleTime: 1000 * 60 * 60 * 5, // 5 hours
+        // staleTime: 1000 * 60 * 60 * 5, // 5 hours
     });
 }
