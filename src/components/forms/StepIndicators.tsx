@@ -8,10 +8,11 @@ interface StepIndicatorsProps {
 
 export const StepIndicators = ({ currentStep, totalSteps }: StepIndicatorsProps) => {
     return (
-        <View style={styles.stepsContainer}>
+        <View style={styles.stepsContainer} testID="steps-container">
             {Array.from({ length: totalSteps }, (_, index) => (
                 <View
                     key={index}
+                    testID="step-indicator"
                     style={[
                         styles.step,
                         index + 1 === currentStep && styles.stepActive,

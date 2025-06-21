@@ -15,10 +15,11 @@ export const FormatSelector = ({ selectedFormat, onSelectFormat }: FormatSelecto
     ];
 
     return (
-        <View style={styles.formatSelector}>
+        <View style={styles.formatSelector} testID="format-selector">
             {formats.map((format) => (
                 <TouchableOpacity
                     key={format.key}
+                    testID={`format-chip-${format.key}`}
                     style={[
                         styles.formatChip,
                         selectedFormat === format.key && styles.formatChipSelected
