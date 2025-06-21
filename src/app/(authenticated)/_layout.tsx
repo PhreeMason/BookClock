@@ -15,16 +15,7 @@ export default function ProtectedLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name='search' options={{ headerShown: false }} />
       <Stack.Screen name='index' options={{ headerShown: false }} />
-      <Stack.Screen
-        name='book/[api_id]/add'
-        options={{ 
-           animation: 'fade_from_bottom',
-           presentation: 'modal',
-           headerTitle: 'Add to library',
-        }}
-      />
     </Stack>
   );
 }
