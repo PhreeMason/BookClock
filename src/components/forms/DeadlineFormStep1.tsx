@@ -13,7 +13,6 @@ interface DeadlineFormStep1Props {
     selectedSource: 'arc' | 'library' | 'personal';
     onFormatChange: (format: 'physical' | 'ebook' | 'audio') => void;
     onSourceChange: (source: 'arc' | 'library' | 'personal') => void;
-    readingEstimate: string;
 }
 
 export const DeadlineFormStep1 = ({
@@ -21,8 +20,7 @@ export const DeadlineFormStep1 = ({
     selectedFormat,
     selectedSource,
     onFormatChange,
-    onSourceChange,
-    readingEstimate
+    onSourceChange
 }: DeadlineFormStep1Props) => {
     const getTotalQuantityLabel = () => {
         switch (selectedFormat) {
@@ -37,8 +35,6 @@ export const DeadlineFormStep1 = ({
         switch (selectedFormat) {
             case 'audio':
                 return 'Hours';
-            case 'ebook':
-                return 'How many pages or % total?';
             default:
                 return 'How many pages total?';
         }
@@ -106,12 +102,6 @@ export const DeadlineFormStep1 = ({
                     We'll use this to calculate your daily reading pace
                 </ThemedText>
             </View>
-
-            {readingEstimate && (
-                <View style={styles.estimateContainer}>
-                    <ThemedText style={styles.estimateText}>{readingEstimate}</ThemedText>
-                </View>
-            )}
         </View>
     );
 };
@@ -147,18 +137,5 @@ const styles = StyleSheet.create({
         color: '#666666',
         marginTop: 6,
         lineHeight: 18,
-    },
-    estimateContainer: {
-        backgroundColor: 'rgba(74, 222, 128, 0.1)',
-        borderWidth: 1,
-        borderColor: '#4ade80',
-        borderRadius: 8,
-        padding: 14,
-        marginTop: 16,
-    },
-    estimateText: {
-        fontSize: 14,
-        color: '#4ade80',
-        lineHeight: 20,
     },
 }); 
