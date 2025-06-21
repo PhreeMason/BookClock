@@ -1,4 +1,4 @@
-import ActiveBookCard from '@/components/ActiveBookCard'
+import DeadlineCard from '@/components/DeadlineCard'
 import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import { StyleSheet } from 'react-native'
 import { ThemedScrollView } from './ThemedScrollView'
@@ -16,7 +16,7 @@ const OverdueReads = ({deadlines}:{
                 <ThemedText style={styles.pageTitle}>OVERDUE DEADLINES</ThemedText>
                 {overdueDeadlines.length > 0 ? (
                     overdueDeadlines.map((deadline) => (
-                        <ActiveBookCard 
+                        <DeadlineCard 
                             key={deadline.id}
                             deadline={deadline}
                         />

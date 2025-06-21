@@ -15,11 +15,11 @@ const urgencyBorderColorMap = {
   'approaching': '#FB923C',
 }
 
-interface ActiveBookCardProps {
+interface DeadlineCardProps {
   deadline: ReadingDeadlineWithProgress;
 }
 
-export function ActiveBookCard({ deadline }: ActiveBookCardProps) {
+export function DeadlineCard({ deadline }: DeadlineCardProps) {
 
   //  🎧 vs 📱 vs 📖
   const formatEmojiMap = {
@@ -272,4 +272,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ActiveBookCard
+export default DeadlineCard

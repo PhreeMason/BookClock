@@ -3,7 +3,7 @@ import { StyleSheet, Text } from 'react-native'
 import { ThemedText } from './ThemedText'
 import { ThemedView } from './ThemedView'
 
-const WaitingBookCard = () => {
+const WaitingDeadlineCard = () => {
     return (
         <ThemedView style={styles.content}>
             <Text style={styles.icon}>📚</Text>
@@ -15,7 +15,7 @@ const WaitingBookCard = () => {
     )
 }
 
-export default WaitingBookCard
+export default WaitingDeadlineCard
 
 const styles = StyleSheet.create({
     content: {
