@@ -338,7 +338,6 @@ describe('NewDeadLine', () => {
     mockHandleSubmit.mockImplementation((onSubmit) => {
       return () => {
         // Simulate form submission
-        console.log('Form submitted');
       };
     });
     
@@ -445,7 +444,7 @@ describe('NewDeadLine', () => {
 
         // Call the actual addDeadline function
         mockAddDeadline({ deadlineDetails, progressDetails }, 
-          () => console.log('Success'), 
+          () => {}, 
           (error: Error) => console.error('Error:', error)
         );
       };
@@ -528,7 +527,7 @@ describe('NewDeadLine', () => {
 
         // Call the actual addDeadline function
         mockAddDeadline({ deadlineDetails, progressDetails }, 
-          () => console.log('Success'), 
+          () => {}, 
           (error: Error) => console.error('Error:', error)
         );
       };
@@ -611,7 +610,7 @@ describe('NewDeadLine', () => {
 
         // Call the actual addDeadline function
         mockAddDeadline({ deadlineDetails, progressDetails }, 
-          () => console.log('Success'), 
+          () => {}, 
           (error: Error) => console.error('Error:', error)
         );
       };
@@ -786,7 +785,7 @@ describe('NewDeadLine', () => {
 
         // Call addDeadline with error callback
         mockAddDeadline({ deadlineDetails, progressDetails }, 
-          () => console.log('Success'), 
+          () => {}, 
           (error: Error) => {
             // Error callback
             Toast.show({
