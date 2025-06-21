@@ -21,6 +21,37 @@ import {
 
 ## Core UI Components
 
+### DeadlineCard
+**API:**
+- Props: `{ deadline: ReadingDeadlineWithProgress }`
+- Requires: `DeadlineProvider` context (automatically available in authenticated screens)
+
+**Use Case:** Displays a deadline card with visual urgency indicators, progress tracking, and reading pace calculations. Uses the centralized DeadlineProvider for all calculations and data management. Features include:
+- Color-coded urgency levels (overdue, urgent, good, approaching)
+- Days remaining counter with dynamic styling
+- Format-specific emoji indicators (📖 physical, 📱 ebook, 🎧 audio)
+- Reading pace requirements
+- Status messages
+- Background image support with fallback
+
+**Example:**
+```typescript
+import { DeadlineCard } from '@/components/DeadlineCard';
+import { useDeadlines } from '@/contexts/DeadlineProvider';
+
+const MyComponent = () => {
+  const { deadlines } = useDeadlines();
+  
+  return (
+    <View>
+      {deadlines.map(deadline => (
+        <DeadlineCard key={deadline.id} deadline={deadline} />
+      ))}
+    </View>
+  );
+};
+```
+
 ### HapticTab
 **API:** Extends `BottomTabBarButtonProps` from React Navigation  
 **Use Case:** Enhanced tab bar button that provides haptic feedback on iOS devices when pressed. Automatically adds light impact feedback for better user experience in tab navigation.

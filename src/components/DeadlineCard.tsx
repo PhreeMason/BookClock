@@ -2,8 +2,7 @@
 // 250 words per minute or 40 pages per hour
 // color code the countdown number instead of the card border
 import { ThemedText } from '@/components/ThemedText';
-import { calculateCurrentProgress, calculateTotalQuantity } from '@/lib/deadlineCalculations';
-import { calculateDaysLeft, calculateProgress, getUnitForFormat } from '@/lib/deadlineUtils';
+import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import React from 'react';
 import { ImageBackground, StyleSheet, View } from 'react-native';
@@ -20,6 +19,7 @@ interface DeadlineCardProps {
 }
 
 export function DeadlineCard({ deadline }: DeadlineCardProps) {
+  const { getDeadlineCalculations, formatUnitsPerDay } = useDeadlines();
 
   //  🎧 vs 📱 vs 📖
   const formatEmojiMap = {
@@ -28,62 +28,15 @@ export function DeadlineCard({ deadline }: DeadlineCardProps) {
     'ebook': '📱',
   }
 
-  // Calculate units per day needed based on format
-  const calculateUnitsPerDay = (totalQuantity: number, currentProgress: number, daysLeft: number, format: 'physical' | 'ebook' | 'audio'): number => {
-    const total = calculateTotalQuantity(format, totalQuantity);
-    const current = calculateCurrentProgress(format, currentProgress);
-    const remaining = total - current;
-    
-    if (daysLeft <= 0) return remaining;
-    return Math.ceil(remaining / daysLeft);
-  };
+  const {
+    daysLeft,
+    unitsPerDay,
+    urgencyLevel,
+    statusMessage
+  } = getDeadlineCalculations(deadline);
 
-  // Get color coding based on urgency
-  const getUrgencyLevel = (daysLeft: number): 'overdue' | 'urgent' | 'good' | 'approaching' => {
-    if (daysLeft <= 0) return 'overdue';
-    if (daysLeft <= 7) return 'urgent';
-    if (daysLeft <= 14) return 'approaching';
-    return 'good';
-  };
-
-  const getUrgencyColor = (urgencyLevel: string): string => {
-    switch (urgencyLevel) {
-      case 'overdue': return '#DC2626';
-      case 'urgent': return '#EF4444';
-      case 'good': return '#4ADE80';
-      case 'approaching': return '#FB923C';
-      default: return '#4ECDC4';
-    }
-  };
-
-  const getStatusMessage = (urgencyLevel: string): string => {
-    if (urgencyLevel === 'overdue') return 'Return or renew';
-    if (urgencyLevel === 'urgent') return 'Tough timeline';
-    if (urgencyLevel === 'good') return "You're doing great";
-    if (urgencyLevel === 'approaching') return 'A bit more daily';
-    return 'Good';
-  }
-
-  const currentProgress = calculateProgress(deadline);
-  const daysLeft = calculateDaysLeft(deadline.deadline_date);
-  const unitsPerDay = calculateUnitsPerDay(deadline.total_quantity, currentProgress, daysLeft, deadline.format);
-  const urgencyLevel = getUrgencyLevel(daysLeft);
-  const countdownColor = getUrgencyColor(urgencyLevel);
-  const borderColor = getUrgencyColor(urgencyLevel);
-  const unit = getUnitForFormat(deadline.format);
-
-  // Format the units per day display based on format
-  const formatUnitsPerDay = (units: number, format: 'physical' | 'ebook' | 'audio'): string => {
-    if (format === 'audio') {
-      const hours = Math.floor(units / 60);
-      const minutes = units % 60;
-      if (hours > 0) {
-        return `${hours}h ${minutes}m/day needed`;
-      }
-      return `${minutes} minutes/day needed`;
-    }
-    return `${units} ${unit}/day needed`;
-  };
+  const countdownColor = urgencyBorderColorMap[urgencyLevel];
+  const borderColor = urgencyBorderColorMap[urgencyLevel];
 
   // Consolidated book content rendering
   const renderBookContent = () => (
@@ -120,7 +73,7 @@ export function DeadlineCard({ deadline }: DeadlineCardProps) {
           {formatUnitsPerDay(unitsPerDay, deadline.format)}
         </ThemedText>
         <ThemedText style={[styles.statusMessage, { color: countdownColor }]}>
-          {getStatusMessage(urgencyLevel)}
+          {statusMessage}
         </ThemedText>
       </View>
     </View>

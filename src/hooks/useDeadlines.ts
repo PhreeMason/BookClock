@@ -1,12 +1,14 @@
 import { useSupabase } from "@/lib/supabase";
 import { ReadingDeadlineInsert, ReadingDeadlineProgressInsert, ReadingDeadlineWithProgress } from "@/types/deadline";
 import { useUser } from "@clerk/clerk-expo";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useAddDeadline = () => {
     const supabase = useSupabase();
     const user = useUser();
     const userId = user?.user?.id;
+    const queryClient = useQueryClient();
+    
     return useMutation({
         mutationKey: ['addDeadline'],
         mutationFn: async (
@@ -17,10 +19,24 @@ export const useAddDeadline = () => {
                 deadlineDetails: Omit<ReadingDeadlineInsert, 'user_id'>,
                 progressDetails: ReadingDeadlineProgressInsert
             }) => {
-            if (!userId) throw new Error("User not authenticated");
-            const { data: deadlineId } = await supabase.rpc('generate_prefixed_id', { prefix: 'rd' });
-            const { data: progressId } = await supabase.rpc('generate_prefixed_id', { prefix: 'rdp' });
-            deadlineDetails.id = deadlineId
+            if (!userId) {
+                throw new Error("User not authenticated");
+            }
+            
+            // Generate IDs
+            const { data: deadlineId, error: deadlineIdError } = await supabase.rpc('generate_prefixed_id', { prefix: 'rd' });
+            if (deadlineIdError) {
+                console.error('Error generating deadline ID:', deadlineIdError);
+                throw new Error(`Failed to generate deadline ID: ${deadlineIdError.message}`);
+            }
+            
+            const { data: progressId, error: progressIdError } = await supabase.rpc('generate_prefixed_id', { prefix: 'rdp' });
+            if (progressIdError) {
+                console.error('Error generating progress ID:', progressIdError);
+                throw new Error(`Failed to generate progress ID: ${progressIdError.message}`);
+            }
+            
+            deadlineDetails.id = deadlineId;
             progressDetails.id = progressId;
             progressDetails.reading_deadline_id = deadlineId;
 
@@ -31,17 +47,27 @@ export const useAddDeadline = () => {
                 .select()
                 .single();
 
-            if (error) throw new Error(error.message);
-
+            if (error) {
+                console.error('Error inserting deadline:', error);
+                throw new Error(error.message);
+            }
 
             const { data: progressData, error: progressError } = await supabase.from('reading_deadline_progress')
                 .insert(progressDetails)
                 .select()
                 .single();
 
-            if (progressError) throw new Error(progressError.message);
+            if (progressError) {
+                console.error('Error inserting progress:', progressError);
+                throw new Error(progressError.message);
+            }
+            
             data.progress = progressData;
             return data;
+        },
+        onSuccess: () => {
+            // Invalidate and refetch deadlines after successful addition
+            queryClient.invalidateQueries({ queryKey: ['deadlines', userId] });
         },
         onError: (error) => {
             console.error("Error adding deadline:", error);

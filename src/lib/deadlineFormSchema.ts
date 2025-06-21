@@ -11,17 +11,15 @@ export const deadlineFormSchema = z.object({
     }),
     deadline: z.date({
         required_error: 'Deadline is required'
-    }).refine(date => date > new Date(), {
-        message: 'Deadline must be in the future'
     }),
     totalQuantity: z.coerce.number().int().positive({
         message: 'Total must be a positive number'
     }),
-    totalMinutes: z.coerce.number().int().positive({
-        message: 'Minutes must be a positive number'
+    totalMinutes: z.coerce.number().int().min(0, {
+        message: 'Minutes must be 0 or greater'
     }).optional(),
-    currentMinutes: z.coerce.number().int().positive({
-        message: 'Minutes must be a positive number'
+    currentMinutes: z.coerce.number().int().min(0, {
+        message: 'Minutes must be 0 or greater'
     }).optional(),
     currentProgress: z.coerce.number().int().min(0).optional(),
     flexibility: z.enum(['flexible', 'strict'], {
