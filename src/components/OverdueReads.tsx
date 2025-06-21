@@ -1,14 +1,32 @@
 import DeadlineCard from '@/components/DeadlineCard'
-import { ReadingDeadlineWithProgress } from '@/types/deadline'
+import { useDeadlines } from '@/contexts/DeadlineProvider'
 import { StyleSheet } from 'react-native'
 import { ThemedScrollView } from './ThemedScrollView'
 import { ThemedText } from './ThemedText'
 import { ThemedView } from './ThemedView'
 
-const OverdueReads = ({deadlines}:{
-    deadlines?: ReadingDeadlineWithProgress[]
-}) => {
-    const overdueDeadlines: ReadingDeadlineWithProgress[] = deadlines ?? [];
+const OverdueReads = () => {
+    const { overdueDeadlines, isLoading, error } = useDeadlines();
+
+    if (isLoading) {
+        return (
+            <ThemedScrollView>
+                <ThemedView style={styles.container}>
+                    <ThemedText>Loading overdue deadlines...</ThemedText>
+                </ThemedView>
+            </ThemedScrollView>
+        );
+    }
+
+    if (error) {
+        return (
+            <ThemedScrollView>
+                <ThemedView style={styles.container}>
+                    <ThemedText style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
+                </ThemedView>
+            </ThemedScrollView>
+        );
+    }
 
     return (
         <ThemedScrollView>
@@ -46,5 +64,10 @@ const styles = StyleSheet.create({
         color: '#666',
         textAlign: 'center',
         fontStyle: 'italic'
+    },
+    errorText: {
+        fontSize: 14,
+        color: '#DC2626',
+        textAlign: 'center'
     }
 })

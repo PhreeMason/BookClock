@@ -3,19 +3,39 @@ import { ThemedScrollView } from '@/components/ThemedScrollView'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedView } from '@/components/ThemedView'
 import WaitingDeadlineCard from '@/components/WaitingDeadlineCard'
-import { ReadingDeadlineWithProgress } from '@/types/deadline'
+import { useDeadlines } from '@/contexts/DeadlineProvider'
 import { Link } from 'expo-router'
 import { StyleSheet, TouchableOpacity } from 'react-native'
 
-const ActiveReads = ({deadlines}:{
-    deadlines: ReadingDeadlineWithProgress[]
-}) => {
+const ActiveReads = () => {
+    const { activeDeadlines, isLoading, error } = useDeadlines();
+
+    if (isLoading) {
+        return (
+            <ThemedScrollView>
+                <ThemedView style={styles.container}>
+                    <ThemedText>Loading active deadlines...</ThemedText>
+                </ThemedView>
+            </ThemedScrollView>
+        );
+    }
+
+    if (error) {
+        return (
+            <ThemedScrollView>
+                <ThemedView style={styles.container}>
+                    <ThemedText style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
+                </ThemedView>
+            </ThemedScrollView>
+        );
+    }
+
     return (
         <ThemedScrollView>
             <ThemedView style={styles.container}>
                 <ThemedText style={styles.pageTitle}>ACTIVE DEADLINES</ThemedText>
-                {deadlines.length > 0 ? (
-                    deadlines.map((deadline) => (
+                {activeDeadlines.length > 0 ? (
+                    activeDeadlines.map((deadline) => (
                         <DeadlineCard 
                             key={deadline.id}
                             deadline={deadline}
@@ -66,6 +86,11 @@ const styles = StyleSheet.create({
         color: '#666',
         textAlign: 'center',
         fontStyle: 'italic'
+    },
+    errorText: {
+        fontSize: 14,
+        color: '#DC2626',
+        textAlign: 'center'
     },
     addNewButton: {
         margin: 20,
