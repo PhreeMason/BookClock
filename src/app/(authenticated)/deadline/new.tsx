@@ -21,8 +21,7 @@ import {
     calculateCurrentProgressFromForm,
     calculateRemainingFromForm,
     calculateTotalQuantityFromForm,
-    getPaceEstimate,
-    getReadingEstimate
+    getPaceEstimate
 } from '@/lib/deadlineCalculations';
 
 import { DeadlineFormData, deadlineFormSchema } from '@/lib/deadlineFormSchema';
@@ -33,7 +32,6 @@ const NewDeadLine = () => {
     const [selectedSource, setSelectedSource] = useState<'arc' | 'library' | 'personal'>('arc');
     const [selectedPriority, setSelectedPriority] = useState<'flexible' | 'strict'>('flexible');
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [readingEstimate, setReadingEstimate] = useState<string>('');
     const [paceEstimate, setPaceEstimate] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { addDeadline } = useDeadlines();
@@ -65,19 +63,6 @@ const NewDeadLine = () => {
     });
 
     const watchedValues = watch();
-
-    // Calculate reading estimate when format or quantity changes
-    useEffect(() => {
-        const remaining = calculateRemainingFromForm(
-            selectedFormat,
-            watchedValues.totalQuantity || 0,
-            watchedValues.totalMinutes,
-            watchedValues.currentProgress || 0,
-            watchedValues.currentMinutes
-        );
-        
-        setReadingEstimate(getReadingEstimate(selectedFormat, remaining));
-    }, [selectedFormat, watchedValues.totalQuantity, watchedValues.currentProgress, watchedValues.totalMinutes, watchedValues.currentMinutes]);
 
     // Calculate pace estimate when deadline or progress changes
     useEffect(() => {
@@ -243,7 +228,6 @@ const NewDeadLine = () => {
                         selectedSource={selectedSource}
                         onFormatChange={handleFormatChange}
                         onSourceChange={handleSourceChange}
-                        readingEstimate={readingEstimate}
                     />
                 ) : (
                     <DeadlineFormStep2

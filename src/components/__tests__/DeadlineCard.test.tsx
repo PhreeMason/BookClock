@@ -64,6 +64,7 @@ describe('DeadlineCard', () => {
       getUrgencyLevel: jest.fn(),
       getUrgencyColor: jest.fn(),
       getStatusMessage: jest.fn(),
+      getTotalReadingTimePerDay: jest.fn(),
       activeCount: 0,
       overdueCount: 0,
     });

@@ -1,6 +1,5 @@
 import { render } from '@testing-library/react-native';
 import React from 'react';
-import { useForm } from 'react-hook-form';
 import { DeadlineFormStep1 } from '../forms/DeadlineFormStep1';
 
 // Mock the ThemedText component
@@ -98,8 +97,7 @@ const TestComponent = ({
   selectedFormat = 'physical' as 'physical' | 'ebook' | 'audio',
   selectedSource = 'arc' as 'arc' | 'library' | 'personal',
   onFormatChange = jest.fn(),
-  onSourceChange = jest.fn(),
-  readingEstimate = ''
+  onSourceChange = jest.fn()
 }) => {
   const mockControl = {
     register: jest.fn(),
@@ -110,15 +108,6 @@ const TestComponent = ({
     getValues: jest.fn(),
   } as any;
 
-  (useForm as jest.Mock).mockReturnValue({
-    control: mockControl,
-    handleSubmit: jest.fn(),
-    formState: { errors: {} },
-    watch: jest.fn(),
-    setValue: jest.fn(),
-    getValues: jest.fn(),
-  });
-
   return (
     <DeadlineFormStep1
       control={mockControl}
@@ -126,7 +115,6 @@ const TestComponent = ({
       selectedSource={selectedSource}
       onFormatChange={onFormatChange}
       onSourceChange={onSourceChange}
-      readingEstimate={readingEstimate}
     />
   );
 };
@@ -253,7 +241,7 @@ describe('DeadlineFormStep1', () => {
     );
     
     const input = getByTestId('input-totalQuantity');
-    expect(input.props.placeholder).toBe('How many pages or % total?');
+    expect(input.props.placeholder).toBe('How many pages total?');
   });
 
   it('shows correct placeholder for audio format', () => {
@@ -291,32 +279,6 @@ describe('DeadlineFormStep1', () => {
     );
     
     expect(queryByTestId('input-totalMinutes')).toBeNull();
-  });
-
-  it('renders reading estimate when provided', () => {
-    const readingEstimate = 'You need to read 20 pages per day';
-    const { getByText } = render(
-      <TestComponent
-        onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
-        readingEstimate={readingEstimate}
-      />
-    );
-    
-    expect(getByText(readingEstimate)).toBeTruthy();
-  });
-
-  it('does not render reading estimate when not provided', () => {
-    const { queryByTestId } = render(
-      <TestComponent
-        onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
-        readingEstimate=""
-      />
-    );
-    
-    // The estimate container should not be rendered
-    expect(queryByTestId('estimate-container')).toBeNull();
   });
 
   it('renders helper text for format selection', () => {
@@ -379,5 +341,17 @@ describe('DeadlineFormStep1', () => {
     
     const sourceSelector = getByTestId('source-selector');
     expect(sourceSelector).toBeTruthy();
+  });
+
+  it('does not render reading estimate when not provided', () => {
+    const { queryByTestId } = render(
+      <TestComponent
+        onFormatChange={mockOnFormatChange}
+        onSourceChange={mockOnSourceChange}
+      />
+    );
+    
+    // The estimate container should not be rendered
+    expect(queryByTestId('estimate-container')).toBeNull();
   });
 }); 
