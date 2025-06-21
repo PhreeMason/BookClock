@@ -3,25 +3,27 @@ import { ThemedScrollView } from '@/components/ThemedScrollView'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedView } from '@/components/ThemedView'
 import WaitingBookCard from '@/components/WaitingBookCard'
+import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import { Link } from 'expo-router'
 import { StyleSheet, TouchableOpacity } from 'react-native'
 
-
-const ActiveReads = () => {
+const ActiveReads = ({deadlines}:{
+    deadlines: ReadingDeadlineWithProgress[]
+}) => {
     return (
         <ThemedScrollView>
             <ThemedView style={styles.container}>
                 <ThemedText style={styles.pageTitle}>ACTIVE DEADLINES</ThemedText>
-                <ActiveBookCard />
-                <ActiveBookCard bookData={{
-                    title: 'Playground: A Novel',
-                    author: ' Richard Powers',
-                    totalPages: 320,
-                    currentPage: 120,
-                    daysLeft: 10,
-                    format: 'Book',
-                    coverUrl: 'https://m.media-amazon.com/images/I/91rnexU88KL._SL1500_.jpg'
-                }} />
+                {deadlines.length > 0 ? (
+                    deadlines.map((deadline) => (
+                        <ActiveBookCard 
+                            key={deadline.id}
+                            deadline={deadline}
+                        />
+                    ))
+                ) : (
+                    <ThemedText style={styles.emptyText}>No active deadlines</ThemedText>
+                )}
             </ThemedView>
             <ThemedView style={styles.container}>
                 <ThemedText style={styles.pageTitle}>WAITING</ThemedText>
@@ -58,6 +60,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: '#b0b0b0'
+    },
+    emptyText: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+        fontStyle: 'italic'
     },
     addNewButton: {
         margin: 20,

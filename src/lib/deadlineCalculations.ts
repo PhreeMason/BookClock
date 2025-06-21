@@ -8,7 +8,7 @@ export const calculateTotalQuantity = (
     const minutes = typeof totalMinutes === 'string' ? parseInt(totalMinutes) : (totalMinutes || 0);
     
     if (format === 'audio') {
-        return (quantity * 60) + minutes; // Convert hours to minutes and add extra minutes
+        return quantity + minutes; // totalQuantity is already in minutes, just add extra minutes
     }
     return quantity;
 };
@@ -22,7 +22,7 @@ export const calculateCurrentProgress = (
     const minutes = typeof currentMinutes === 'string' ? parseInt(currentMinutes) : (currentMinutes || 0);
     
     if (format === 'audio') {
-        return (progress * 60) + minutes; // Convert hours to minutes and add extra minutes
+        return progress + minutes; // currentProgress is already in minutes, just add extra minutes
     }
     return progress;
 };
