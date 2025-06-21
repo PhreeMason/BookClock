@@ -18,9 +18,9 @@ import {
 } from '@/components/forms';
 
 import {
-    calculateCurrentProgress,
-    calculateRemaining,
-    calculateTotalQuantity,
+    calculateCurrentProgressFromForm,
+    calculateRemainingFromForm,
+    calculateTotalQuantityFromForm,
     getPaceEstimate,
     getReadingEstimate
 } from '@/lib/deadlineCalculations';
@@ -67,7 +67,7 @@ const NewDeadLine = () => {
 
     // Calculate reading estimate when format or quantity changes
     useEffect(() => {
-        const remaining = calculateRemaining(
+        const remaining = calculateRemainingFromForm(
             selectedFormat,
             watchedValues.totalQuantity || 0,
             watchedValues.totalMinutes,
@@ -81,7 +81,7 @@ const NewDeadLine = () => {
     // Calculate pace estimate when deadline or progress changes
     useEffect(() => {
         const deadline = watchedValues.deadline;
-        const remaining = calculateRemaining(
+        const remaining = calculateRemainingFromForm(
             selectedFormat,
             watchedValues.totalQuantity || 0,
             watchedValues.totalMinutes,
@@ -98,7 +98,7 @@ const NewDeadLine = () => {
 
     const onSubmit = (data: DeadlineFormData) => {
         // Calculate total quantity accounting for format
-        const finalTotalQuantity = calculateTotalQuantity(
+        const finalTotalQuantity = calculateTotalQuantityFromForm(
             selectedFormat,
             data.totalQuantity,
             data.totalMinutes
@@ -116,7 +116,7 @@ const NewDeadLine = () => {
         }
 
         // Calculate current progress accounting for format
-        const finalCurrentProgress = calculateCurrentProgress(
+        const finalCurrentProgress = calculateCurrentProgressFromForm(
             selectedFormat,
             data.currentProgress || 0,
             data.currentMinutes

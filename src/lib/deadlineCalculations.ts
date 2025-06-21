@@ -1,4 +1,35 @@
 // Helper functions for deadline calculations
+
+// Functions for processing form data (where totalQuantity is in hours for audio)
+export const calculateTotalQuantityFromForm = (
+    format: 'physical' | 'ebook' | 'audio',
+    totalQuantity: number | string,
+    totalMinutes?: number | string
+): number => {
+    const quantity = typeof totalQuantity === 'string' ? parseInt(totalQuantity) : totalQuantity;
+    const minutes = typeof totalMinutes === 'string' ? parseInt(totalMinutes) : (totalMinutes || 0);
+    
+    if (format === 'audio') {
+        return (quantity * 60) + minutes; // Convert hours to minutes, then add extra minutes
+    }
+    return quantity;
+};
+
+export const calculateCurrentProgressFromForm = (
+    format: 'physical' | 'ebook' | 'audio',
+    currentProgress: number | string,
+    currentMinutes?: number | string
+): number => {
+    const progress = typeof currentProgress === 'string' ? parseInt(currentProgress) : (currentProgress || 0);
+    const minutes = typeof currentMinutes === 'string' ? parseInt(currentMinutes) : (currentMinutes || 0);
+    
+    if (format === 'audio') {
+        return (progress * 60) + minutes; // Convert hours to minutes, then add extra minutes
+    }
+    return progress;
+};
+
+// Functions for processing database data (where totalQuantity is already in minutes for audio)
 export const calculateTotalQuantity = (
     format: 'physical' | 'ebook' | 'audio',
     totalQuantity: number | string,
@@ -36,6 +67,18 @@ export const calculateRemaining = (
 ): number => {
     const total = calculateTotalQuantity(format, totalQuantity, totalMinutes);
     const current = calculateCurrentProgress(format, currentProgress, currentMinutes);
+    return total - current;
+};
+
+export const calculateRemainingFromForm = (
+    format: 'physical' | 'ebook' | 'audio',
+    totalQuantity: number | string,
+    totalMinutes: number | string | undefined,
+    currentProgress: number | string,
+    currentMinutes: number | string | undefined
+): number => {
+    const total = calculateTotalQuantityFromForm(format, totalQuantity, totalMinutes);
+    const current = calculateCurrentProgressFromForm(format, currentProgress, currentMinutes);
     return total - current;
 };
 
@@ -81,6 +124,7 @@ export const getPaceEstimate = (
     const unitsPerDay = Math.ceil(remaining / daysLeft);
     
     if (format === 'audio') {
+        // For audio, remaining is already in minutes, so unitsPerDay is minutes per day
         const hoursPerDay = Math.floor(unitsPerDay / 60);
         const minutesPerDay = unitsPerDay % 60;
         let paceText = '';
