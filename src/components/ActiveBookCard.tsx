@@ -2,18 +2,11 @@
 // 250 words per minute or 40 pages per hour
 // color code the countdown number instead of the card border
 import { ThemedText } from '@/components/ThemedText';
+import { calculateCurrentProgress, calculateTotalQuantity } from '@/lib/deadlineCalculations';
+import { calculateDaysLeft, calculateProgress, getUnitForFormat } from '@/lib/deadlineUtils';
+import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import React from 'react';
-import { Dimensions, ImageBackground, StyleSheet, View } from 'react-native';
-
-interface BookData {
-  title: string;
-  author: string;
-  totalPages: number;
-  currentPage: number;
-  daysLeft: number;
-  format: 'Book' | 'Audio' | 'Ebook';
-  coverUrl?: string;
-}
+import { ImageBackground, StyleSheet, View } from 'react-native';
 
 const urgencyBorderColorMap = {
   'overdue': '#DC2626',
@@ -22,41 +15,27 @@ const urgencyBorderColorMap = {
   'approaching': '#FB923C',
 }
 
-interface SampleBookCardProps {
-  bookData?: BookData;
+interface ActiveBookCardProps {
+  deadline: ReadingDeadlineWithProgress;
 }
 
-export function SampleBookCard({ bookData }: SampleBookCardProps) {
-
-  // Default book data for the sample
-  const getBookData = (): BookData => {
-    return bookData || {
-      title: 'The Seven Moons of Maali Almeida',
-      author: 'Shehan Karunatilaka',
-      totalPages: 320,
-      currentPage: 120,
-      daysLeft: 40,
-      format: 'Book',
-      coverUrl: 'https://m.media-amazon.com/images/I/81MF6Z0s1oL._SL1500_.jpg'
-    };
-  };
+export function ActiveBookCard({ deadline }: ActiveBookCardProps) {
 
   //  🎧 vs 📱 vs 📖
   const formatEmojiMap = {
-    'Book': '📖',
-    'Audio': '🎧',
-    'Ebook': '📱',
+    'physical': '📖',
+    'audio': '🎧',
+    'ebook': '📱',
   }
-  // Calculate pages per day needed based on industry standard
-  const calculatePagesPerDay = (totalPages: number, currentPage: number, daysLeft: number): number => {
-    const remainingPages = totalPages - currentPage;
-    if (daysLeft <= 0) return remainingPages;
-    return Math.ceil(remainingPages / daysLeft);
-  };
 
-  // Calculate hours per day needed (40 pages per hour industry standard)
-  const calculateHoursPerDay = (pagesPerDay: number): number => {
-    return Math.round((pagesPerDay / 40) * 10) / 10; // Round to 1 decimal place
+  // Calculate units per day needed based on format
+  const calculateUnitsPerDay = (totalQuantity: number, currentProgress: number, daysLeft: number, format: 'physical' | 'ebook' | 'audio'): number => {
+    const total = calculateTotalQuantity(format, totalQuantity);
+    const current = calculateCurrentProgress(format, currentProgress);
+    const remaining = total - current;
+    
+    if (daysLeft <= 0) return remaining;
+    return Math.ceil(remaining / daysLeft);
   };
 
   // Get color coding based on urgency
@@ -85,12 +64,26 @@ export function SampleBookCard({ bookData }: SampleBookCardProps) {
     return 'Good';
   }
 
-
-  const currentBookData = getBookData();
-  const pagesPerDay = calculatePagesPerDay(currentBookData.totalPages, currentBookData.currentPage, currentBookData.daysLeft);
-  const urgencyLevel = getUrgencyLevel(currentBookData.daysLeft);
+  const currentProgress = calculateProgress(deadline);
+  const daysLeft = calculateDaysLeft(deadline.deadline_date);
+  const unitsPerDay = calculateUnitsPerDay(deadline.total_quantity, currentProgress, daysLeft, deadline.format);
+  const urgencyLevel = getUrgencyLevel(daysLeft);
   const countdownColor = getUrgencyColor(urgencyLevel);
   const borderColor = getUrgencyColor(urgencyLevel);
+  const unit = getUnitForFormat(deadline.format);
+
+  // Format the units per day display based on format
+  const formatUnitsPerDay = (units: number, format: 'physical' | 'ebook' | 'audio'): string => {
+    if (format === 'audio') {
+      const hours = Math.floor(units / 60);
+      const minutes = units % 60;
+      if (hours > 0) {
+        return `${hours}h ${minutes}m/day needed`;
+      }
+      return `${minutes} minutes/day needed`;
+    }
+    return `${units} ${unit}/day needed`;
+  };
 
   // Consolidated book content rendering
   const renderBookContent = () => (
@@ -99,7 +92,7 @@ export function SampleBookCard({ bookData }: SampleBookCardProps) {
         {/* Days Left Counter - Top Left */}
         <View style={styles.daysLeftContainer}>
           <ThemedText type='title' style={[styles.daysLeftNumber, { color: countdownColor }]}>
-            {currentBookData.daysLeft}
+            {daysLeft}
           </ThemedText>
           <ThemedText style={styles.daysLeftLabel}>
             Days Left
@@ -109,14 +102,14 @@ export function SampleBookCard({ bookData }: SampleBookCardProps) {
         {/* Centered Title and Author */}
         <View style={styles.titleContainer}>
           <ThemedText style={styles.title} numberOfLines={2}>
-            {currentBookData.title}
+            {deadline.book_title}
           </ThemedText>
         </View>
 
         {/* Type and Format Badges - Top Right */}
         <View style={styles.badgesContainer}>
           <View style={styles.formatBadge}>
-            <ThemedText style={styles.formatBadgeText}>{formatEmojiMap[currentBookData.format]}</ThemedText>
+            <ThemedText style={styles.formatBadgeText}>{formatEmojiMap[deadline.format]}</ThemedText>
           </View>
         </View>
       </View>
@@ -124,7 +117,7 @@ export function SampleBookCard({ bookData }: SampleBookCardProps) {
       {/* Reading Statistics - Bottom */}
       <View style={styles.statsContainer}>
         <ThemedText style={[styles.pagesPerDay]}>
-          {pagesPerDay} pages/day needed
+          {formatUnitsPerDay(unitsPerDay, deadline.format)}
         </ThemedText>
         <ThemedText style={[styles.statusMessage, { color: countdownColor }]}>
           {getStatusMessage(urgencyLevel)}
@@ -135,9 +128,9 @@ export function SampleBookCard({ bookData }: SampleBookCardProps) {
 
   return (
     <View style={[styles.card, { borderColor }]}>
-      {currentBookData.coverUrl ? (
+      {true ? (
         <ImageBackground
-          source={{ uri: currentBookData.coverUrl }}
+          source={{ uri: 'https://m.media-amazon.com/images/I/91rnexU88KL._SL1500_.jpg' }}
           style={styles.backgroundImage}
           blurRadius={50}
         >
@@ -153,17 +146,11 @@ export function SampleBookCard({ bookData }: SampleBookCardProps) {
   );
 }
 
-const { width } = Dimensions.get('window');
-const cardWidth = width - 32; // 16px margin on each side
-
 const styles = StyleSheet.create({
   card: {
-    width: cardWidth,
     height: 200,
     borderRadius: 16,
     borderWidth: 3,
-    marginVertical: 8,
-    marginHorizontal: 16,
     overflow: 'hidden',
   },
   backgroundImage: {
@@ -285,4 +272,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SampleBookCard
+export default ActiveBookCard
