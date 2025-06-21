@@ -7,13 +7,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const TopTabs = createMaterialTopTabNavigator();
 
 export default function MyTabs() {
-    const { activeCount, overdueCount } = useDeadlines();
+    const { activeCount, overdueCount, getTotalReadingTimePerDay } = useDeadlines();
     
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <Header
                 activeCount={activeCount}
                 attentionCount={overdueCount}
+                totalReadingTimePerDay={getTotalReadingTimePerDay()}
             />
             <TopTabs.Navigator
                 screenOptions={{

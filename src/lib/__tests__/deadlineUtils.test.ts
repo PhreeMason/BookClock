@@ -4,8 +4,10 @@ import {
     calculateProgress,
     calculateProgressPercentage,
     formatProgressDisplay,
+    getTotalReadingTimePerDay,
     getUnitForFormat,
-    separateDeadlines
+    separateDeadlines,
+    sortDeadlines
 } from '../deadlineUtils';
 
 // Mock data for testing
@@ -67,7 +69,7 @@ describe('deadlineUtils', () => {
       expect(result.active).toHaveLength(2);
       expect(result.overdue).toHaveLength(2);
       expect(result.active.map(d => d.id)).toEqual(['1', '3']);
-      expect(result.overdue.map(d => d.id)).toEqual(['2', '4']);
+      expect(result.overdue.map(d => d.id)).toEqual(['4', '2']);
     });
 
     it('should handle empty array', () => {
@@ -287,6 +289,164 @@ describe('deadlineUtils', () => {
       expect(formatProgressDisplay('audio', 1)).toBe('1m');
       expect(formatProgressDisplay('audio', 59)).toBe('59m');
       expect(formatProgressDisplay('audio', 3600)).toBe('60h 0m'); // 60 hours
+    });
+  });
+
+  describe('sortDeadlines', () => {
+    it('should sort by due date first (earliest first)', () => {
+      const deadline1 = createMockDeadline('1', '2024-01-20T00:00:00Z');
+      const deadline2 = createMockDeadline('2', '2024-01-15T00:00:00Z');
+      const deadline3 = createMockDeadline('3', '2024-01-25T00:00:00Z');
+
+      const deadlines = [deadline1, deadline2, deadline3];
+      deadlines.sort(sortDeadlines);
+
+      expect(deadlines.map(d => d.id)).toEqual(['2', '1', '3']);
+    });
+
+    it('should sort by updated_at when due dates are equal (most recent first)', () => {
+      const deadline1 = createMockDeadline('1', '2024-01-20T00:00:00Z');
+      deadline1.updated_at = '2024-01-10T00:00:00Z';
+      
+      const deadline2 = createMockDeadline('2', '2024-01-20T00:00:00Z');
+      deadline2.updated_at = '2024-01-15T00:00:00Z';
+      
+      const deadline3 = createMockDeadline('3', '2024-01-20T00:00:00Z');
+      deadline3.updated_at = '2024-01-05T00:00:00Z';
+
+      const deadlines = [deadline1, deadline2, deadline3];
+      deadlines.sort(sortDeadlines);
+
+      expect(deadlines.map(d => d.id)).toEqual(['2', '1', '3']);
+    });
+
+    it('should sort by created_at when updated_at dates are equal (most recent first)', () => {
+      const deadline1 = createMockDeadline('1', '2024-01-20T00:00:00Z');
+      deadline1.updated_at = '2024-01-10T00:00:00Z';
+      deadline1.created_at = '2024-01-05T00:00:00Z';
+      
+      const deadline2 = createMockDeadline('2', '2024-01-20T00:00:00Z');
+      deadline2.updated_at = '2024-01-10T00:00:00Z';
+      deadline2.created_at = '2024-01-15T00:00:00Z';
+      
+      const deadline3 = createMockDeadline('3', '2024-01-20T00:00:00Z');
+      deadline3.updated_at = '2024-01-10T00:00:00Z';
+      deadline3.created_at = '2024-01-01T00:00:00Z';
+
+      const deadlines = [deadline1, deadline2, deadline3];
+      deadlines.sort(sortDeadlines);
+
+      expect(deadlines.map(d => d.id)).toEqual(['2', '1', '3']);
+    });
+
+    it('should handle null updated_at and created_at values', () => {
+      const deadline1 = createMockDeadline('1', '2024-01-20T00:00:00Z');
+      deadline1.updated_at = null;
+      deadline1.created_at = null;
+      
+      const deadline2 = createMockDeadline('2', '2024-01-20T00:00:00Z');
+      deadline2.updated_at = '2024-01-10T00:00:00Z';
+      deadline2.created_at = '2024-01-05T00:00:00Z';
+
+      const deadlines = [deadline1, deadline2];
+      deadlines.sort(sortDeadlines);
+
+      expect(deadlines.map(d => d.id)).toEqual(['2', '1']);
+    });
+
+    it('should maintain stable sort for identical deadlines', () => {
+      const deadline1 = createMockDeadline('1', '2024-01-20T00:00:00Z');
+      const deadline2 = createMockDeadline('2', '2024-01-20T00:00:00Z');
+      deadline2.updated_at = deadline1.updated_at;
+      deadline2.created_at = deadline1.created_at;
+
+      const deadlines = [deadline1, deadline2];
+      deadlines.sort(sortDeadlines);
+
+      // Should maintain original order for identical dates
+      expect(deadlines.map(d => d.id)).toEqual(['1', '2']);
+    });
+  });
+
+  describe('getTotalReadingTimePerDay', () => {
+    const mockGetDeadlineCalculations = (deadline: ReadingDeadlineWithProgress) => ({
+      unitsPerDay: deadline.format === 'audio' ? 30 : 15 // 30 minutes for audio, 15 pages for others
+    });
+
+    it('should return "No active deadlines" for empty array', () => {
+      const result = getTotalReadingTimePerDay([], mockGetDeadlineCalculations);
+      expect(result).toBe('No active deadlines');
+    });
+
+    it('should calculate total time for single audio deadline', () => {
+      const deadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'audio', 180);
+      const result = getTotalReadingTimePerDay([deadline], mockGetDeadlineCalculations);
+      expect(result).toBe('30m/day needed');
+    });
+
+    it('should calculate total time for single physical deadline', () => {
+      const deadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'physical', 300);
+      const result = getTotalReadingTimePerDay([deadline], mockGetDeadlineCalculations);
+      expect(result).toBe('23m/day needed'); // 15 pages * 1.5 minutes = 22.5 minutes, rounded to 23
+    });
+
+    it('should calculate total time for single ebook deadline', () => {
+      const deadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'ebook', 400);
+      const result = getTotalReadingTimePerDay([deadline], mockGetDeadlineCalculations);
+      expect(result).toBe('23m/day needed'); // 15 pages * 1.5 minutes = 22.5 minutes, rounded to 23
+    });
+
+    it('should calculate total time for multiple deadlines', () => {
+      const audioDeadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'audio', 180);
+      const physicalDeadline = createMockDeadline('2', '2024-01-25T00:00:00Z', 'physical', 300);
+      
+      const result = getTotalReadingTimePerDay([audioDeadline, physicalDeadline], mockGetDeadlineCalculations);
+      expect(result).toBe('53m/day needed'); // 30m + (15*1.5)m = 30m + 22.5m = 52.5m, rounded to 53
+    });
+
+    it('should format hours and minutes correctly', () => {
+      const mockCalculations = (deadline: ReadingDeadlineWithProgress) => ({
+        unitsPerDay: deadline.format === 'audio' ? 90 : 45 // 90 minutes for audio, 45 pages for others
+      });
+
+      const audioDeadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'audio', 180);
+      const physicalDeadline = createMockDeadline('2', '2024-01-25T00:00:00Z', 'physical', 300);
+      
+      const result = getTotalReadingTimePerDay([audioDeadline, physicalDeadline], mockCalculations);
+      expect(result).toBe('2h 38m/day needed'); // 90m + (45*1.5)m = 90m + 67.5m = 157.5m = 2h 37.5m, rounded to 2h 38m
+    });
+
+    it('should format hours and minutes with remainder', () => {
+      const mockCalculations = (deadline: ReadingDeadlineWithProgress) => ({
+        unitsPerDay: deadline.format === 'audio' ? 45 : 20 // 45 minutes for audio, 20 pages for others
+      });
+
+      const audioDeadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'audio', 180);
+      const physicalDeadline = createMockDeadline('2', '2024-01-25T00:00:00Z', 'physical', 300);
+      
+      const result = getTotalReadingTimePerDay([audioDeadline, physicalDeadline], mockCalculations);
+      expect(result).toBe('1h 15m/day needed'); // 45m + (20*1.5)m = 45m + 30m = 75m = 1h 15m
+    });
+
+    it('should round minutes correctly', () => {
+      const mockCalculations = (deadline: ReadingDeadlineWithProgress) => ({
+        unitsPerDay: deadline.format === 'audio' ? 30 : 12.7 // 30 minutes for audio, 12.7 pages for others
+      });
+
+      const physicalDeadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'physical', 300);
+      
+      const result = getTotalReadingTimePerDay([physicalDeadline], mockCalculations);
+      expect(result).toBe('19m/day needed'); // 12.7 * 1.5 = 19.05, rounded to 19
+    });
+
+    it('should handle zero units per day', () => {
+      const mockCalculations = (deadline: ReadingDeadlineWithProgress) => ({
+        unitsPerDay: 0
+      });
+
+      const deadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'physical', 300);
+      const result = getTotalReadingTimePerDay([deadline], mockCalculations);
+      expect(result).toBe('0m/day needed');
     });
   });
 }); 

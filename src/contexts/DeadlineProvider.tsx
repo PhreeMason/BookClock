@@ -6,7 +6,7 @@ import {
     getPaceEstimate,
     getReadingEstimate
 } from '@/lib/deadlineCalculations';
-import { calculateDaysLeft, calculateProgress, calculateProgressPercentage, getUnitForFormat, separateDeadlines } from '@/lib/deadlineUtils';
+import { calculateDaysLeft, calculateProgress, calculateProgressPercentage, getTotalReadingTimePerDay, getUnitForFormat, separateDeadlines } from '@/lib/deadlineUtils';
 import { ReadingDeadlineInsert, ReadingDeadlineProgressInsert, ReadingDeadlineWithProgress } from '@/types/deadline';
 import React, { createContext, ReactNode, useContext } from 'react';
 
@@ -50,6 +50,9 @@ interface DeadlineContextType {
   // Counts
   activeCount: number;
   overdueCount: number;
+  
+  // Summary calculations
+  getTotalReadingTimePerDay: () => string;
 }
 
 const DeadlineContext = createContext<DeadlineContextType | undefined>(undefined);
@@ -196,6 +199,11 @@ export const DeadlineProvider: React.FC<DeadlineProviderProps> = ({ children }) 
     // Counts
     activeCount: activeDeadlines.length,
     overdueCount: overdueDeadlines.length,
+    
+    // Summary calculations
+    getTotalReadingTimePerDay: () => {
+      return getTotalReadingTimePerDay(activeDeadlines, getDeadlineCalculations);
+    },
   };
 
   return (
