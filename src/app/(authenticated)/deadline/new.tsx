@@ -1,12 +1,12 @@
 import { ThemedScrollView } from '@/components/ThemedScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useAddDeadline } from '@/hooks/useDeadlines';
+import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import {
@@ -35,7 +35,8 @@ const NewDeadLine = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [readingEstimate, setReadingEstimate] = useState<string>('');
     const [paceEstimate, setPaceEstimate] = useState<string>('');
-    const { mutate: addDeadline } = useAddDeadline();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { addDeadline } = useDeadlines();
 
     const formSteps = ['Book Details', 'Set Deadline'];
     const totalSteps = formSteps.length;
@@ -46,7 +47,7 @@ const NewDeadLine = () => {
         watch,
         setValue,
         trigger,
-        formState: { errors, isValid }
+        formState: { errors, isValid, isSubmitting: formIsSubmitting }
     } = useForm<DeadlineFormData>({
         resolver: zodResolver(deadlineFormSchema),
         defaultValues: {
@@ -97,6 +98,14 @@ const NewDeadLine = () => {
     }, [selectedFormat, watchedValues.deadline, watchedValues.totalQuantity, watchedValues.totalMinutes, watchedValues.currentProgress, watchedValues.currentMinutes]);
 
     const onSubmit = (data: DeadlineFormData) => {
+        if (isSubmitting) {
+            console.log('Already submitting, ignoring duplicate submission');
+            return;
+        }
+        
+        console.log('Form submission started');
+        setIsSubmitting(true);
+        
         // Calculate total quantity accounting for format
         const finalTotalQuantity = calculateTotalQuantityFromForm(
             selectedFormat,
@@ -128,11 +137,15 @@ const NewDeadLine = () => {
             reading_deadline_id: '' // This will be set after the deadline is created
         };
 
-        addDeadline({
-            deadlineDetails,
-            progressDetails
-        }, {
-            onSuccess: (data) => {
+        addDeadline(
+            {
+                deadlineDetails,
+                progressDetails
+            },
+            // Success callback
+            () => {
+                console.log('Deadline added successfully');
+                setIsSubmitting(false);
                 Toast.show({
                     type: 'success',
                     text1: 'Deadline added successfully!',
@@ -144,24 +157,55 @@ const NewDeadLine = () => {
                     }
                 });
             },
-            onError: (error) => {
-                Alert.alert('Error', error.message || 'Failed to add deadline');
+            // Error callback
+            (error) => {
+                console.error('Failed to add deadline:', error);
+                setIsSubmitting(false);
+                Toast.show({
+                    type: 'error',
+                    text1: 'Failed to add deadline',
+                    text2: error.message || 'Please try again',
+                    autoHide: true,
+                    visibilityTime: 3000,
+                    position: 'top'
+                });
             }
-        })
+        );
     };
 
     const nextStep = async () => {
         if (currentStep < totalSteps) {
-            const result = await trigger([
+            const fieldsToValidate: (keyof DeadlineFormData)[] = [
                 'bookTitle',
                 'format',
                 'source',
                 'totalQuantity',
-            ]);
+            ];
+            
+            // Add totalMinutes validation for audio format
+            if (selectedFormat === 'audio') {
+                fieldsToValidate.push('totalMinutes');
+            }
+            
+            console.log('Validating fields:', fieldsToValidate);
+            console.log('Current form values:', watchedValues);
+            console.log('Current form errors:', errors);
+            
+            const result = await trigger(fieldsToValidate);
+            console.log('Validation result:', result);
+            
+            if (!result) {
+                console.log('Validation failed. Form errors:', errors);
+                console.log('Form is submitting:', formIsSubmitting);
+            }
+            
             if (result) {
                 setCurrentStep(currentStep + 1);
             }
         } else {
+            console.log('Submitting form...');
+            console.log('Form is valid:', isValid);
+            console.log('Form errors:', errors);
             handleSubmit(onSubmit)();
         }
     };
@@ -240,11 +284,12 @@ const NewDeadLine = () => {
                     </TouchableOpacity>
                 )}
                 <TouchableOpacity
-                    style={styles.navButtonPrimary}
+                    style={[styles.navButtonPrimary, isSubmitting && styles.navButtonDisabled]}
                     onPress={nextStep}
+                    disabled={isSubmitting}
                 >
                     <ThemedText style={styles.navButtonPrimaryText}>
-                        {currentStep === totalSteps ? 'Add Book' : 'Continue'}
+                        {isSubmitting ? 'Adding...' : (currentStep === totalSteps ? 'Add Book' : 'Continue')}
                     </ThemedText>
                 </TouchableOpacity>
             </View>
@@ -292,5 +337,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: '#1a1a1a',
+    },
+    navButtonDisabled: {
+        backgroundColor: '#6b7280',
+        opacity: 0.6,
     },
 });

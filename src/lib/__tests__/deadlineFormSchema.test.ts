@@ -137,24 +137,18 @@ describe('deadlineFormSchema', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should reject past date', () => {
+    it('should accept past date', () => {
       const pastDate = new Date('2025-01-10T12:00:00Z'); // Past relative to mocked time
       const data = { ...validFormData, deadline: pastDate };
       const result = deadlineFormSchema.safeParse(data);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Deadline must be in the future');
-      }
+      expect(result.success).toBe(true);
     });
 
-    it('should reject current date', () => {
+    it('should accept current date', () => {
       const currentDate = new Date('2025-01-15T12:00:00Z'); // Same as mocked time
       const data = { ...validFormData, deadline: currentDate };
       const result = deadlineFormSchema.safeParse(data);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Deadline must be in the future');
-      }
+      expect(result.success).toBe(true);
     });
 
     it('should reject missing deadline', () => {
@@ -233,13 +227,10 @@ describe('deadlineFormSchema', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should reject zero', () => {
+    it('should accept zero', () => {
       const data = { ...validFormData, totalMinutes: 0 };
       const result = deadlineFormSchema.safeParse(data);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Minutes must be a positive number');
-      }
+      expect(result.success).toBe(true);
     });
 
     it('should reject negative numbers', () => {
@@ -247,7 +238,7 @@ describe('deadlineFormSchema', () => {
       const result = deadlineFormSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Minutes must be a positive number');
+        expect(result.error.issues[0].message).toBe('Minutes must be 0 or greater');
       }
     });
   });
@@ -274,13 +265,10 @@ describe('deadlineFormSchema', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should reject zero', () => {
+    it('should accept zero', () => {
       const data = { ...validFormData, currentMinutes: 0 };
       const result = deadlineFormSchema.safeParse(data);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Minutes must be a positive number');
-      }
+      expect(result.success).toBe(true);
     });
 
     it('should reject negative numbers', () => {
@@ -288,7 +276,7 @@ describe('deadlineFormSchema', () => {
       const result = deadlineFormSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Minutes must be a positive number');
+        expect(result.error.issues[0].message).toBe('Minutes must be 0 or greater');
       }
     });
   });

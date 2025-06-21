@@ -72,7 +72,6 @@ export const DeadlineFormStep2 = ({
                                         mode="date"
                                         display="inline"
                                         onChange={onDateChange}
-                                        minimumDate={new Date()}
                                     />
                                 )}
                             </TouchableOpacity>
@@ -80,7 +79,7 @@ export const DeadlineFormStep2 = ({
                     )}
                 />
                 <ThemedText style={styles.helperText}>
-                    When do you need to finish reading this book?
+                    When do you need to finish reading this book? (Past dates will be marked as overdue)
                 </ThemedText>
             </View>
 
@@ -139,8 +138,14 @@ export const DeadlineFormStep2 = ({
             </View>
 
             {paceEstimate && (
-                <View style={styles.estimateContainer}>
-                    <ThemedText style={styles.estimateText}>{paceEstimate}</ThemedText>
+                <View style={[
+                    styles.estimateContainer,
+                    paceEstimate.includes('⚠️ This deadline has already passed') && styles.estimateContainerWarning
+                ]}>
+                    <ThemedText style={[
+                        styles.estimateText,
+                        paceEstimate.includes('⚠️ This deadline has already passed') && styles.estimateTextWarning
+                    ]}>{paceEstimate}</ThemedText>
                 </View>
             )}
 
@@ -203,10 +208,17 @@ const styles = StyleSheet.create({
         padding: 14,
         marginTop: 16,
     },
+    estimateContainerWarning: {
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        borderColor: '#ef4444',
+    },
     estimateText: {
         fontSize: 14,
         color: '#4ade80',
         lineHeight: 20,
+    },
+    estimateTextWarning: {
+        color: '#ef4444',
     },
     summaryCard: {
         backgroundColor: '#2d2d2d',
