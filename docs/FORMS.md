@@ -32,7 +32,7 @@ The app uses a modular form architecture for complex multi-step forms.
 // Main form component
 import { DeadlineFormStep1, DeadlineFormStep2 } from '@/components/forms';
 import { deadlineFormSchema, DeadlineFormData } from '@/lib/deadlineFormSchema';
-import { calculateRemaining, getReadingEstimate } from '@/lib/deadlineCalculations';
+import { calculateRemaining, getPaceEstimate } from '@/lib/deadlineCalculations';
 
 const MyForm = () => {
   const { control, watch } = useForm<DeadlineFormData>({
@@ -45,7 +45,9 @@ const MyForm = () => {
         <DeadlineFormStep1 
           control={control}
           selectedFormat={format}
+          selectedSource={source}
           onFormatChange={handleFormatChange}
+          onSourceChange={handleSourceChange}
         />
       ) : (
         <DeadlineFormStep2 
@@ -67,6 +69,21 @@ const MyForm = () => {
 ```
 
 ## Form Step Details
+
+### DeadlineFormStep1
+**Props:**
+- `control`: React Hook Form control object
+- `selectedFormat`: Current format selection ('physical' | 'ebook' | 'audio')
+- `selectedSource`: Current source selection ('arc' | 'library' | 'personal')
+- `onFormatChange`: Callback for format changes
+- `onSourceChange`: Callback for source changes
+
+**Features:**
+- Book title input
+- Format selection (physical/ebook/audio)
+- Source selection (ARC/library/personal)
+- Total quantity input (pages for physical/ebook, time for audio)
+- Helper text for user guidance
 
 ### DeadlineFormStep2
 **Props:**
