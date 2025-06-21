@@ -1,8 +1,8 @@
-import ActiveBookCard from '@/components/ActiveBookCard'
+import DeadlineCard from '@/components/DeadlineCard'
 import { ThemedScrollView } from '@/components/ThemedScrollView'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedView } from '@/components/ThemedView'
-import WaitingBookCard from '@/components/WaitingBookCard'
+import WaitingDeadlineCard from '@/components/WaitingDeadlineCard'
 import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import { Link } from 'expo-router'
 import { StyleSheet, TouchableOpacity } from 'react-native'
@@ -16,7 +16,7 @@ const ActiveReads = ({deadlines}:{
                 <ThemedText style={styles.pageTitle}>ACTIVE DEADLINES</ThemedText>
                 {deadlines.length > 0 ? (
                     deadlines.map((deadline) => (
-                        <ActiveBookCard 
+                        <DeadlineCard 
                             key={deadline.id}
                             deadline={deadline}
                         />
@@ -27,8 +27,8 @@ const ActiveReads = ({deadlines}:{
             </ThemedView>
             <ThemedView style={styles.container}>
                 <ThemedText style={styles.pageTitle}>WAITING</ThemedText>
-                <WaitingBookCard />
-                <WaitingBookCard />
+                <WaitingDeadlineCard />
+                <WaitingDeadlineCard />
             </ThemedView>
             <Link href='/deadline/new' asChild>
                 <TouchableOpacity style={styles.addNewButton}>
