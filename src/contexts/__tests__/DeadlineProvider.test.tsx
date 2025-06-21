@@ -381,6 +381,9 @@ describe('DeadlineProvider', () => {
           reading_deadline_id: 'test-id',
           current_progress: 0
         }
+      }, {
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function)
       });
     });
   });

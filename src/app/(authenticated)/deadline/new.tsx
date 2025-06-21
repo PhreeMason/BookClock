@@ -99,11 +99,9 @@ const NewDeadLine = () => {
 
     const onSubmit = (data: DeadlineFormData) => {
         if (isSubmitting) {
-            console.log('Already submitting, ignoring duplicate submission');
             return;
         }
         
-        console.log('Form submission started');
         setIsSubmitting(true);
         
         // Calculate total quantity accounting for format
@@ -144,7 +142,6 @@ const NewDeadLine = () => {
             },
             // Success callback
             () => {
-                console.log('Deadline added successfully');
                 setIsSubmitting(false);
                 Toast.show({
                     type: 'success',
@@ -187,25 +184,12 @@ const NewDeadLine = () => {
                 fieldsToValidate.push('totalMinutes');
             }
             
-            console.log('Validating fields:', fieldsToValidate);
-            console.log('Current form values:', watchedValues);
-            console.log('Current form errors:', errors);
-            
             const result = await trigger(fieldsToValidate);
-            console.log('Validation result:', result);
-            
-            if (!result) {
-                console.log('Validation failed. Form errors:', errors);
-                console.log('Form is submitting:', formIsSubmitting);
-            }
             
             if (result) {
                 setCurrentStep(currentStep + 1);
             }
         } else {
-            console.log('Submitting form...');
-            console.log('Form is valid:', isValid);
-            console.log('Form errors:', errors);
             handleSubmit(onSubmit)();
         }
     };
