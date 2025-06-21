@@ -25,7 +25,6 @@ export default function SearchScreen() {
 
     const handleBookPress = (book: BookData) => {
         // TODO: Navigate to book details or handle book selection
-        console.log('Book pressed:', book.title);
         router.push(`/book/${book.api_id}/add`);
     };
 

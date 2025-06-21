@@ -461,41 +461,35 @@ export type Database = {
                 Row: {
                     author: string | null
                     book_title: string
-                    deadline_date: string | null
-                    flexibility:
-                    | Database["public"]["Enums"]["deadline_flexibility"]
-                    | null
-                    format: Database["public"]["Enums"]["book_format_enum"] | null
+                    deadline_date: string
+                    flexibility: Database["public"]["Enums"]["deadline_flexibility"]
+                    format: Database["public"]["Enums"]["book_format_enum"]
                     id: string
-                    page_count: number | null
-                    source: string | null
-                    user_id: string | null
+                    source: string
+                    total_quantity: number
+                    user_id: string
                 }
                 Insert: {
                     author?: string | null
                     book_title: string
-                    deadline_date?: string | null
-                    flexibility?:
-                    | Database["public"]["Enums"]["deadline_flexibility"]
-                    | null
-                    format?: Database["public"]["Enums"]["book_format_enum"] | null
+                    deadline_date: string
+                    flexibility: Database["public"]["Enums"]["deadline_flexibility"]
+                    format: Database["public"]["Enums"]["book_format_enum"]
                     id: string
-                    page_count?: number | null
-                    source?: string | null
-                    user_id?: string | null
+                    source: string
+                    total_quantity: number
+                    user_id: string
                 }
                 Update: {
                     author?: string | null
                     book_title?: string
-                    deadline_date?: string | null
-                    flexibility?:
-                    | Database["public"]["Enums"]["deadline_flexibility"]
-                    | null
-                    format?: Database["public"]["Enums"]["book_format_enum"] | null
+                    deadline_date?: string
+                    flexibility?: Database["public"]["Enums"]["deadline_flexibility"]
+                    format?: Database["public"]["Enums"]["book_format_enum"]
                     id?: string
-                    page_count?: number | null
-                    source?: string | null
-                    user_id?: string | null
+                    source?: string
+                    total_quantity?: number
+                    user_id?: string
                 }
                 Relationships: [
                     {
@@ -647,7 +641,7 @@ export type Database = {
             | "withdrew"
             book_format_enum: "physical" | "ebook" | "audio"
             book_status_enum: "tbr" | "current" | "completed" | "dnf" | "pause"
-            deadline_flexibility: "flexibile" | "strict"
+            deadline_flexibility: "flexible" | "strict"
         }
         CompositeTypes: {
             [_ in never]: never
@@ -773,7 +767,7 @@ export const Constants = {
             ],
             book_format_enum: ["physical", "ebook", "audio"],
             book_status_enum: ["tbr", "current", "completed", "dnf", "pause"],
-            deadline_flexibility: ["flexibile", "strict"],
+            deadline_flexibility: ["flexible", "strict"],
         },
     },
 } as const

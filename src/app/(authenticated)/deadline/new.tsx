@@ -246,7 +246,6 @@ const NewDeadLine = () => {
     useEffect(() => {
         const totalQuantity = watchedValues.totalQuantity || 0;
         const totalMinutes = watchedValues.totalMinutes || 0;
-        // const currentMinutes = 
         const currentProgress = watchedValues.currentProgress || 0;
         const currentMinutes = watchedValues.currentMinutes || 0;
 
@@ -255,19 +254,13 @@ const NewDeadLine = () => {
         let xTotalMinutes = typeof totalMinutes === 'string' ? parseInt(totalMinutes) : totalMinutes;
         let xCurrentProgress = typeof currentProgress === 'string' ? parseInt(currentProgress) : currentProgress;
         let xCurrentMinutes = typeof currentMinutes === 'string' ? parseInt(currentMinutes) : currentMinutes;
+        
         if (isAudioFormat) {
             xTotalQuantity = xTotalMinutes + (xTotalQuantity * 60);
-            xCurrentProgress = xCurrentMinutes + (xCurrentProgress * 60)
+            xCurrentProgress = xCurrentMinutes + (xCurrentProgress * 60);
         }
         
         const remaining = xTotalQuantity - xCurrentProgress;
-        console.log({ 
-            xTotalQuantity: typeof xTotalQuantity,
-            xCurrentProgress: typeof xCurrentProgress,
-            xTotalMinutes: typeof xTotalMinutes,
-            xCurrentMinutes: typeof xCurrentMinutes,
-            remaining: typeof remaining
-        })
 
         if (remaining > 0) {
             let estimate = '';
@@ -278,9 +271,13 @@ const NewDeadLine = () => {
                     estimate = `📖 About ${hours} hours of reading time`;
                     break;
                 case 'audio':
-                    const hoursRemaining = Math.ceil(remaining / 60); // Assuming 60 minutes per hour
+                    const hoursRemaining = Math.floor(remaining / 60);
                     const minutesRemaining = remaining % 60;
-                    estimate = `🎧 About ${Math.floor(hoursRemaining)} hours ${minutesRemaining && `and ${minutesRemaining} minutes`} of listening time`;
+                    if (hoursRemaining > 0) {
+                        estimate = `🎧 About ${hoursRemaining} hour${hoursRemaining > 1 ? 's' : ''}${minutesRemaining > 0 ? ` and ${minutesRemaining} minutes` : ''} of listening time`;
+                    } else {
+                        estimate = `🎧 About ${minutesRemaining} minutes of listening time`;
+                    }
                     break;
             }
             setReadingEstimate(estimate);
@@ -291,11 +288,25 @@ const NewDeadLine = () => {
 
     // Calculate pace estimate when deadline or progress changes
     useEffect(() => {
-        console.log('calculating')
         const deadline = watchedValues.deadline;
         const totalQuantity = watchedValues.totalQuantity || 0;
+        const totalMinutes = watchedValues.totalMinutes || 0;
         const currentProgress = watchedValues.currentProgress || 0;
-        const remaining = totalQuantity - currentProgress;
+        const currentMinutes = watchedValues.currentMinutes || 0;
+
+        // Calculate total and current values accounting for format
+        const isAudioFormat = selectedFormat === 'audio';
+        let xTotalQuantity = typeof totalQuantity === 'string' ? parseInt(totalQuantity) : totalQuantity;
+        let xTotalMinutes = typeof totalMinutes === 'string' ? parseInt(totalMinutes) : totalMinutes;
+        let xCurrentProgress = typeof currentProgress === 'string' ? parseInt(currentProgress) : currentProgress;
+        let xCurrentMinutes = typeof currentMinutes === 'string' ? parseInt(currentMinutes) : currentMinutes;
+        
+        if (isAudioFormat) {
+            xTotalQuantity = xTotalMinutes + (xTotalQuantity * 60);
+            xCurrentProgress = xCurrentMinutes + (xCurrentProgress * 60);
+        }
+        
+        const remaining = xTotalQuantity - xCurrentProgress;
 
         if (deadline && remaining > 0) {
             const today = new Date();
@@ -304,15 +315,28 @@ const NewDeadLine = () => {
 
             if (daysLeft > 0) {
                 const unitsPerDay = Math.ceil(remaining / daysLeft);
-                let unit = selectedFormat === 'audio' ? 'hours' : 'pages';
-                setPaceEstimate(`📅 You'll need to read ${unitsPerDay} ${unit}/day to finish on time`);
+                let unit = selectedFormat === 'audio' ? 'minutes' : 'pages';
+                let paceText = '';
+                
+                if (selectedFormat === 'audio') {
+                    const hoursPerDay = Math.floor(unitsPerDay / 60);
+                    const minutesPerDay = unitsPerDay % 60;
+                    if (hoursPerDay > 0) {
+                        paceText = `${hoursPerDay} hour${hoursPerDay > 1 ? 's' : ''}${minutesPerDay > 0 ? ` ${minutesPerDay} minutes` : ''}`;
+                    } else {
+                        paceText = `${minutesPerDay} minutes`;
+                    }
+                    setPaceEstimate(`📅 You'll need to listen ${paceText}/day to finish on time`);
+                } else {
+                    setPaceEstimate(`📅 You'll need to read ${unitsPerDay} ${unit}/day to finish on time`);
+                }
             } else {
                 setPaceEstimate('⚠️ This deadline has already passed');
             }
         } else {
             setPaceEstimate('');
         }
-    }, [selectedFormat, watchedValues.deadline, watchedValues.totalQuantity, watchedValues.currentProgress]);
+    }, [selectedFormat, watchedValues.deadline, watchedValues.totalQuantity, watchedValues.totalMinutes, watchedValues.currentProgress, watchedValues.currentMinutes]);
 
     const getTotalQuantityLabel = () => {
         switch (selectedFormat) {
@@ -344,20 +368,38 @@ const NewDeadLine = () => {
     };
 
     const onSubmit = (data: FormData) => {
+        // Calculate total quantity accounting for format
+        let finalTotalQuantity = data.totalQuantity;
+        
+        if (selectedFormat === 'audio') {
+            const hours = typeof data.totalQuantity === 'string' ? parseInt(data.totalQuantity) : data.totalQuantity;
+            const minutes = typeof data.totalMinutes === 'string' ? parseInt(data.totalMinutes) : (data.totalMinutes || 0);
+            finalTotalQuantity = (hours * 60) + minutes; // Convert to total minutes
+        }
+
         const deadlineDetails = {
             id: '',
             author: data.bookAuthor || null,
             book_title: data.bookTitle,
             deadline_date: data.deadline.toISOString(),
-            total_quantity: data.totalQuantity,
+            total_quantity: finalTotalQuantity,
             format: selectedFormat,
             source: selectedSource,
             flexibility: selectedPriority
         }
 
+        // Calculate current progress accounting for format
+        let finalCurrentProgress = data.currentProgress || 0;
+        
+        if (selectedFormat === 'audio') {
+            const currentHours = typeof data.currentProgress === 'string' ? parseInt(data.currentProgress) : (data.currentProgress || 0);
+            const currentMinutes = typeof data.currentMinutes === 'string' ? parseInt(data.currentMinutes) : (data.currentMinutes || 0);
+            finalCurrentProgress = (currentHours * 60) + currentMinutes; // Convert to total minutes
+        }
+
         const progressDetails = {
             id: '',
-            current_progress: data.currentProgress || 0,
+            current_progress: finalCurrentProgress,
             reading_deadline_id: '' // This will be set after the deadline is created
         };
 

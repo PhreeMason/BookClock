@@ -28,7 +28,7 @@ const ActiveReads = () => {
                 <WaitingBookCard />
                 <WaitingBookCard />
             </ThemedView>
-            <Link href='/search' asChild>
+            <Link href='/deadline/new' asChild>
                 <TouchableOpacity style={styles.addNewButton}>
                     <ThemedView
                         style={styles.addNewButtonTextContainer}

@@ -1,6 +1,7 @@
 import ActiveReads from '@/components/ActiveReads';
 import Header from '@/components/Header';
 import OverdueReads from '@/components/OverdueReads';
+import { useGetDeadlines } from '@/hooks/useDeadlines';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { SafeAreaView } from "react-native-safe-area-context";
 const TopTabs = createMaterialTopTabNavigator();
@@ -8,6 +9,8 @@ const TopTabs = createMaterialTopTabNavigator();
 export default function MyTabs() {
     const activeCount = 3;
     const attentionCount = 1;
+    const {data: deadlines} = useGetDeadlines();
+    console.log(deadlines);
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <Header
