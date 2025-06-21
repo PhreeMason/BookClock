@@ -1,4 +1,5 @@
 import { Loader } from '@/components/Loader';
+import { DeadlineProvider } from '@/contexts/DeadlineProvider';
 import { useAuth } from '@clerk/clerk-expo';
 import { Redirect, Stack } from 'expo-router';
 
@@ -14,8 +15,11 @@ export default function ProtectedLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name='index' options={{ headerShown: false }} />
-    </Stack>
+    <DeadlineProvider>
+      <Stack>
+        <Stack.Screen name='index' options={{ headerShown: false }} />
+        <Stack.Screen name='deadline' options={{ headerShown: false }} />
+      </Stack>
+    </DeadlineProvider>
   );
 }

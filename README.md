@@ -29,6 +29,7 @@ src/
 - Reading deadline tracking
 - Progress monitoring
 - Multi-format support (physical, ebook, audio)
+- Centralized deadline management with React Context
 - Theme-aware components
 - OAuth authentication
 
@@ -41,3 +42,4 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for detailed guidelines.
 - [Component API Reference](docs/COMPONENTS.md)
 - [Form Architecture](docs/FORMS.md)
 - [Development Guidelines](docs/DEVELOPMENT.md)
+- [Deadline Provider](docs/DEADLINE_PROVIDER.md)

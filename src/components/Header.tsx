@@ -8,9 +8,10 @@ import { IconSymbol } from './ui/IconSymbol';
 type HeaderProps = {
     activeCount: number;
     attentionCount: number;
+    totalReadingTimePerDay: string;
 }
 
-const Header = ({ activeCount, attentionCount }: HeaderProps) => {
+const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderProps) => {
     const today = Date.now()
     const formattedDate = dayjs(today).format('dddd, MMMM DD')
     return (
@@ -19,6 +20,9 @@ const Header = ({ activeCount, attentionCount }: HeaderProps) => {
                 <ThemedText style={styles.dateText}>{formattedDate}</ThemedText>
                 <ThemedText style={styles.statusSummary}>
                     {activeCount} active • {attentionCount} needs attention
+                </ThemedText>
+                <ThemedText style={styles.readingTimeSummary}>
+                    {totalReadingTimePerDay}
                 </ThemedText>
             </ThemedView>
             <ThemedView style={styles.settings}>
@@ -52,6 +56,10 @@ const styles = StyleSheet.create({
         color: '#ffffff'
     },
     statusSummary: {
+        fontSize: 14,
+        color: '#b0b0b0',
+    },
+    readingTimeSummary: {
         fontSize: 14,
         color: '#b0b0b0',
     },

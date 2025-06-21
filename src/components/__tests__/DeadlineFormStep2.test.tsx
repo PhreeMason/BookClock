@@ -294,7 +294,7 @@ describe('DeadlineFormStep2', () => {
       />
     );
     
-    expect(getByText('When do you need to finish reading this book?')).toBeTruthy();
+    expect(getByText('When do you need to finish reading this book? (Past dates will be marked as overdue)')).toBeTruthy();
   });
 
   it('renders helper text for current progress', () => {

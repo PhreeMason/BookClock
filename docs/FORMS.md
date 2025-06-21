@@ -11,7 +11,7 @@ The app uses a modular form architecture for complex multi-step forms.
 - **`SourceSelector`** - Chip-based source selection (ARC/library/personal)
 - **`PrioritySelector`** - Card-based priority selection (flexible/strict)
 - **`DeadlineFormStep1`** - First step: book details and format
-- **`DeadlineFormStep2`** - Second step: deadline and progress
+- **`DeadlineFormStep2`** - Second step: deadline, progress, and flexibility settings
 
 ## Form Utilities (`src/lib/`)
 
@@ -51,13 +51,43 @@ const MyForm = () => {
         <DeadlineFormStep2 
           control={control}
           selectedFormat={format}
+          selectedPriority={priority}
           onPriorityChange={handlePriorityChange}
+          showDatePicker={showDatePicker}
+          onDatePickerToggle={() => setShowDatePicker(true)}
+          onDateChange={onDateChange}
+          deadline={watchedValues.deadline}
+          paceEstimate={paceEstimate}
+          watchedValues={watchedValues}
         />
       )}
     </View>
   );
 };
 ```
+
+## Form Step Details
+
+### DeadlineFormStep2
+**Props:**
+- `control`: React Hook Form control object
+- `selectedFormat`: Current format selection ('physical' | 'ebook' | 'audio')
+- `selectedPriority`: Current priority selection ('flexible' | 'strict')
+- `onPriorityChange`: Callback for priority changes
+- `showDatePicker`: Boolean to control date picker visibility
+- `onDatePickerToggle`: Callback to toggle date picker
+- `onDateChange`: Callback for date selection
+- `deadline`: Current deadline date
+- `paceEstimate`: Calculated pace estimate string
+- `watchedValues`: All form values for summary display
+
+**Features:**
+- Deadline date selection with inline picker
+- Progress tracking (pages read or minutes listened)
+- Deadline flexibility settings
+- Author information (optional)
+- Real-time pace estimates
+- Form summary card
 
 ## Adding New Forms
 
