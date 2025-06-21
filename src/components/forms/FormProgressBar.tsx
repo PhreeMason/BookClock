@@ -9,9 +9,9 @@ interface FormProgressBarProps {
 export const FormProgressBar = ({ currentStep, totalSteps }: FormProgressBarProps) => {
     const progress = (currentStep / totalSteps) * 100;
     return (
-        <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${progress}%` }]} />
+        <View style={styles.progressContainer} testID="progress-container">
+            <View style={styles.progressBar} testID="progress-bar">
+                <View style={[styles.progressFill, { width: `${progress}%` }]} testID="progress-fill" />
             </View>
         </View>
     );

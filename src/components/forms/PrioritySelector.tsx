@@ -14,10 +14,11 @@ export const PrioritySelector = ({ selectedPriority, onSelectPriority }: Priorit
     ];
 
     return (
-        <View style={styles.priorityOptions}>
+        <View style={styles.priorityOptions} testID="priority-options">
             {priorities.map((priority) => (
                 <TouchableOpacity
                     key={priority.key}
+                    testID={`priority-option-${priority.key}`}
                     style={[
                         styles.priorityOption,
                         selectedPriority === priority.key && styles.priorityOptionSelected
