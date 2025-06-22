@@ -206,10 +206,6 @@ When you call `getDeadlineCalculations(deadline)`, you get an object with:
 5. **Type Safety**: Full TypeScript support with proper types
 6. **Reusability**: Any component can easily access deadline data
 
-## Example Component
-
-See `src/components/DeadlineSummary.tsx` for a complete example of how to use the Deadline Provider to create a comprehensive deadline summary component.
-
 ## Migration Guide
 
 To migrate existing components:

@@ -15,5 +15,9 @@ export function ThemedScrollView({
 }: ThemedScrollViewProps) {
     const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
-    return <ScrollView style={[{ backgroundColor }, style]} {...({ bounces: true, ...otherProps })} />;
+    return <ScrollView 
+        style={[{ backgroundColor }, style]} 
+        keyboardShouldPersistTaps='handled'
+        {...({...otherProps })} 
+    />;
 }

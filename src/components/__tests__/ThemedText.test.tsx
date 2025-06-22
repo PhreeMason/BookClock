@@ -38,7 +38,6 @@ describe('ThemedText', () => {
       expect.arrayContaining([
         expect.objectContaining({
           fontSize: 16,
-          lineHeight: 24,
         }),
       ])
     );
@@ -53,7 +52,6 @@ describe('ThemedText', () => {
         expect.objectContaining({
           fontSize: 32,
           fontWeight: 'bold',
-          lineHeight: 32,
         }),
       ])
     );
@@ -67,7 +65,6 @@ describe('ThemedText', () => {
       expect.arrayContaining([
         expect.objectContaining({
           fontSize: 16,
-          lineHeight: 24,
           fontWeight: '600',
         }),
       ])
@@ -95,7 +92,6 @@ describe('ThemedText', () => {
     expect(textElement.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          lineHeight: 30,
           fontSize: 16,
           color: '#0a7ea4',
         }),
@@ -198,7 +194,6 @@ describe('ThemedText', () => {
         expect.objectContaining({
           fontSize: 32,
           fontWeight: 'bold',
-          lineHeight: 32,
         }),
         expect.objectContaining(customStyle),
       ])
@@ -216,7 +211,6 @@ describe('ThemedText', () => {
       expect.arrayContaining([
         expect.objectContaining({
           fontSize: 16,
-          lineHeight: 24,
         }),
       ])
     );

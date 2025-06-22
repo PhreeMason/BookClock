@@ -1,4 +1,5 @@
 import { ThemedText } from '@/components/ThemedText';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -14,26 +15,37 @@ export const FormatSelector = ({ selectedFormat, onSelectFormat }: FormatSelecto
         { key: 'audio', label: 'Audio' }
     ];
 
+    const cardColor = useThemeColor({}, 'card');
+    const mutedTextColor = useThemeColor({}, 'textMuted');
+    const primaryColor = useThemeColor({}, 'primary');
+    const primaryBackgroundColor = useThemeColor({light: 'rgba(92, 46, 184, 0.1)', dark: 'rgba(74, 222, 128, 0.1)'}, 'primary');
+
     return (
         <View style={styles.formatSelector} testID="format-selector">
-            {formats.map((format) => (
-                <TouchableOpacity
-                    key={format.key}
-                    testID={`format-chip-${format.key}`}
-                    style={[
-                        styles.formatChip,
-                        selectedFormat === format.key && styles.formatChipSelected
-                    ]}
-                    onPress={() => onSelectFormat(format.key as 'physical' | 'ebook' | 'audio')}
-                >
-                    <ThemedText style={[
-                        styles.formatChipText,
-                        selectedFormat === format.key && styles.formatChipTextSelected
-                    ]}>
-                        {format.label}
-                    </ThemedText>
-                </TouchableOpacity>
-            ))}
+            {formats.map((format) => {
+                const isSelected = selectedFormat === format.key;
+                return (
+                    <TouchableOpacity
+                        key={format.key}
+                        testID={`format-chip-${format.key}`}
+                        style={[
+                            styles.formatChip,
+                            { 
+                                backgroundColor: isSelected ? primaryBackgroundColor : cardColor,
+                            }
+                        ]}
+                        onPress={() => onSelectFormat(format.key as 'physical' | 'ebook' | 'audio')}
+                    >
+                        <ThemedText style={[
+                            styles.formatChipText,
+                            { color: isSelected ? primaryColor : mutedTextColor },
+                            isSelected && styles.formatChipTextSelected
+                        ]}>
+                            {format.label}
+                        </ThemedText>
+                    </TouchableOpacity>
+                );
+            })}
         </View>
     );
 };
@@ -45,20 +57,14 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     formatChip: {
-        backgroundColor: '#404040',
         borderRadius: 20,
         padding: 8,
         paddingHorizontal: 16,
     },
-    formatChipSelected: {
-        backgroundColor: '#4ade80',
-    },
     formatChipText: {
         fontSize: 14,
-        color: '#b0b0b0',
     },
     formatChipTextSelected: {
-        color: '#1a1a1a',
         fontWeight: '600',
     },
 }); 
