@@ -2,6 +2,32 @@
 
 > **Note:** All components can be imported using `@/components/COMPONENT_NAME`
 
+## Design System & Theming
+
+Our app uses a cohesive design system to ensure a consistent look and feel. This is built upon a semantic color palette and a set of themed components.
+
+### Color Palette
+**Location:** `src/constants/Colors.ts`
+
+The `Colors.ts` file exports a `Colors` object that contains color palettes for both `light` and `dark` modes. The colors are organized semantically to represent their function in the UI.
+
+**Semantic Color Names:**
+- `text`: Default text color.
+- `textMuted`: For secondary or less important text.
+- `background`: The screen background color.
+- `card`: The background color for card-like components.
+- `border`: The color for borders and dividers.
+- `primary`: The primary accent color, used for buttons and important elements.
+- `primaryForeground`: The color for text and icons on a primary-colored background.
+- `icon`: The default color for icons.
+- `tabIconDefault`: The color for inactive tab bar icons.
+- `tabIconSelected`: The color for the active tab bar icon.
+
+### Using Themed Components
+The core of our design system is a set of theme-aware components that automatically adapt to light and dark modes. You should always prefer these components over standard React Native components.
+
+---
+
 ## Form Components
 **Location:** `@/components/forms/`
 
@@ -73,6 +99,24 @@ const MyComponent = () => {
 **API:** No props required  
 **Use Case:** Simple sign-out button that handles user authentication logout via Clerk and redirects to the home page. Displays themed text with touch interaction.
 
+### Button
+**API:**
+- Props: `{ onPress: () => void, title: string, style?: ViewStyle, textStyle?: TextStyle, disabled?: boolean }`
+
+**Use Case:** A reusable, themed button for primary actions. It automatically uses the `primary` and `primaryForeground` colors from the theme.
+
+**Example:**
+```typescript
+import Button from '@/components/Button';
+
+const MyComponent = () => (
+  <Button 
+    title="Submit" 
+    onPress={() => console.log('Pressed!')} 
+  />
+);
+```
+
 ## Themed Components
 
 ### ThemedKeyboardAvoidingView
@@ -89,10 +133,23 @@ const MyComponent = () => {
 
 ### ThemedText
 **API:**
-- Extends `TextProps` with optional `lightColor`, `darkColor`, and `type` props
-- Types: `'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link'`
+- Extends `TextProps`.
+- Props:
+  - `type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link'`
+  - `colorName?: keyof typeof Colors.light`
 
-**Use Case:** Theme-aware text component with predefined typography styles. Automatically applies theme colors and provides consistent text styling across the app with multiple preset variants.
+**Use Case:** The primary component for displaying all text. It automatically handles theme colors and provides consistent, predefined typography styles.
+
+**Example:**
+```typescript
+// For standard text
+<ThemedText>Some default text.</ThemedText>
+
+// For a subtitle with a muted color
+<ThemedText type="subtitle" colorName="textMuted">
+  This is a subtitle.
+</ThemedText>
+```
 
 ## Utility Components
 

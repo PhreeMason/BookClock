@@ -1,9 +1,9 @@
-import DeadlineCard from '@/components/DeadlineCard'
-import { useDeadlines } from '@/contexts/DeadlineProvider'
-import { StyleSheet } from 'react-native'
-import { ThemedScrollView } from './ThemedScrollView'
-import { ThemedText } from './ThemedText'
-import { ThemedView } from './ThemedView'
+import DeadlineCard from '@/components/DeadlineCard';
+import { useDeadlines } from '@/contexts/DeadlineProvider';
+import { StyleSheet } from 'react-native';
+import { ThemedScrollView } from './ThemedScrollView';
+import { ThemedText } from './ThemedText';
+import { ThemedView } from './ThemedView';
 
 const OverdueReads = () => {
     const { overdueDeadlines, isLoading, error } = useDeadlines();
@@ -31,7 +31,13 @@ const OverdueReads = () => {
     return (
         <ThemedScrollView>
             <ThemedView style={styles.container}>
-                <ThemedText style={styles.pageTitle}>OVERDUE DEADLINES</ThemedText>
+                <ThemedText
+                    type='defaultSemiBold'
+                    colorName='textMuted'
+                    style={styles.pageTitle}
+                >
+                    OVERDUE DEADLINES
+                </ThemedText>
                 {overdueDeadlines.length > 0 ? (
                     overdueDeadlines.map((deadline) => (
                         <DeadlineCard 
@@ -40,7 +46,12 @@ const OverdueReads = () => {
                         />
                     ))
                 ) : (
-                    <ThemedText style={styles.emptyText}>No overdue deadlines</ThemedText>
+                    <ThemedText
+                        style={styles.emptyText}
+                        colorName='textMuted'
+                    >
+                        No overdue deadlines
+                    </ThemedText>
                 )}
             </ThemedView>
         </ThemedScrollView>
@@ -57,11 +68,9 @@ const styles = StyleSheet.create({
     pageTitle: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#b0b0b0'
     },
     emptyText: {
         fontSize: 14,
-        color: '#666',
         textAlign: 'center',
         fontStyle: 'italic'
     },
