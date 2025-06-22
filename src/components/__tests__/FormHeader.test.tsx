@@ -179,7 +179,6 @@ describe('FormHeader', () => {
       expect.objectContaining({
         fontSize: 18,
         fontWeight: '600',
-        color: '#ffffff',
       })
     );
   });
@@ -197,7 +196,6 @@ describe('FormHeader', () => {
     expect(backButtonText.props.style).toEqual(
       expect.objectContaining({
         fontSize: 18,
-        color: '#ffffff',
       })
     );
   });

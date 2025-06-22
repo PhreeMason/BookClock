@@ -1,3 +1,4 @@
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import {
     StyleSheet,
@@ -17,6 +18,12 @@ export default function CustomInput<T extends FieldValues>({
     name,
     ...props
 }: CustomInputProps<T>) {
+    const backgroundColor = useThemeColor({}, 'card');
+    const color = useThemeColor({}, 'text');
+    const borderColor = useThemeColor({}, 'border');
+    const errorColor = useThemeColor({}, 'danger'); // Assuming 'danger' is in your color palette
+    const placeholderTextColor = useThemeColor({}, 'textMuted');
+
     return (
         <Controller
             control={control}
@@ -40,14 +47,19 @@ export default function CustomInput<T extends FieldValues>({
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
+                        placeholderTextColor={placeholderTextColor}
                         style={[
                             styles.input,
+                            { 
+                                backgroundColor, 
+                                color, 
+                                borderColor: error ? errorColor : borderColor 
+                            },
                             props.style,
-                            { borderColor: error ? 'crimson' : 'gray' },
                         ]}
                     />
                     {error ? (
-                        <Text style={styles.error}>{error.message}</Text>
+                        <Text style={[styles.error, { color: errorColor }]}>{error.message}</Text>
                     ) : (
                         <View style={{ height: 18 }} />
                     )}
@@ -62,13 +74,12 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     input: {
-        borderWidth: 1,
-        padding: 10,
-        borderRadius: 5,
-        borderColor: '#ccc',
+        borderWidth: 2,
+        padding: 16,
+        borderRadius: 12,
+        fontSize: 16,
     },
     error: {
-        color: 'crimson',
         minHeight: 18,
     },
 });

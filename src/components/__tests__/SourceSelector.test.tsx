@@ -14,6 +14,28 @@ jest.mock('@/components/ThemedText', () => ({
   }),
 }));
 
+// Mock the useThemeColor hook
+jest.mock('@/hooks/useThemeColor', () => ({
+  useThemeColor: jest.fn((props, colorName) => {
+    // Handle custom light/dark color override
+    if (props.light && props.dark) {
+      return props.light; // Return light color for testing
+    }
+    
+    // Return different colors based on the colorName
+    switch (colorName) {
+      case 'card':
+        return '#e3f1e4';
+      case 'textMuted':
+        return '#5b33af';
+      case 'primary':
+        return '#5c2eb8';
+      default:
+        return '#000000';
+    }
+  }),
+}));
+
 describe('SourceSelector', () => {
   const mockOnSelectSource = jest.fn();
 
@@ -46,7 +68,9 @@ describe('SourceSelector', () => {
     expect(selectedText.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          color: '#1a1a1a',
+          color: '#5c2eb8',
+        }),
+        expect.objectContaining({
           fontWeight: '600',
         }),
       ])
@@ -65,7 +89,7 @@ describe('SourceSelector', () => {
     expect(unselectedText.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          color: '#b0b0b0',
+          color: '#5b33af',
         }),
       ])
     );
@@ -126,7 +150,9 @@ describe('SourceSelector', () => {
     expect(arcText.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          color: '#1a1a1a',
+          color: '#5c2eb8',
+        }),
+        expect.objectContaining({
           fontWeight: '600',
         }),
       ])
@@ -144,7 +170,9 @@ describe('SourceSelector', () => {
     expect(libraryText.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          color: '#1a1a1a',
+          color: '#5c2eb8',
+        }),
+        expect.objectContaining({
           fontWeight: '600',
         }),
       ])
@@ -155,7 +183,7 @@ describe('SourceSelector', () => {
     expect(arcTextAfter.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          color: '#b0b0b0',
+          color: '#5b33af',
         }),
       ])
     );

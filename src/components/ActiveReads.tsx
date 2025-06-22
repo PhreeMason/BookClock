@@ -2,11 +2,10 @@ import DeadlineCard from '@/components/DeadlineCard'
 import { ThemedScrollView } from '@/components/ThemedScrollView'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedView } from '@/components/ThemedView'
-import WaitingDeadlineCard from '@/components/WaitingDeadlineCard'
 import { useDeadlines } from '@/contexts/DeadlineProvider'
 import { Link } from 'expo-router'
 import { StyleSheet } from 'react-native'
-import Button from './Button'
+import { ThemedButton } from './ThemedButton'
 
 const ActiveReads = () => {
     const { activeDeadlines, isLoading, error } = useDeadlines()
@@ -34,37 +33,29 @@ const ActiveReads = () => {
     return (
         <ThemedScrollView>
             <ThemedView style={styles.container}>
-                <ThemedText 
+                <ThemedText
                     type='defaultSemiBold'
                     colorName='textMuted'
                     style={styles.pageTitle}>ACTIVE DEADLINES</ThemedText>
                 {activeDeadlines.length > 0 ? (
                     activeDeadlines.map((deadline) => (
-                        <DeadlineCard 
+                        <DeadlineCard
                             key={deadline.id}
                             deadline={deadline}
                         />
                     ))
                 ) : (
-                    <ThemedText 
+                    <ThemedText
                         style={styles.emptyText}
                         colorName='textMuted'
                     >No active deadlines</ThemedText>
                 )}
             </ThemedView>
-            <ThemedView style={styles.container}>
-                <ThemedText 
-                    type='defaultSemiBold'
-                    colorName='textMuted'
-                    style={styles.pageTitle}>WAITING</ThemedText>
-                <WaitingDeadlineCard />
-                <WaitingDeadlineCard />
-            </ThemedView>
-            <Link href='/deadline/new' asChild>
-                <Button 
+            <Link href="/deadline/new" asChild>
+                <ThemedButton
                     title='+ Add New Book'
-                    onPress={() => {}}
                     style={styles.addNewButton}
+                    variant='primary'
                 />
             </Link>
         </ThemedScrollView>
