@@ -47,6 +47,12 @@ import {
 
 ## Core UI Components
 
+### Header
+**API:**
+- Props: `{ activeCount: number, attentionCount: number, totalReadingTimePerDay: string }`
+
+**Use Case:** Main header component displaying the current date, reading statistics, and settings access. Used in the authenticated layout to show daily reading summary and navigation.
+
 ### DeadlineCard
 **API:**
 - Props: `{ deadline: ReadingDeadlineWithProgress }`
@@ -78,6 +84,54 @@ const MyComponent = () => {
 };
 ```
 
+### WaitingDeadlineCard
+**API:**
+- Props: `{ deadline: ReadingDeadlineWithProgress }`
+
+**Use Case:** A variant of DeadlineCard used for deadlines that are waiting or in a different state. Provides alternative styling and behavior for specific deadline states.
+
+### ActiveReads
+**API:**
+- Props: None (uses DeadlineProvider context)
+
+**Use Case:** Component for displaying active (non-overdue) reading deadlines. Used in the main tab navigation to show current reading tasks.
+
+### OverdueReads
+**API:**
+- Props: None (uses DeadlineProvider context)
+
+**Use Case:** Component for displaying overdue reading deadlines. Used in the main tab navigation to show tasks that need immediate attention.
+
+### BookList
+**API:**
+- Props: `{ books: Book[], onBookPress?: (book: Book) => void }`
+
+**Use Case:** Displays a list of books with consistent styling and interaction handling.
+
+### BookListItem
+**API:**
+- Props: `{ book: Book, onPress?: (book: Book) => void }`
+
+**Use Case:** Individual book item component used within BookList for consistent book display and interaction.
+
+### SearchBar
+**API:**
+- Props: `{ onSearch: (query: string) => void, placeholder?: string }`
+
+**Use Case:** Search input component with clear functionality and consistent theming.
+
+### UserAvatar
+**API:**
+- Props: `{ size?: number, imageUrl?: string }`
+
+**Use Case:** Displays user avatar with fallback to initials or default image.
+
+### UserProfile
+**API:**
+- Props: None (uses authentication context)
+
+**Use Case:** User profile display component showing user information and settings access.
+
 ### HapticTab
 **API:** Extends `BottomTabBarButtonProps` from React Navigation  
 **Use Case:** Enhanced tab bar button that provides haptic feedback on iOS devices when pressed. Automatically adds light impact feedback for better user experience in tab navigation.
@@ -99,19 +153,20 @@ const MyComponent = () => {
 **API:** No props required  
 **Use Case:** Simple sign-out button that handles user authentication logout via Clerk and redirects to the home page. Displays themed text with touch interaction.
 
-### Button
+### ThemedButton
 **API:**
-- Props: `{ onPress: () => void, title: string, style?: ViewStyle, textStyle?: TextStyle, disabled?: boolean }`
+- Props: `{ onPress: () => void, title: string, variant?: 'primary' | 'secondary' | 'danger' | 'ghost', style?: ViewStyle, textStyle?: TextStyle, disabled?: boolean }`
 
-**Use Case:** A reusable, themed button for primary actions. It automatically uses the `primary` and `primaryForeground` colors from the theme.
+**Use Case:** A reusable, themed button for primary actions. It automatically uses the `primary` and `primaryForeground` colors from the theme and supports multiple variants.
 
 **Example:**
 ```typescript
-import Button from '@/components/Button';
+import { ThemedButton } from '@/components/ThemedButton';
 
 const MyComponent = () => (
-  <Button 
+  <ThemedButton 
     title="Submit" 
+    variant="primary"
     onPress={() => console.log('Pressed!')} 
   />
 );
@@ -175,4 +230,4 @@ const MyComponent = () => (
 
 ### HelloWave
 **API:** No props required
-**Use Case:** Welcome/greeting component for user onboarding or welcome screens. 
+**Use Case:** Welcome/greeting component for user onboarding or welcome screens with animated wave emoji. 
