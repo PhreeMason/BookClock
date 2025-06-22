@@ -1,7 +1,8 @@
 import { useThemeColor } from '@/hooks/useThemeColor';
 import dayjs from 'dayjs';
+import { router } from 'expo-router';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 import { IconSymbol } from './ui/IconSymbol';
@@ -20,6 +21,10 @@ const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderP
     const borderColor = useThemeColor({}, 'border');
     const iconColor = useThemeColor({}, 'icon');
 
+    const handleSettingsPress = () => {
+        router.push('/settings');
+    };
+
     return (
         <ThemedView style={[styles.container, { borderBottomColor: borderColor, backgroundColor }]}>
             <ThemedView style={[styles.dateRow, { backgroundColor }]}>
@@ -31,9 +36,12 @@ const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderP
                     {totalReadingTimePerDay}
                 </ThemedText>
             </ThemedView>
-            <ThemedView style={[styles.settings, { backgroundColor }]}>
+            <TouchableOpacity 
+                style={[styles.settings, { backgroundColor }]} 
+                onPress={handleSettingsPress}
+            >
                 <IconSymbol size={28} name="gearshape.fill" color={iconColor} />
-            </ThemedView>
+            </TouchableOpacity>
         </ThemedView>
     )
 }
