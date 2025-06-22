@@ -48,12 +48,10 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 18,
-        color: '#ffffff',
     },
     headerTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#ffffff',
     },
     skipButton: {
         padding: 5,

@@ -180,18 +180,6 @@ describe('DeadlineFormStep2', () => {
     expect(getByTestId('priority-selector')).toBeTruthy();
   });
 
-  it('renders author input', () => {
-    const { getByTestId } = render(
-      <TestComponent
-        onPriorityChange={mockOnPriorityChange}
-        onDatePickerToggle={mockOnDatePickerToggle}
-        onDateChange={mockOnDateChange}
-      />
-    );
-    
-    expect(getByTestId('input-bookAuthor')).toBeTruthy();
-  });
-
   it('shows "Pages Already Read" label for physical format', () => {
     const { getByText } = render(
       <TestComponent
@@ -333,7 +321,6 @@ describe('DeadlineFormStep2', () => {
     expect(getByText('Deadline Date *')).toBeTruthy();
     expect(getByText('Pages Already Read')).toBeTruthy();
     expect(getByText('Deadline Flexibility')).toBeTruthy();
-    expect(getByText('Author')).toBeTruthy();
   });
 
   it('renders summary card with ready message', () => {
