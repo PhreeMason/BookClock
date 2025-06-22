@@ -13,7 +13,7 @@ const ActiveReads = () => {
     if (isLoading) {
         return (
             <ThemedScrollView>
-                <ThemedView style={styles.container}>
+                <ThemedView colorName="card" style={styles.container}>
                     <ThemedText>Loading active deadlines...</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
@@ -23,8 +23,8 @@ const ActiveReads = () => {
     if (error) {
         return (
             <ThemedScrollView>
-                <ThemedView style={styles.container}>
-                    <ThemedText style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
+                <ThemedView colorName="card" style={styles.container}>
+                    <ThemedText color="error" style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
         );
@@ -32,10 +32,10 @@ const ActiveReads = () => {
 
     return (
         <ThemedScrollView>
-            <ThemedView style={styles.container}>
+            <ThemedView colorName="card" style={styles.container}>
                 <ThemedText
                     type='defaultSemiBold'
-                    colorName='textMuted'
+                    color='textMuted'
                     style={styles.pageTitle}>ACTIVE DEADLINES</ThemedText>
                 {activeDeadlines.length > 0 ? (
                     activeDeadlines.map((deadline) => (
@@ -47,7 +47,7 @@ const ActiveReads = () => {
                 ) : (
                     <ThemedText
                         style={styles.emptyText}
-                        colorName='textMuted'
+                        color='textMuted'
                     >No active deadlines</ThemedText>
                 )}
             </ThemedView>
@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
     },
     errorText: {
         fontSize: 14,
-        color: '#DC2626',
         textAlign: 'center'
     },
     addNewButton: {

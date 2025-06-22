@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useThemeColor, type ColorValue } from '@/hooks/useThemeColor';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 
@@ -11,6 +11,7 @@ export type LoaderProps = {
     fullScreen?: boolean;
     lightColor?: string;
     darkColor?: string;
+    indicatorColor?: ColorValue;
 };
 
 export function Loader({
@@ -18,13 +19,14 @@ export function Loader({
     text,
     fullScreen = false,
     lightColor,
-    darkColor
+    darkColor,
+    indicatorColor = 'primary'
 }: LoaderProps) {
-    const indicatorColor = useThemeColor({ light: lightColor, dark: darkColor }, 'tint');
+    const color = useThemeColor({ light: lightColor, dark: darkColor }, indicatorColor);
 
     return (
-        <ThemedView style={[styles.container, fullScreen && styles.fullScreen]}>
-            <ActivityIndicator size={size} color={indicatorColor} />
+        <ThemedView colorName="background" style={[styles.container, fullScreen && styles.fullScreen]}>
+            <ActivityIndicator size={size} color={color} />
             {text && (
                 <ThemedText style={styles.text} type="defaultSemiBold">
                     {text}

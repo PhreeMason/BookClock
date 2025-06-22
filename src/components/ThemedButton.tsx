@@ -1,4 +1,4 @@
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useThemeColor, type ColorValue } from '@/hooks/useThemeColor';
 import React from 'react';
 import { Pressable, PressableProps, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
 
@@ -7,6 +7,10 @@ interface ThemedButtonProps extends PressableProps {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   style?: ViewStyle;
   textStyle?: TextStyle;
+  // New color props for easier theming
+  backgroundColor?: ColorValue;
+  textColor?: ColorValue;
+  borderColor?: ColorValue;
 }
 
 export function ThemedButton({
@@ -14,29 +18,41 @@ export function ThemedButton({
   variant = 'primary',
   style,
   textStyle,
+  backgroundColor,
+  textColor,
+  borderColor,
   ...props
 }: ThemedButtonProps) {
-  const backgroundColor = useThemeColor(
-    {},
-    variant === 'primary'
-      ? 'primary'
-      : variant === 'secondary'
-      ? 'card'
-      : 'background'
-  );
-  const color = useThemeColor(
-    {},
-    variant === 'primary' ? 'primaryForeground' : 'text'
-  );
-  const borderColor = useThemeColor({}, 'border');
+  // Use provided colors or fall back to variant-based colors
+  const bgColor = backgroundColor 
+    ? useThemeColor({}, backgroundColor)
+    : useThemeColor(
+        {},
+        variant === 'primary'
+          ? 'primary'
+          : variant === 'secondary'
+          ? 'card'
+          : 'background'
+      );
+  
+  const txtColor = textColor
+    ? useThemeColor({}, textColor)
+    : useThemeColor(
+        {},
+        variant === 'primary' ? 'primaryForeground' : 'text'
+      );
+  
+  const brdColor = borderColor 
+    ? useThemeColor({}, borderColor)
+    : useThemeColor({}, 'border');
 
   return (
     <Pressable
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor,
-          borderColor,
+          backgroundColor: bgColor,
+          borderColor: brdColor,
           borderWidth: variant === 'secondary' ? 1 : 0,
         },
         pressed && styles.pressed,
@@ -45,7 +61,7 @@ export function ThemedButton({
       ]}
       {...props}
     >
-      <Text style={[styles.text, { color }, textStyle]}>{title}</Text>
+      <Text style={[styles.text, { color: txtColor }, textStyle]}>{title}</Text>
     </Pressable>
   );
 }

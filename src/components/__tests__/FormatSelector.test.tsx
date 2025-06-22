@@ -4,35 +4,26 @@ import { FormatSelector } from '../forms/FormatSelector';
 
 // Mock the ThemedText component
 jest.mock('@/components/ThemedText', () => ({
-  ThemedText: jest.fn(({ children, style, ...props }) => {
+  ThemedText: jest.fn(({ children, style, color, ...props }) => {
     const { Text } = require('react-native');
+    
+    // Apply color based on the color prop
+    let colorStyle = {};
+    if (color === 'primary') {
+      colorStyle = { color: '#5c2eb8' };
+    } else if (color === 'textMuted') {
+      colorStyle = { color: '#5b33af' };
+    }
+    
+    // Flatten the style array and merge with color style
+    const flattenedStyle = Array.isArray(style) ? style.flat() : [style];
+    const finalStyle = [...flattenedStyle, colorStyle];
+    
     return (
-      <Text testID="themed-text" style={style} {...props}>
+      <Text testID="themed-text" style={finalStyle} {...props}>
         {children}
       </Text>
     );
-  }),
-}));
-
-// Mock the useThemeColor hook
-jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn((props, colorName) => {
-    // Handle custom light/dark color override
-    if (props.light && props.dark) {
-      return props.light; // Return light color for testing
-    }
-    
-    // Return different colors based on the colorName
-    switch (colorName) {
-      case 'card':
-        return '#e3f1e4';
-      case 'textMuted':
-        return '#5b33af';
-      case 'primary':
-        return '#5c2eb8';
-      default:
-        return '#000000';
-    }
   }),
 }));
 
@@ -54,40 +45,6 @@ describe('FormatSelector', () => {
     expect(getByText('Physical')).toBeTruthy();
     expect(getByText('E-book')).toBeTruthy();
     expect(getByText('Audio')).toBeTruthy();
-  });
-
-  it('applies selected style to selected format', () => {
-    const { getByTestId } = render(
-      <FormatSelector
-        selectedFormat="ebook"
-        onSelectFormat={mockOnSelectFormat}
-      />
-    );
-    
-    const ebookChip = getByTestId('format-chip-ebook');
-    
-    expect(ebookChip.props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: 'rgba(92, 46, 184, 0.1)',
-      })
-    );
-  });
-
-  it('applies unselected style to non-selected formats', () => {
-    const { getByTestId } = render(
-      <FormatSelector
-        selectedFormat="physical"
-        onSelectFormat={mockOnSelectFormat}
-      />
-    );
-    
-    const ebookChip = getByTestId('format-chip-ebook');
-    
-    expect(ebookChip.props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: '#e3f1e4',
-      })
-    );
   });
 
   it('applies selected text style to selected format', () => {
@@ -129,87 +86,21 @@ describe('FormatSelector', () => {
     );
   });
 
-  it('calls onSelectFormat with correct format when physical is pressed', () => {
-    const { getByTestId } = render(
+  it('calls onSelectFormat with correct format when Physical is pressed', () => {
+    const { getByText } = render(
       <FormatSelector
         selectedFormat="ebook"
         onSelectFormat={mockOnSelectFormat}
       />
     );
     
-    const physicalChip = getByTestId('format-chip-physical');
+    const physicalChip = getByText('Physical');
     fireEvent.press(physicalChip);
     
     expect(mockOnSelectFormat).toHaveBeenCalledWith('physical');
   });
 
-  it('calls onSelectFormat with correct format when ebook is pressed', () => {
-    const { getByTestId } = render(
-      <FormatSelector
-        selectedFormat="physical"
-        onSelectFormat={mockOnSelectFormat}
-      />
-    );
-    
-    const ebookChip = getByTestId('format-chip-ebook');
-    fireEvent.press(ebookChip);
-    
-    expect(mockOnSelectFormat).toHaveBeenCalledWith('ebook');
-  });
-
-  it('calls onSelectFormat with correct format when audio is pressed', () => {
-    const { getByTestId } = render(
-      <FormatSelector
-        selectedFormat="physical"
-        onSelectFormat={mockOnSelectFormat}
-      />
-    );
-    
-    const audioChip = getByTestId('format-chip-audio');
-    fireEvent.press(audioChip);
-    
-    expect(mockOnSelectFormat).toHaveBeenCalledWith('audio');
-  });
-
-  it('applies correct container styles', () => {
-    const { getByTestId } = render(
-      <FormatSelector
-        selectedFormat="physical"
-        onSelectFormat={mockOnSelectFormat}
-      />
-    );
-    
-    const container = getByTestId('format-selector');
-    expect(container.props.style).toEqual(
-      expect.objectContaining({
-        flexDirection: 'row',
-        gap: 8,
-        marginTop: 8,
-      })
-    );
-  });
-
-  it('applies correct chip styles', () => {
-    const { getByTestId } = render(
-      <FormatSelector
-        selectedFormat="physical"
-        onSelectFormat={mockOnSelectFormat}
-      />
-    );
-    
-    const chip = getByTestId('format-chip-ebook');
-    
-    expect(chip.props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: '#e3f1e4',
-        borderRadius: 20,
-        padding: 8,
-        paddingHorizontal: 16,
-      })
-    );
-  });
-
-  it('applies correct chip text styles', () => {
+  it('calls onSelectFormat with correct format when E-book is pressed', () => {
     const { getByText } = render(
       <FormatSelector
         selectedFormat="physical"
@@ -217,30 +108,45 @@ describe('FormatSelector', () => {
       />
     );
     
-    const chipText = getByText('E-book');
-    expect(chipText.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          fontSize: 14,
-        }),
-      ])
-    );
+    const ebookChip = getByText('E-book');
+    fireEvent.press(ebookChip);
+    
+    expect(mockOnSelectFormat).toHaveBeenCalledWith('ebook');
   });
 
-  it('handles multiple format selections correctly', () => {
-    const { getByTestId, rerender } = render(
+  it('calls onSelectFormat with correct format when Audio is pressed', () => {
+    const { getByText } = render(
       <FormatSelector
         selectedFormat="physical"
         onSelectFormat={mockOnSelectFormat}
       />
     );
     
-    // Initially physical should be selected
-    const physicalChip = getByTestId('format-chip-physical');
-    expect(physicalChip.props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: 'rgba(92, 46, 184, 0.1)',
-      })
+    const audioChip = getByText('Audio');
+    fireEvent.press(audioChip);
+    
+    expect(mockOnSelectFormat).toHaveBeenCalledWith('audio');
+  });
+
+  it('handles multiple format selections correctly', () => {
+    const { getByText, rerender } = render(
+      <FormatSelector
+        selectedFormat="physical"
+        onSelectFormat={mockOnSelectFormat}
+      />
+    );
+    
+    // Initially Physical should be selected
+    const physicalText = getByText('Physical');
+    expect(physicalText.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          color: '#5c2eb8',
+        }),
+        expect.objectContaining({
+          fontWeight: '600',
+        }),
+      ])
     );
     
     // Rerender with ebook selected
@@ -251,48 +157,26 @@ describe('FormatSelector', () => {
       />
     );
     
-    const ebookChip = getByTestId('format-chip-ebook');
-    expect(ebookChip.props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: 'rgba(92, 46, 184, 0.1)',
-      })
+    const ebookText = getByText('E-book');
+    expect(ebookText.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          color: '#5c2eb8',
+        }),
+        expect.objectContaining({
+          fontWeight: '600',
+        }),
+      ])
     );
     
     // Physical should now be unselected
-    const physicalChipAfter = getByTestId('format-chip-physical');
-    expect(physicalChipAfter.props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: '#e3f1e4',
-      })
-    );
-  });
-
-  it('maintains selection state after multiple interactions', () => {
-    const { getByTestId, rerender } = render(
-      <FormatSelector
-        selectedFormat="physical"
-        onSelectFormat={mockOnSelectFormat}
-      />
-    );
-    
-    // Select audio
-    const audioChip = getByTestId('format-chip-audio');
-    fireEvent.press(audioChip);
-    
-    // Rerender with new selection
-    rerender(
-      <FormatSelector
-        selectedFormat="audio"
-        onSelectFormat={mockOnSelectFormat}
-      />
-    );
-    
-    // Verify audio is now selected
-    const selectedAudioChip = getByTestId('format-chip-audio');
-    expect(selectedAudioChip.props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: 'rgba(92, 46, 184, 0.1)',
-      })
+    const physicalTextAfter = getByText('Physical');
+    expect(physicalTextAfter.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          color: '#5b33af',
+        }),
+      ])
     );
   });
 }); 

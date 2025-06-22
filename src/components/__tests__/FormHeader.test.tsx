@@ -25,6 +25,20 @@ jest.mock('@/components/ThemedView', () => ({
   }),
 }));
 
+// Mock the useThemeColor hook
+jest.mock('@/hooks/useThemeColor', () => ({
+  useThemeColor: jest.fn((props, colorName) => {
+    switch (colorName) {
+      case 'textMuted':
+        return '#5b33af';
+      case 'success':
+        return '#4ade80';
+      default:
+        return '#000000';
+    }
+  }),
+}));
+
 describe('FormHeader', () => {
   const mockOnBack = jest.fn();
   const mockOnSkip = jest.fn();
@@ -154,14 +168,18 @@ describe('FormHeader', () => {
     
     const header = getByTestId('themed-view');
     expect(header.props.style).toEqual(
-      expect.objectContaining({
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#404040',
-      })
+      expect.arrayContaining([
+        expect.objectContaining({
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: 15,
+          borderBottomWidth: 1,
+        }),
+        expect.objectContaining({
+          borderBottomColor: '#5b33af',
+        }),
+      ])
     );
   });
 
@@ -213,11 +231,15 @@ describe('FormHeader', () => {
     
     const skipButtonText = getByText('Skip');
     expect(skipButtonText.props.style).toEqual(
-      expect.objectContaining({
-        fontSize: 16,
-        color: '#4ade80',
-        fontWeight: '600',
-      })
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 16,
+          fontWeight: '600',
+        }),
+        expect.objectContaining({
+          color: '#4ade80',
+        }),
+      ])
     );
   });
 

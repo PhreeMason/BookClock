@@ -17,19 +17,13 @@ jest.mock('@/components/ThemedText', () => ({
 // Mock the useThemeColor hook
 jest.mock('@/hooks/useThemeColor', () => ({
   useThemeColor: jest.fn((props, colorName) => {
-    // Handle custom light/dark color override
-    if (props.light && props.dark) {
-      return props.light; // Return light color for testing
-    }
-    
-    // Return different colors based on the colorName
     switch (colorName) {
+      case 'primary':
+        return '#5c2eb8';
       case 'card':
         return '#e3f1e4';
       case 'textMuted':
         return '#5b33af';
-      case 'primary':
-        return '#5c2eb8';
       default:
         return '#000000';
     }
@@ -70,7 +64,7 @@ describe('PrioritySelector', () => {
     expect(strictOption.props.style).toEqual(
       expect.objectContaining({
         borderColor: '#5c2eb8',
-        backgroundColor: 'rgba(92, 46, 184, 0.1)',
+        backgroundColor: '#5c2eb820',
       })
     );
   });
@@ -265,7 +259,7 @@ describe('PrioritySelector', () => {
     expect(selectedStrictOption.props.style).toEqual(
       expect.objectContaining({
         borderColor: '#5c2eb8',
-        backgroundColor: 'rgba(92, 46, 184, 0.1)',
+        backgroundColor: '#5c2eb820',
       })
     );
   });

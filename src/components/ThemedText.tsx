@@ -1,13 +1,15 @@
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
-import { Colors } from '@/constants/Colors';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useThemeColor, type ColorValue } from '@/hooks/useThemeColor';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
   type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
-  colorName?: keyof typeof Colors.light & keyof typeof Colors.dark;
+  colorName?: ColorValue;
+  color?: ColorValue;
+  backgroundColor?: ColorValue;
+  borderColor?: ColorValue;
 };
 
 export function ThemedText({
@@ -16,15 +18,24 @@ export function ThemedText({
   darkColor,
   type = 'default',
   colorName = 'text',
+  color,
+  backgroundColor,
+  borderColor,
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, colorName);
+  const textColorName = color || colorName;
+  const textColor = useThemeColor({ light: lightColor, dark: darkColor }, textColorName);
+  
+  const bgColor = backgroundColor ? useThemeColor({}, backgroundColor) : undefined;
+  const brdColor = borderColor ? useThemeColor({}, borderColor) : undefined;
 
   return (
     <Text
       style={[
         { fontFamily: 'Inter' },
-        { color },
+        { color: textColor },
+        bgColor && { backgroundColor: bgColor },
+        brdColor && { borderColor: brdColor },
         type === 'default' ? styles.default : undefined,
         type === 'title' ? styles.title : undefined,
         type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
@@ -55,6 +66,5 @@ const styles = StyleSheet.create({
   },
   link: {
     fontSize: 16,
-    color: '#0a7ea4',
   },
 });

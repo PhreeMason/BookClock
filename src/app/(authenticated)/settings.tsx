@@ -12,11 +12,8 @@ import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function SettingsScreen() {
     const { user } = useUser();
-    const backgroundColor = useThemeColor({}, 'background');
-    const cardBackgroundColor = useThemeColor({}, 'card');
     const borderColor = useThemeColor({}, 'border');
     const iconColor = useThemeColor({}, 'icon');
-    const textColor = useThemeColor({}, 'text');
     const textMutedColor = useThemeColor({}, 'textMuted');
 
     const handleBackPress = () => {
@@ -24,7 +21,7 @@ export default function SettingsScreen() {
     };
 
     return (
-        <ThemedView style={[styles.container, { backgroundColor }]}>
+        <ThemedView colorName="background" style={styles.container}>
             {/* Header */}
             <View style={[styles.header, { borderBottomColor: borderColor }]}>
                 <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
@@ -36,25 +33,25 @@ export default function SettingsScreen() {
                 <View style={styles.headerSpacer} />
             </View>
 
-            <ThemedScrollView style={styles.content}>
+            <ThemedScrollView backgroundColor="background" style={styles.content}>
                 {/* User Profile Section */}
-                <View style={[styles.section, { backgroundColor: cardBackgroundColor, borderColor }]}>
+                <ThemedView colorName="card" borderColor="border" style={styles.section}>
                     <View style={styles.profileHeader}>
                         <UserAvatar size={80} />
                         <View style={styles.profileInfo}>
                             <ThemedText type="defaultSemiBold" style={styles.userName}>
                                 {user?.fullName || user?.firstName || 'User'}
                             </ThemedText>
-                            <ThemedText colorName="textMuted" style={styles.userEmail}>
+                            <ThemedText color="textMuted" style={styles.userEmail}>
                                 {user?.primaryEmailAddress?.emailAddress}
                             </ThemedText>
                         </View>
                     </View>
-                </View>
+                </ThemedView>
 
                 {/* Settings Options */}
                 <View style={styles.settingsSection}>
-                    <View style={[styles.section, { backgroundColor: cardBackgroundColor, borderColor }]}>
+                    <ThemedView colorName="card" borderColor="border" style={styles.section}>
                         <TouchableOpacity style={styles.settingItem}>
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="person.fill" size={20} color={iconColor} />
@@ -82,14 +79,14 @@ export default function SettingsScreen() {
                             </View>
                             <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
                         </TouchableOpacity>
-                    </View>
+                    </ThemedView>
                 </View>
 
                 {/* Sign Out Section */}
                 <View style={styles.signOutSection}>
-                    <View style={[styles.section, { backgroundColor: cardBackgroundColor, borderColor }]}>
+                    <ThemedView colorName="card" borderColor="border" style={styles.section}>
                         <SignOutButton />
-                    </View>
+                    </ThemedView>
                 </View>
             </ThemedScrollView>
         </ThemedView>

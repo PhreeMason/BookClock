@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { useUser } from '@clerk/clerk-expo';
 import React from 'react';
 import { Image } from 'react-native';
@@ -12,10 +13,12 @@ interface UserAvatarProps {
 
 export function UserAvatar({ 
   size = 40, 
-  backgroundColor = '#667eea',
-  textColor = 'white'
+  backgroundColor,
+  textColor
 }: UserAvatarProps) {
   const { user } = useUser();
+  const defaultBgColor = useThemeColor({}, 'primary');
+  const defaultTextColor = useThemeColor({}, 'primaryForeground');
 
   // Helper function to get user initials
   const getUserInitials = () => {
@@ -29,7 +32,7 @@ export function UserAvatar({
     width: size,
     height: size,
     borderRadius: size / 2,
-    backgroundColor,
+    backgroundColor: backgroundColor || defaultBgColor,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
   };
@@ -41,14 +44,14 @@ export function UserAvatar({
   };
 
   const textStyle = {
-    color: textColor,
+    color: textColor || defaultTextColor,
     fontWeight: '600' as const,
     fontSize: size * 0.4, // Scale font size based on avatar size
   };
 
   return (
-    <ThemedView style={avatarStyle} testID="user-avatar-container">
-      {user?.hasImage && user.imageUrl ? (
+    <ThemedView colorName="card" style={avatarStyle} testID="user-avatar-container">
+      {user?.imageUrl ? (
         <Image 
           source={{ uri: user.imageUrl }} 
           style={imageStyle}

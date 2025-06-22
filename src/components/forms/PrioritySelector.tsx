@@ -9,15 +9,14 @@ interface PrioritySelectorProps {
 }
 
 export const PrioritySelector = ({ selectedPriority, onSelectPriority }: PrioritySelectorProps) => {
+    const primaryColor = useThemeColor({}, 'primary');
+    const cardColor = useThemeColor({}, 'card');
+    const textMutedColor = useThemeColor({}, 'textMuted');
+    
     const priorities = [
         { key: 'flexible', label: 'Flexible', icon: '🕐' },
         { key: 'strict', label: 'Must Meet', icon: '⚡' }
     ];
-
-    const cardColor = useThemeColor({}, 'card');
-    const mutedBorderColor = useThemeColor({}, 'textMuted');
-    const primaryColor = useThemeColor({}, 'primary');
-    const primaryBackgroundColor = useThemeColor({light: 'rgba(92, 46, 184, 0.1)', dark: 'rgba(74, 222, 128, 0.1)'}, 'primary');
 
     return (
         <View style={styles.priorityOptions} testID="priority-options">
@@ -30,14 +29,19 @@ export const PrioritySelector = ({ selectedPriority, onSelectPriority }: Priorit
                         style={[
                             styles.priorityOption,
                             { 
-                                backgroundColor: isSelected ? primaryBackgroundColor : cardColor,
-                                borderColor: isSelected ? primaryColor : mutedBorderColor,
+                                backgroundColor: isSelected ? `${primaryColor}20` : cardColor, // primary with opacity or card
+                                borderColor: isSelected ? primaryColor : textMutedColor, // primary or textMuted
                             }
                         ]}
                         onPress={() => onSelectPriority(priority.key as 'flexible' | 'strict')}
                     >
                         <Text style={[styles.priorityIcon, !isSelected && { opacity: 0.5}]}>{priority.icon}</Text>
-                        <ThemedText style={[{fontWeight: '600'}, !isSelected && { opacity: 0.7 }]}>{priority.label}</ThemedText>
+                        <ThemedText 
+                            color={isSelected ? 'primary' : 'textMuted'}
+                            style={[{fontWeight: '600'}, !isSelected && { opacity: 0.7 }]}
+                        >
+                            {priority.label}
+                        </ThemedText>
                     </TouchableOpacity>
                 )
             })}

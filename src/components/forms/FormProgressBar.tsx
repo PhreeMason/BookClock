@@ -1,3 +1,4 @@
+import { useThemeColor } from '@/hooks/useThemeColor';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -8,10 +9,13 @@ interface FormProgressBarProps {
 
 export const FormProgressBar = ({ currentStep, totalSteps }: FormProgressBarProps) => {
     const progress = (currentStep / totalSteps) * 100;
+    const progressBgColor = useThemeColor({}, 'textMuted');
+    const progressFillColor = useThemeColor({}, 'success');
+    
     return (
         <View style={styles.progressContainer} testID="progress-container">
-            <View style={styles.progressBar} testID="progress-bar">
-                <View style={[styles.progressFill, { width: `${progress}%` }]} testID="progress-fill" />
+            <View style={[styles.progressBar, { backgroundColor: progressBgColor }]} testID="progress-bar">
+                <View style={[styles.progressFill, { width: `${progress}%`, backgroundColor: progressFillColor }]} testID="progress-fill" />
             </View>
         </View>
     );
@@ -24,13 +28,11 @@ const styles = StyleSheet.create({
     },
     progressBar: {
         height: 4,
-        backgroundColor: '#404040',
         borderRadius: 2,
         overflow: 'hidden',
     },
     progressFill: {
         height: '100%',
-        backgroundColor: '#4ade80',
         borderRadius: 2,
     },
 }); 
