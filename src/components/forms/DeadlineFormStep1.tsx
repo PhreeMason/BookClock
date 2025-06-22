@@ -3,7 +3,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { DeadlineFormData } from '@/lib/deadlineFormSchema';
 import React from 'react';
 import { Control } from 'react-hook-form';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { FormatSelector } from './FormatSelector';
 import { SourceSelector } from './SourceSelector';
 
@@ -41,34 +41,42 @@ export const DeadlineFormStep1 = ({
     };
 
     return (
-        <View style={styles.screen}>
-            <ThemedText style={styles.introText}>
+        <View style={{ flex: 1, gap: 24 }}>
+            <ThemedText colorName="textMuted" style={{lineHeight: 24, fontSize: 16}}>
                 Add a book with a deadline to track your reading progress.
             </ThemedText>
 
             <View>
-                <ThemedText style={styles.formLabel}>Book Title *</ThemedText>
+                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Book Title *</ThemedText>
                 <CustomInput
                     control={control}
                     name="bookTitle"
                     placeholder="Enter the book title"
-                    style={styles.formInput}
                 />
             </View>
 
             <View>
-                <ThemedText style={styles.formLabel}>Format</ThemedText>
+                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Author</ThemedText>
+                <CustomInput
+                    control={control}
+                    name="bookAuthor"
+                    placeholder="Author name (optional)"
+                />
+            </View>
+
+            <View>
+                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Format</ThemedText>
                 <FormatSelector
                     selectedFormat={selectedFormat}
                     onSelectFormat={onFormatChange}
                 />
-                <ThemedText style={styles.helperText}>
+                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     This affects how we calculate your reading pace
                 </ThemedText>
             </View>
 
-            <View style={{ marginVertical: 16 }}>
-                <ThemedText style={styles.formLabel}>Where is this book from?</ThemedText>
+            <View>
+                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Where is this book from?</ThemedText>
                 <SourceSelector
                     selectedSource={selectedSource}
                     onSelectSource={onSourceChange}
@@ -76,7 +84,7 @@ export const DeadlineFormStep1 = ({
             </View>
 
             <View>
-                <ThemedText style={styles.formLabel}>{getTotalQuantityLabel()}</ThemedText>
+                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>{getTotalQuantityLabel()}</ThemedText>
                 <View style={{ flexDirection: 'row', gap: 10 }}>
                     <View style={{ flex: 1 }}>
                         <CustomInput
@@ -84,7 +92,6 @@ export const DeadlineFormStep1 = ({
                             name="totalQuantity"
                             placeholder={getTotalQuantityPlaceholder()}
                             keyboardType="numeric"
-                            style={styles.formInput}
                         />
                     </View>
                     {selectedFormat === 'audio' ?
@@ -94,48 +101,13 @@ export const DeadlineFormStep1 = ({
                                 name="totalMinutes"
                                 placeholder="Minutes (optional)"
                                 keyboardType="numeric"
-                                style={styles.formInput}
                             />
                         </View> : null}
                 </View>
-                <ThemedText style={styles.helperText}>
+                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     We'll use this to calculate your daily reading pace
                 </ThemedText>
             </View>
         </View>
     );
-};
-
-const styles = StyleSheet.create({
-    screen: {
-        flex: 1,
-        gap: 5,
-    },
-    introText: {
-        color: '#b0b0b0',
-        fontSize: 16,
-        lineHeight: 24,
-        marginBottom: 32,
-    },
-    formLabel: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#ffffff',
-        marginBottom: 8,
-    },
-    formInput: {
-        backgroundColor: '#2d2d2d',
-        borderWidth: 2,
-        borderColor: '#404040',
-        borderRadius: 12,
-        padding: 16,
-        fontSize: 16,
-        color: '#ffffff',
-    },
-    helperText: {
-        fontSize: 13,
-        color: '#666666',
-        marginTop: 6,
-        lineHeight: 18,
-    },
-}); 
+}; 

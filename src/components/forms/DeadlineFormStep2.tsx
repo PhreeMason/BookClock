@@ -1,5 +1,6 @@
 import CustomInput from '@/components/CustomInput';
 import { ThemedText } from '@/components/ThemedText';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { DeadlineFormData } from '@/lib/deadlineFormSchema';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React from 'react';
@@ -41,24 +42,30 @@ export const DeadlineFormStep2 = ({
         }
     };
 
+    const cardBackgroundColor = useThemeColor({}, 'card');
+    const borderColor = useThemeColor({}, 'border');
+    const dangerColor = useThemeColor({}, 'danger');
+    const successColor = useThemeColor({}, 'primary'); // Assuming primary is a success-like color
+    const cardOverlay = useThemeColor({}, 'cardOverlay');
+
     return (
-        <View style={styles.screen}>
-            <ThemedText style={styles.introText}>
+        <View style={{flex: 1, gap: 24}}>
+            <ThemedText colorName="textMuted" style={{fontSize: 16}}>
                 When do you need to finish, and what are the details?
             </ThemedText>
 
             <View>
-                <ThemedText style={styles.formLabel}>Deadline Date *</ThemedText>
+                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Deadline Date *</ThemedText>
                 <Controller
                     control={control}
                     name="deadline"
                     render={({ field: { value } }) => (
                         <>
                             <TouchableOpacity
-                                style={styles.dateInput}
+                                style={[styles.dateInput, {backgroundColor: cardBackgroundColor, borderColor: borderColor}]}
                                 onPress={onDatePickerToggle}
                             >
-                                <ThemedText style={styles.dateInputText}>
+                                <ThemedText>
                                     {value.toLocaleDateString('en-US', {
                                         weekday: 'long',
                                         year: 'numeric',
@@ -78,7 +85,7 @@ export const DeadlineFormStep2 = ({
                         </>
                     )}
                 />
-                <ThemedText style={styles.helperText}>
+                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     When do you need to finish reading this book? (Past dates will be marked as overdue)
                 </ThemedText>
             </View>
@@ -86,7 +93,7 @@ export const DeadlineFormStep2 = ({
             <View style={styles.sectionDivider} />
 
             <View>
-                <ThemedText style={styles.formLabel}>{getProgressLabel()}</ThemedText>
+                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>{getProgressLabel()}</ThemedText>
                 <View style={{ flexDirection: 'row', gap: 10 }}>
                     <View style={{ flex: 1 }}>
                         <CustomInput
@@ -94,7 +101,6 @@ export const DeadlineFormStep2 = ({
                             name="currentProgress"
                             placeholder='0'
                             keyboardType="numeric"
-                            style={styles.formInput}
                         />
                     </View>
                     {selectedFormat === 'audio' ?
@@ -104,56 +110,47 @@ export const DeadlineFormStep2 = ({
                                 name="currentMinutes"
                                 placeholder='0'
                                 keyboardType="numeric"
-                                style={styles.formInput}
                             />
                         </View> : null}
                 </View>
-                <ThemedText style={styles.helperText}>
+                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     How much have you already finished?
                 </ThemedText>
             </View>
 
             <View style={styles.sectionDivider} />
             <View>
-                <ThemedText style={styles.formLabel}>Deadline Flexibility</ThemedText>
+                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Deadline Flexibility</ThemedText>
                 <PrioritySelector
                     selectedPriority={selectedPriority}
                     onSelectPriority={onPriorityChange}
                 />
-                <ThemedText style={styles.helperText}>
+                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     Can this deadline be adjusted if needed?
                 </ThemedText>
             </View>
 
             <View style={styles.sectionDivider} />
 
-            <View>
-                <ThemedText style={styles.formLabel}>Author</ThemedText>
-                <CustomInput
-                    control={control}
-                    name="bookAuthor"
-                    placeholder="Author name (optional)"
-                    style={styles.formInput}
-                />
-            </View>
-
             {paceEstimate && (
                 <View style={[
                     styles.estimateContainer,
-                    paceEstimate.includes('⚠️ This deadline has already passed') && styles.estimateContainerWarning
+                    {
+                        backgroundColor: paceEstimate.includes('⚠️') ? 'rgba(239, 68, 68, 0.1)' : cardOverlay,
+                        borderColor: paceEstimate.includes('⚠️') ? dangerColor : successColor,
+                    }
                 ]}>
-                    <ThemedText style={[
-                        styles.estimateText,
-                        paceEstimate.includes('⚠️ This deadline has already passed') && styles.estimateTextWarning
-                    ]}>{paceEstimate}</ThemedText>
+                    <ThemedText style={{color: paceEstimate.includes('⚠️') ? dangerColor : successColor}}>
+                        {paceEstimate}
+                    </ThemedText>
                 </View>
             )}
 
-            <View style={styles.summaryCard}>
-                <ThemedText style={styles.summaryTitle}>✓ Ready to Add</ThemedText>
-                <ThemedText style={styles.summaryText}>
+            <View style={[styles.summaryCard, {backgroundColor: cardBackgroundColor, borderColor: borderColor}]}>
+                <ThemedText type="defaultSemiBold" style={[styles.summaryTitle, {color: successColor}]}>✓ Ready to Add</ThemedText>
+                <ThemedText colorName="textMuted" style={styles.summaryText}>
                     {watchedValues.bookTitle && watchedValues.deadline
-                        ? `${watchedValues.bookTitle}${watchedValues.bookAuthor ? ` by ${watchedValues.bookAuthor}` : ''} • Due ${watchedValues.deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                        ? `${watchedValues.bookTitle} • Due ${watchedValues.deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
                         : 'Complete the form above to see your reading plan'
                     }
                 </ThemedText>
@@ -163,91 +160,36 @@ export const DeadlineFormStep2 = ({
 };
 
 const styles = StyleSheet.create({
-    screen: {
-        flex: 1,
-        gap: 5,
-    },
-    introText: {
-        color: '#b0b0b0',
-        fontSize: 16,
-        lineHeight: 24,
-        marginBottom: 32,
-    },
-    formLabel: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#ffffff',
-        marginBottom: 8,
-    },
-    formInput: {
-        backgroundColor: '#2d2d2d',
-        borderWidth: 2,
-        borderColor: '#404040',
-        borderRadius: 12,
-        padding: 16,
-        fontSize: 16,
-        color: '#ffffff',
-    },
-    helperText: {
-        fontSize: 13,
-        color: '#666666',
-        marginTop: 6,
-        lineHeight: 18,
-    },
     sectionDivider: {
         height: 1,
         backgroundColor: '#404040',
-        marginVertical: 32,
+        marginVertical: 16,
         opacity: 0.5,
     },
     estimateContainer: {
-        backgroundColor: 'rgba(74, 222, 128, 0.1)',
         borderWidth: 1,
-        borderColor: '#4ade80',
         borderRadius: 8,
         padding: 14,
         marginTop: 16,
     },
-    estimateContainerWarning: {
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        borderColor: '#ef4444',
-    },
-    estimateText: {
-        fontSize: 14,
-        color: '#4ade80',
-        lineHeight: 20,
-    },
-    estimateTextWarning: {
-        color: '#ef4444',
-    },
     summaryCard: {
-        backgroundColor: '#2d2d2d',
         borderRadius: 16,
         padding: 20,
         marginTop: 32,
         borderWidth: 2,
-        borderColor: '#404040',
     },
     summaryTitle: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#4ade80',
         marginBottom: 8,
     },
     summaryText: {
         fontSize: 14,
-        color: '#b0b0b0',
         lineHeight: 20,
     },
     dateInput: {
-        backgroundColor: '#2d2d2d',
         borderWidth: 2,
-        borderColor: '#404040',
         borderRadius: 12,
         padding: 16,
-    },
-    dateInputText: {
-        fontSize: 16,
-        color: '#ffffff',
     },
 }); 

@@ -20,10 +20,12 @@ src/
 ├── components/            # Reusable UI components
 │   ├── forms/            # Form-specific components
 │   └── ui/               # General UI components
+├── contexts/             # React Context providers
 ├── lib/                   # Utility functions and schemas
 ├── hooks/                 # Custom React hooks
 ├── types/                 # TypeScript type definitions
-└── constants/             # App constants
+├── constants/             # App constants
+└── assets/               # Static assets (images, fonts, etc.)
 ```
 
 ## Best Practices

@@ -1,4 +1,5 @@
 import { ThemedText } from '@/components/ThemedText';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -13,22 +14,33 @@ export const PrioritySelector = ({ selectedPriority, onSelectPriority }: Priorit
         { key: 'strict', label: 'Must Meet', icon: '⚡' }
     ];
 
+    const cardColor = useThemeColor({}, 'card');
+    const mutedBorderColor = useThemeColor({}, 'textMuted');
+    const primaryColor = useThemeColor({}, 'primary');
+    const primaryBackgroundColor = useThemeColor({light: 'rgba(92, 46, 184, 0.1)', dark: 'rgba(74, 222, 128, 0.1)'}, 'primary');
+
     return (
         <View style={styles.priorityOptions} testID="priority-options">
-            {priorities.map((priority) => (
-                <TouchableOpacity
-                    key={priority.key}
-                    testID={`priority-option-${priority.key}`}
-                    style={[
-                        styles.priorityOption,
-                        selectedPriority === priority.key && styles.priorityOptionSelected
-                    ]}
-                    onPress={() => onSelectPriority(priority.key as 'flexible' | 'strict')}
-                >
-                    <Text style={styles.priorityIcon}>{priority.icon}</Text>
-                    <ThemedText style={styles.priorityLabel}>{priority.label}</ThemedText>
-                </TouchableOpacity>
-            ))}
+            {priorities.map((priority) => {
+                const isSelected = selectedPriority === priority.key;
+                return (
+                    <TouchableOpacity
+                        key={priority.key}
+                        testID={`priority-option-${priority.key}`}
+                        style={[
+                            styles.priorityOption,
+                            { 
+                                backgroundColor: isSelected ? primaryBackgroundColor : cardColor,
+                                borderColor: isSelected ? primaryColor : mutedBorderColor,
+                            }
+                        ]}
+                        onPress={() => onSelectPriority(priority.key as 'flexible' | 'strict')}
+                    >
+                        <Text style={[styles.priorityIcon, !isSelected && { opacity: 0.5}]}>{priority.icon}</Text>
+                        <ThemedText style={[{fontWeight: '600'}, !isSelected && { opacity: 0.7 }]}>{priority.label}</ThemedText>
+                    </TouchableOpacity>
+                )
+            })}
         </View>
     );
 };
@@ -41,24 +53,13 @@ const styles = StyleSheet.create({
     },
     priorityOption: {
         flex: 1,
-        backgroundColor: '#2d2d2d',
         borderWidth: 2,
-        borderColor: '#404040',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
     },
-    priorityOptionSelected: {
-        borderColor: '#4ade80',
-        backgroundColor: 'rgba(74, 222, 128, 0.1)',
-    },
     priorityIcon: {
         fontSize: 24,
         marginBottom: 8,
-    },
-    priorityLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#ffffff',
     },
 }); 

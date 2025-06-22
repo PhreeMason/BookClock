@@ -149,6 +149,17 @@ describe('DeadlineFormStep1', () => {
     expect(getByTestId('input-bookTitle')).toBeTruthy();
   });
 
+  it('renders author input', () => {
+    const { getByTestId } = render(
+      <TestComponent
+        onFormatChange={mockOnFormatChange}
+        onSourceChange={mockOnSourceChange}
+      />
+    );
+    
+    expect(getByTestId('input-bookAuthor')).toBeTruthy();
+  });
+
   it('renders format selector', () => {
     const { getByTestId } = render(
       <TestComponent
@@ -312,6 +323,7 @@ describe('DeadlineFormStep1', () => {
     );
     
     expect(getByText('Book Title *')).toBeTruthy();
+    expect(getByText('Author')).toBeTruthy();
     expect(getByText('Format')).toBeTruthy();
     expect(getByText('Where is this book from?')).toBeTruthy();
     expect(getByText('Total Pages')).toBeTruthy();

@@ -14,6 +14,28 @@ jest.mock('@/components/ThemedText', () => ({
   }),
 }));
 
+// Mock the useThemeColor hook
+jest.mock('@/hooks/useThemeColor', () => ({
+  useThemeColor: jest.fn((props, colorName) => {
+    // Handle custom light/dark color override
+    if (props.light && props.dark) {
+      return props.light; // Return light color for testing
+    }
+    
+    // Return different colors based on the colorName
+    switch (colorName) {
+      case 'card':
+        return '#e3f1e4';
+      case 'textMuted':
+        return '#5b33af';
+      case 'primary':
+        return '#5c2eb8';
+      default:
+        return '#000000';
+    }
+  }),
+}));
+
 describe('PrioritySelector', () => {
   const mockOnSelectPriority = jest.fn();
 
@@ -47,8 +69,8 @@ describe('PrioritySelector', () => {
     
     expect(strictOption.props.style).toEqual(
       expect.objectContaining({
-        borderColor: '#4ade80',
-        backgroundColor: 'rgba(74, 222, 128, 0.1)',
+        borderColor: '#5c2eb8',
+        backgroundColor: 'rgba(92, 46, 184, 0.1)',
       })
     );
   });
@@ -65,8 +87,8 @@ describe('PrioritySelector', () => {
     
     expect(strictOption.props.style).toEqual(
       expect.objectContaining({
-        borderColor: '#404040',
-        backgroundColor: '#2d2d2d',
+        borderColor: '#5b33af',
+        backgroundColor: '#e3f1e4',
       })
     );
   });
@@ -130,9 +152,9 @@ describe('PrioritySelector', () => {
     expect(option.props.style).toEqual(
       expect.objectContaining({
         flex: 1,
-        backgroundColor: '#2d2d2d',
+        backgroundColor: '#e3f1e4',
         borderWidth: 2,
-        borderColor: '#404040',
+        borderColor: '#5b33af',
         borderRadius: 12,
         padding: 16,
         alignItems: 'center',
@@ -150,10 +172,12 @@ describe('PrioritySelector', () => {
     
     const icon = getByText('⚡');
     expect(icon.props.style).toEqual(
-      expect.objectContaining({
-        fontSize: 24,
-        marginBottom: 8,
-      })
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 24,
+          marginBottom: 8,
+        }),
+      ])
     );
   });
 
@@ -167,11 +191,11 @@ describe('PrioritySelector', () => {
     
     const label = getByText('Must Meet');
     expect(label.props.style).toEqual(
-      expect.objectContaining({
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#ffffff',
-      })
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontWeight: '600',
+        }),
+      ])
     );
   });
 
@@ -203,15 +227,15 @@ describe('PrioritySelector', () => {
     
     expect(flexibleOption.props.style).toEqual(
       expect.objectContaining({
-        borderColor: '#404040',
-        backgroundColor: '#2d2d2d',
+        borderColor: '#5b33af',
+        backgroundColor: '#e3f1e4',
       })
     );
     
     expect(strictOption.props.style).toEqual(
       expect.objectContaining({
-        borderColor: '#404040',
-        backgroundColor: '#2d2d2d',
+        borderColor: '#5b33af',
+        backgroundColor: '#e3f1e4',
       })
     );
   });
@@ -240,8 +264,8 @@ describe('PrioritySelector', () => {
     const selectedStrictOption = getByTestId('priority-option-strict');
     expect(selectedStrictOption.props.style).toEqual(
       expect.objectContaining({
-        borderColor: '#4ade80',
-        backgroundColor: 'rgba(74, 222, 128, 0.1)',
+        borderColor: '#5c2eb8',
+        backgroundColor: 'rgba(92, 46, 184, 0.1)',
       })
     );
   });
@@ -254,11 +278,11 @@ describe('PrioritySelector', () => {
       />
     );
     
-    expect(getByText('🕐')).toBeTruthy(); // Flexible icon
-    expect(getByText('⚡')).toBeTruthy(); // Strict icon
+    expect(getByText('🕐')).toBeTruthy();
+    expect(getByText('⚡')).toBeTruthy();
   });
 
-  it('renders both labels correctly', () => {
+  it('applies opacity to unselected icons', () => {
     const { getByText } = render(
       <PrioritySelector
         selectedPriority="flexible"
@@ -266,7 +290,31 @@ describe('PrioritySelector', () => {
       />
     );
     
-    expect(getByText('Flexible')).toBeTruthy();
-    expect(getByText('Must Meet')).toBeTruthy();
+    const strictIcon = getByText('⚡');
+    expect(strictIcon.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          opacity: 0.5,
+        }),
+      ])
+    );
+  });
+
+  it('applies opacity to unselected labels', () => {
+    const { getByText } = render(
+      <PrioritySelector
+        selectedPriority="flexible"
+        onSelectPriority={mockOnSelectPriority}
+      />
+    );
+    
+    const strictLabel = getByText('Must Meet');
+    expect(strictLabel.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          opacity: 0.7,
+        }),
+      ])
+    );
   });
 }); 

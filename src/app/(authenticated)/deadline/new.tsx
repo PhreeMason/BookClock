@@ -1,12 +1,11 @@
 import { ThemedScrollView } from '@/components/ThemedScrollView';
-import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import {
@@ -24,6 +23,7 @@ import {
     getPaceEstimate
 } from '@/lib/deadlineCalculations';
 
+import { ThemedButton } from '@/components/ThemedButton';
 import { DeadlineFormData, deadlineFormSchema } from '@/lib/deadlineFormSchema';
 
 const NewDeadLine = () => {
@@ -213,14 +213,16 @@ const NewDeadLine = () => {
         <ThemedView style={styles.container}>
             <FormProgressBar currentStep={currentStep} totalSteps={totalSteps} />
             <StepIndicators currentStep={currentStep} totalSteps={totalSteps} />
+            <ThemedScrollView 
+                style={styles.content} 
+                contentContainerStyle={{paddingBottom: 48}}
+            >
+                <FormHeader
+                    title={formSteps[currentStep - 1]}
+                    onBack={goBack}
+                    showBack={currentStep > 1}
+                />
 
-            <FormHeader
-                title={formSteps[currentStep - 1]}
-                onBack={goBack}
-                showBack={currentStep > 1}
-            />
-
-            <ThemedScrollView style={styles.content}>
                 {currentStep === 1 ? (
                     <DeadlineFormStep1
                         control={control}
@@ -247,25 +249,23 @@ const NewDeadLine = () => {
 
             <View style={styles.navButtons}>
                 {currentStep > 1 && (
-                    <TouchableOpacity style={styles.navButtonSecondary} onPress={goBack}>
-                        <ThemedText style={styles.navButtonSecondaryText}>Back</ThemedText>
-                    </TouchableOpacity>
+                    <ThemedButton
+                        title="Back"
+                        variant="secondary"
+                        onPress={goBack}
+                        style={{flex: 1}}
+                    />
                 )}
-                <TouchableOpacity
-                    style={[styles.navButtonPrimary, isSubmitting && styles.navButtonDisabled]}
+                <ThemedButton
+                    title={isSubmitting ? 'Adding...' : (currentStep === totalSteps ? 'Add Book' : 'Continue')}
                     onPress={nextStep}
                     disabled={isSubmitting}
-                >
-                    <ThemedText style={styles.navButtonPrimaryText}>
-                        {isSubmitting ? 'Adding...' : (currentStep === totalSteps ? 'Add Book' : 'Continue')}
-                    </ThemedText>
-                </TouchableOpacity>
+                    style={{flex: 1}}
+                />
             </View>
         </ThemedView>
     );
 };
-
-export default NewDeadLine;
 
 const styles = StyleSheet.create({
     container: {
@@ -273,41 +273,13 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        padding: 24,
+        padding: 16,
     },
     navButtons: {
         flexDirection: 'row',
-        gap: 12,
-        padding: 20,
-        borderTopWidth: 1,
-        borderTopColor: '#404040',
-    },
-    navButtonSecondary: {
-        flex: 1,
-        backgroundColor: '#404040',
-        borderRadius: 12,
+        gap: 16,
         padding: 16,
-        alignItems: 'center',
-    },
-    navButtonSecondaryText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#ffffff',
-    },
-    navButtonPrimary: {
-        flex: 1,
-        backgroundColor: '#4ade80',
-        borderRadius: 12,
-        padding: 16,
-        alignItems: 'center',
-    },
-    navButtonPrimaryText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#1a1a1a',
-    },
-    navButtonDisabled: {
-        backgroundColor: '#6b7280',
-        opacity: 0.6,
     },
 });
+
+export default NewDeadLine;

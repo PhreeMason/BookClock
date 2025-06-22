@@ -1,4 +1,5 @@
 import { ThemedText } from '@/components/ThemedText';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -14,50 +15,55 @@ export const SourceSelector = ({ selectedSource, onSelectSource }: SourceSelecto
         { key: 'personal', label: '📗 Personal' }
     ];
 
+    const cardColor = useThemeColor({}, 'card');
+    const mutedTextColor = useThemeColor({}, 'textMuted');
+    const primaryColor = useThemeColor({}, 'primary');
+    const primaryBackgroundColor = useThemeColor({light: 'rgba(92, 46, 184, 0.1)', dark: 'rgba(74, 222, 128, 0.1)'}, 'primary');
+
     return (
-        <View style={styles.formatSelector}>
-            {sources.map((source) => (
-                <TouchableOpacity
-                    key={source.key}
-                    style={[
-                        styles.formatChip,
-                        selectedSource === source.key && styles.formatChipSelected
-                    ]}
-                    onPress={() => onSelectSource(source.key as 'arc' | 'library' | 'personal')}
-                >
-                    <ThemedText style={[
-                        styles.formatChipText,
-                        selectedSource === source.key && styles.formatChipTextSelected
-                    ]}>
-                        {source.label}
-                    </ThemedText>
-                </TouchableOpacity>
-            ))}
+        <View style={styles.sourceSelector}>
+            {sources.map((source) => {
+                const isSelected = selectedSource === source.key;
+                return (
+                    <TouchableOpacity
+                        key={source.key}
+                        style={[
+                            styles.sourceChip,
+                            { 
+                                backgroundColor: isSelected ? primaryBackgroundColor : cardColor,
+                            }
+                        ]}
+                        onPress={() => onSelectSource(source.key as 'arc' | 'library' | 'personal')}
+                    >
+                        <ThemedText style={[
+                            styles.sourceChipText,
+                            { color: isSelected ? primaryColor : mutedTextColor },
+                            isSelected && styles.sourceChipTextSelected
+                        ]}>
+                            {source.label}
+                        </ThemedText>
+                    </TouchableOpacity>
+                );
+            })}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    formatSelector: {
+    sourceSelector: {
         flexDirection: 'row',
         gap: 8,
         marginTop: 8,
     },
-    formatChip: {
-        backgroundColor: '#404040',
+    sourceChip: {
         borderRadius: 20,
         padding: 8,
         paddingHorizontal: 16,
     },
-    formatChipSelected: {
-        backgroundColor: '#4ade80',
-    },
-    formatChipText: {
+    sourceChipText: {
         fontSize: 14,
-        color: '#b0b0b0',
     },
-    formatChipTextSelected: {
-        color: '#1a1a1a',
+    sourceChipTextSelected: {
         fontWeight: '600',
     },
 }); 
