@@ -24,7 +24,6 @@ export default function MyTabs() {
                 screenOptions={{
                     tabBarLabelStyle: { fontSize: 18, fontWeight: '600' },
                     tabBarStyle: { backgroundColor },
-                    tabBarBounces: true,
                     tabBarIndicatorStyle: { backgroundColor: tabIconSelected },
                     tabBarActiveTintColor: textColor,
                     tabBarInactiveTintColor: textColor,
