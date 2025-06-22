@@ -22,6 +22,20 @@ jest.mock('../ThemedView', () => ({
   },
 }));
 
+// Mock the useThemeColor hook
+jest.mock('@/hooks/useThemeColor', () => ({
+  useThemeColor: jest.fn((props, colorName) => {
+    switch (colorName) {
+      case 'primary':
+        return '#5c2eb8';
+      case 'primaryForeground':
+        return '#b3f5b9';
+      default:
+        return '#000000';
+    }
+  }),
+}));
+
 // Import the mocked hook to control its behavior in tests
 const mockUseUser = require('@clerk/clerk-expo').useUser;
 
@@ -198,7 +212,7 @@ describe('UserAvatar', () => {
           width: 40,
           height: 40,
           borderRadius: 20,
-          backgroundColor: '#667eea',
+          backgroundColor: '#5c2eb8',
           alignItems: 'center',
           justifyContent: 'center',
         })

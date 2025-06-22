@@ -2,11 +2,11 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import {
     StyleSheet,
-    Text,
     TextInput,
     TextInputProps,
     View,
 } from 'react-native';
+import { ThemedText } from './ThemedText';
 
 type CustomInputProps<T extends FieldValues> = {
     control: Control<T>; // custom fields
@@ -18,11 +18,11 @@ export default function CustomInput<T extends FieldValues>({
     name,
     ...props
 }: CustomInputProps<T>) {
-    const backgroundColor = useThemeColor({}, 'card');
-    const color = useThemeColor({}, 'text');
+    const textMutedColor = useThemeColor({}, 'textMuted');
+    const cardColor = useThemeColor({}, 'card');
+    const textColor = useThemeColor({}, 'text');
     const borderColor = useThemeColor({}, 'border');
-    const errorColor = useThemeColor({}, 'danger'); // Assuming 'danger' is in your color palette
-    const placeholderTextColor = useThemeColor({}, 'textMuted');
+    const dangerColor = useThemeColor({}, 'danger');
 
     return (
         <Controller
@@ -47,19 +47,19 @@ export default function CustomInput<T extends FieldValues>({
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
-                        placeholderTextColor={placeholderTextColor}
+                        placeholderTextColor={textMutedColor}
                         style={[
                             styles.input,
                             { 
-                                backgroundColor, 
-                                color, 
-                                borderColor: error ? errorColor : borderColor 
+                                backgroundColor: cardColor,
+                                color: textColor,
+                                borderColor: error ? dangerColor : borderColor
                             },
                             props.style,
                         ]}
                     />
                     {error ? (
-                        <Text style={[styles.error, { color: errorColor }]}>{error.message}</Text>
+                        <ThemedText color="danger" style={styles.error}>{error.message}</ThemedText>
                     ) : (
                         <View style={{ height: 18 }} />
                     )}

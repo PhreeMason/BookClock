@@ -11,7 +11,7 @@ const OverdueReads = () => {
     if (isLoading) {
         return (
             <ThemedScrollView>
-                <ThemedView style={styles.container}>
+                <ThemedView colorName="card" style={styles.container}>
                     <ThemedText>Loading overdue deadlines...</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
@@ -21,8 +21,8 @@ const OverdueReads = () => {
     if (error) {
         return (
             <ThemedScrollView>
-                <ThemedView style={styles.container}>
-                    <ThemedText style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
+                <ThemedView colorName="card" style={styles.container}>
+                    <ThemedText color="error" style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
         );
@@ -30,10 +30,10 @@ const OverdueReads = () => {
 
     return (
         <ThemedScrollView>
-            <ThemedView style={styles.container}>
+            <ThemedView colorName="card" style={styles.container}>
                 <ThemedText
                     type='defaultSemiBold'
-                    colorName='textMuted'
+                    color='textMuted'
                     style={styles.pageTitle}
                 >
                     OVERDUE DEADLINES
@@ -48,7 +48,7 @@ const OverdueReads = () => {
                 ) : (
                     <ThemedText
                         style={styles.emptyText}
-                        colorName='textMuted'
+                        color='textMuted'
                     >
                         No overdue deadlines
                     </ThemedText>
@@ -76,7 +76,6 @@ const styles = StyleSheet.create({
     },
     errorText: {
         fontSize: 14,
-        color: '#DC2626',
         textAlign: 'center'
     }
 })

@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
@@ -12,8 +13,11 @@ interface FormHeaderProps {
 }
 
 export const FormHeader = ({ title, onBack, showBack, onSkip, showSkip }: FormHeaderProps) => {
+    const borderColor = useThemeColor({}, 'textMuted');
+    const successColor = useThemeColor({}, 'success');
+    
     return (
-        <ThemedView style={styles.header}>
+        <ThemedView colorName="card" style={[styles.header, { borderBottomColor: borderColor }]}>
             <TouchableOpacity
                 style={styles.backButton}
                 onPress={onBack}
@@ -26,7 +30,7 @@ export const FormHeader = ({ title, onBack, showBack, onSkip, showSkip }: FormHe
 
             {showSkip && onSkip && (
                 <TouchableOpacity style={styles.skipButton} onPress={onSkip}>
-                    <ThemedText style={styles.skipButtonText}>Skip</ThemedText>
+                    <ThemedText style={[styles.skipButtonText, { color: successColor }]}>Skip</ThemedText>
                 </TouchableOpacity>
             )}
         </ThemedView>
@@ -40,7 +44,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: 15,
         borderBottomWidth: 1,
-        borderBottomColor: '#404040',
     },
     backButton: {
         padding: 5,
@@ -59,7 +62,6 @@ const styles = StyleSheet.create({
     },
     skipButtonText: {
         fontSize: 16,
-        color: '#4ade80',
         fontWeight: '600',
     },
 }); 

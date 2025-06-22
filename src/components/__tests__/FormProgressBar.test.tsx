@@ -2,6 +2,20 @@ import { render } from '@testing-library/react-native';
 import React from 'react';
 import { FormProgressBar } from '../forms/FormProgressBar';
 
+// Mock the useThemeColor hook
+jest.mock('@/hooks/useThemeColor', () => ({
+  useThemeColor: jest.fn((props, colorName) => {
+    switch (colorName) {
+      case 'textMuted':
+        return '#5b33af';
+      case 'success':
+        return '#4ade80';
+      default:
+        return '#000000';
+    }
+  }),
+}));
+
 describe('FormProgressBar', () => {
   it('renders with default props', () => {
     const { getByTestId } = render(
@@ -105,12 +119,16 @@ describe('FormProgressBar', () => {
     
     const progressBar = getByTestId('progress-bar');
     expect(progressBar.props.style).toEqual(
-      expect.objectContaining({
-        height: 4,
-        backgroundColor: '#404040',
-        borderRadius: 2,
-        overflow: 'hidden',
-      })
+      expect.arrayContaining([
+        expect.objectContaining({
+          height: 4,
+          borderRadius: 2,
+          overflow: 'hidden',
+        }),
+        expect.objectContaining({
+          backgroundColor: '#5b33af',
+        }),
+      ])
     );
   });
 
@@ -124,8 +142,11 @@ describe('FormProgressBar', () => {
       expect.arrayContaining([
         expect.objectContaining({
           height: '100%',
-          backgroundColor: '#4ade80',
           borderRadius: 2,
+        }),
+        expect.objectContaining({
+          backgroundColor: '#4ade80',
+          width: '33.33333333333333%',
         }),
       ])
     );

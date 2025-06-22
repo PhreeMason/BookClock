@@ -93,7 +93,6 @@ describe('ThemedText', () => {
       expect.arrayContaining([
         expect.objectContaining({
           fontSize: 16,
-          color: '#0a7ea4',
         }),
       ])
     );

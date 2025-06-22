@@ -4,35 +4,26 @@ import { SourceSelector } from '../forms/SourceSelector';
 
 // Mock the ThemedText component
 jest.mock('@/components/ThemedText', () => ({
-  ThemedText: jest.fn(({ children, style, ...props }) => {
+  ThemedText: jest.fn(({ children, style, color, ...props }) => {
     const { Text } = require('react-native');
+    
+    // Apply color based on the color prop
+    let colorStyle = {};
+    if (color === 'primary') {
+      colorStyle = { color: '#5c2eb8' };
+    } else if (color === 'textMuted') {
+      colorStyle = { color: '#5b33af' };
+    }
+    
+    // Flatten the style array and merge with color style
+    const flattenedStyle = Array.isArray(style) ? style.flat() : [style];
+    const finalStyle = [...flattenedStyle, colorStyle];
+    
     return (
-      <Text testID="themed-text" style={style} {...props}>
+      <Text testID="themed-text" style={finalStyle} {...props}>
         {children}
       </Text>
     );
-  }),
-}));
-
-// Mock the useThemeColor hook
-jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn((props, colorName) => {
-    // Handle custom light/dark color override
-    if (props.light && props.dark) {
-      return props.light; // Return light color for testing
-    }
-    
-    // Return different colors based on the colorName
-    switch (colorName) {
-      case 'card':
-        return '#e3f1e4';
-      case 'textMuted':
-        return '#5b33af';
-      case 'primary':
-        return '#5c2eb8';
-      default:
-        return '#000000';
-    }
   }),
 }));
 

@@ -1,5 +1,6 @@
 import CustomInput from '@/components/CustomInput';
 import SignInWith from '@/components/SignInWith';
+import { ThemedButton } from '@/components/ThemedButton';
 import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -8,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { z } from 'zod';
 
 const signInSchema = z.object({
@@ -80,7 +81,7 @@ export default function Page() {
         <ThemedKeyboardAvoidingView style={styles.container}>
             <ThemedText type="title" style={styles.title}>Sign in</ThemedText>
 
-            <ThemedView style={styles.form}>
+            <ThemedView colorName="card" style={styles.form}>
                 <CustomInput
                     control={control}
                     name="email"
@@ -100,21 +101,25 @@ export default function Page() {
                 />
 
                 {errors.root && (
-                    <ThemedText style={styles.errorText}>{errors.root.message}</ThemedText>
+                    <ThemedText color="error" style={styles.errorText}>{errors.root.message}</ThemedText>
                 )}
 
-                <TouchableOpacity style={styles.button} onPress={handleSubmit(onSignInPress)}>
-                    <ThemedText style={styles.buttonText}>Continue</ThemedText>
-                </TouchableOpacity>
+                <ThemedButton
+                    title="Continue"
+                    style={styles.button}
+                    backgroundColor="buttonPrimary"
+                    textColor="buttonText"
+                    onPress={handleSubmit(onSignInPress)}
+                />
             </ThemedView>
 
-            <ThemedView style={styles.footer}>
+            <ThemedView colorName="card" style={styles.footer}>
                 <ThemedText>Don't have an account? </ThemedText>
                 <Link href="/(auth)/sign-up">
                     <ThemedText type="link">Sign up</ThemedText>
                 </Link>
             </ThemedView>
-            <ThemedView style={{ flexDirection: 'row', gap: 10, marginHorizontal: 'auto' }}>
+            <ThemedView colorName="card" style={{ flexDirection: 'row', gap: 10, marginHorizontal: 'auto' }}>
                 <SignInWith strategy='oauth_google' />
                 <SignInWith strategy='oauth_apple' />
             </ThemedView>
@@ -138,23 +143,15 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ddd',
         borderRadius: 8,
         padding: 16,
         fontSize: 16,
-        backgroundColor: '#fff',
     },
     button: {
-        backgroundColor: '#0a7ea4',
         borderRadius: 8,
         padding: 16,
         alignItems: 'center',
         marginTop: 8,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
     },
     footer: {
         flexDirection: 'row',
@@ -163,7 +160,6 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     errorText: {
-        color: 'crimson',
         textAlign: 'center',
     },
 });

@@ -1,14 +1,16 @@
 import CustomInput from '@/components/CustomInput';
 import SignInWith from '@/components/SignInWith';
+import { ThemedButton } from '@/components/ThemedButton';
 import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { isClerkAPIResponseError, useSignUp } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, TextInput } from 'react-native';
 import { z } from 'zod';
 
 const signUpSchema = z.object({
@@ -97,22 +99,28 @@ export default function SignUpScreen() {
     };
 
     if (pendingVerification) {
+        const textMutedColor = useThemeColor({}, 'textMuted');
+        
         return (
-            <ThemedView style={styles.container}>
+            <ThemedView colorName="background" style={styles.container}>
                 <ThemedText type="title" style={styles.title}>Verify your email</ThemedText>
 
-                <ThemedView style={styles.form}>
+                <ThemedView colorName="card" style={styles.form}>
                     <TextInput
                         style={styles.input}
                         value={code}
                         placeholder="Enter your verification code"
-                        placeholderTextColor="#666"
+                        placeholderTextColor={textMutedColor}
                         onChangeText={(code) => setCode(code)}
                     />
 
-                    <TouchableOpacity style={styles.button} onPress={onVerifyPress}>
-                        <ThemedText style={styles.buttonText}>Verify</ThemedText>
-                    </TouchableOpacity>
+                    <ThemedButton
+                        title="Verify"
+                        style={styles.button}
+                        backgroundColor="buttonPrimary"
+                        textColor="buttonText"
+                        onPress={onVerifyPress}
+                    />
                 </ThemedView>
             </ThemedView>
         );
@@ -122,7 +130,7 @@ export default function SignUpScreen() {
         <ThemedKeyboardAvoidingView style={styles.container}>
             <ThemedText type="title" style={styles.title}>Sign up</ThemedText>
 
-            <ThemedView style={styles.form}>
+            <ThemedView colorName="card" style={styles.form}>
                 <CustomInput
                     control={control}
                     name="email"
@@ -142,21 +150,25 @@ export default function SignUpScreen() {
                 />
 
                 {errors.root && (
-                    <ThemedText style={styles.errorText}>{errors.root.message}</ThemedText>
+                    <ThemedText color="error" style={styles.errorText}>{errors.root.message}</ThemedText>
                 )}
 
-                <TouchableOpacity style={styles.button} onPress={handleSubmit(onSignUpPress)}>
-                    <ThemedText style={styles.buttonText}>Continue</ThemedText>
-                </TouchableOpacity>
+                <ThemedButton
+                    title="Continue"
+                    style={styles.button}
+                    backgroundColor="buttonPrimary"
+                    textColor="buttonText"
+                    onPress={handleSubmit(onSignUpPress)}
+                />
             </ThemedView>
 
-            <ThemedView style={styles.footer}>
+            <ThemedView colorName="card" style={styles.footer}>
                 <ThemedText>Already have an account? </ThemedText>
                 <Link href="/(auth)/sign-in">
                     <ThemedText type="link">Sign in</ThemedText>
                 </Link>
             </ThemedView>
-            <ThemedView style={{ flexDirection: 'row', gap: 10, marginHorizontal: 'auto' }}>
+            <ThemedView colorName="card" style={{ flexDirection: 'row', gap: 10, marginHorizontal: 'auto' }}>
                 <SignInWith strategy='oauth_google' />
                 <SignInWith strategy='oauth_apple' />
             </ThemedView>
@@ -180,23 +192,15 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ddd',
         borderRadius: 8,
         padding: 16,
         fontSize: 16,
-        backgroundColor: '#fff',
     },
     button: {
-        backgroundColor: '#0a7ea4',
         borderRadius: 8,
         padding: 16,
         alignItems: 'center',
         marginTop: 8,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
     },
     footer: {
         flexDirection: 'row',
@@ -205,7 +209,6 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     errorText: {
-        color: 'crimson',
         textAlign: 'center',
     },
 });
