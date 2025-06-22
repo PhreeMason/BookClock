@@ -8,7 +8,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { useUser } from '@clerk/clerk-expo';
 import { router } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function SettingsScreen() {
     const { user } = useUser();
@@ -28,7 +28,7 @@ export default function SettingsScreen() {
             {/* Header */}
             <View style={[styles.header, { borderBottomColor: borderColor }]}>
                 <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-                    <IconSymbol name="chevron.left" size={24} color={iconColor} />
+                    <IconSymbol name="chevron.left" size={Platform.OS === 'ios' ? 24 : 40} color={iconColor} />
                 </TouchableOpacity>
                 <ThemedText type="defaultSemiBold" style={styles.headerTitle}>
                     Settings
@@ -109,7 +109,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
     },
     backButton: {
-        padding: 8,
         marginRight: 8,
     },
     headerTitle: {
