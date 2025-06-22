@@ -24,6 +24,7 @@ const MAPPING = {
   'arrow.left': 'arrow-left',
   'gearshape.fill': 'settings',
   'rectangle.portrait.and.arrow.right': 'logout',
+  'chevron.left': 'keyboard-arrow-left',
 } as IconMapping;
 
 /**
