@@ -1,6 +1,17 @@
 // Helper functions for deadline calculations
 
 // Functions for processing form data (where totalQuantity is in hours for audio)
+
+/**
+ * Calculates the total quantity from form data, converting audio hours to minutes.
+ * For audio books, converts hours to minutes and adds any additional minutes.
+ * For physical/ebook formats, returns the quantity as-is (pages/chapters).
+ * 
+ * @param format - The book format ('physical', 'ebook', or 'audio')
+ * @param totalQuantity - The main quantity value (hours for audio, pages/chapters for others)
+ * @param totalMinutes - Additional minutes for audio format (optional)
+ * @returns The total quantity in appropriate units (minutes for audio, pages/chapters for others)
+ */
 export const calculateTotalQuantityFromForm = (
     format: 'physical' | 'ebook' | 'audio',
     totalQuantity: number | string,
@@ -15,6 +26,16 @@ export const calculateTotalQuantityFromForm = (
     return quantity;
 };
 
+/**
+ * Calculates the current progress from form data, converting audio hours to minutes.
+ * For audio books, converts hours to minutes and adds any additional minutes.
+ * For physical/ebook formats, returns the progress as-is (pages/chapters).
+ * 
+ * @param format - The book format ('physical', 'ebook', or 'audio')
+ * @param currentProgress - The main progress value (hours for audio, pages/chapters for others)
+ * @param currentMinutes - Additional minutes for audio format (optional)
+ * @returns The current progress in appropriate units (minutes for audio, pages/chapters for others)
+ */
 export const calculateCurrentProgressFromForm = (
     format: 'physical' | 'ebook' | 'audio',
     currentProgress: number | string,
@@ -30,6 +51,17 @@ export const calculateCurrentProgressFromForm = (
 };
 
 // Functions for processing database data (where totalQuantity is already in minutes for audio)
+
+/**
+ * Calculates the total quantity from database data.
+ * For audio books, totalQuantity is already in minutes, so just adds additional minutes.
+ * For physical/ebook formats, returns the quantity as-is (pages/chapters).
+ * 
+ * @param format - The book format ('physical', 'ebook', or 'audio')
+ * @param totalQuantity - The main quantity value (minutes for audio, pages/chapters for others)
+ * @param totalMinutes - Additional minutes for audio format (optional)
+ * @returns The total quantity in appropriate units (minutes for audio, pages/chapters for others)
+ */
 export const calculateTotalQuantity = (
     format: 'physical' | 'ebook' | 'audio',
     totalQuantity: number | string,
@@ -44,6 +76,16 @@ export const calculateTotalQuantity = (
     return quantity;
 };
 
+/**
+ * Calculates the current progress from database data.
+ * For audio books, currentProgress is already in minutes, so just adds additional minutes.
+ * For physical/ebook formats, returns the progress as-is (pages/chapters).
+ * 
+ * @param format - The book format ('physical', 'ebook', or 'audio')
+ * @param currentProgress - The main progress value (minutes for audio, pages/chapters for others)
+ * @param currentMinutes - Additional minutes for audio format (optional)
+ * @returns The current progress in appropriate units (minutes for audio, pages/chapters for others)
+ */
 export const calculateCurrentProgress = (
     format: 'physical' | 'ebook' | 'audio',
     currentProgress: number | string,
@@ -58,6 +100,17 @@ export const calculateCurrentProgress = (
     return progress;
 };
 
+/**
+ * Calculates the remaining content to be consumed from database data.
+ * Uses database-specific calculation functions that handle minutes correctly for audio.
+ * 
+ * @param format - The book format ('physical', 'ebook', or 'audio')
+ * @param totalQuantity - The total quantity (minutes for audio, pages/chapters for others)
+ * @param totalMinutes - Additional minutes for audio format (optional)
+ * @param currentProgress - The current progress (minutes for audio, pages/chapters for others)
+ * @param currentMinutes - Additional minutes for current progress in audio format (optional)
+ * @returns The remaining content in appropriate units (minutes for audio, pages/chapters for others)
+ */
 export const calculateRemaining = (
     format: 'physical' | 'ebook' | 'audio',
     totalQuantity: number | string,
@@ -70,6 +123,17 @@ export const calculateRemaining = (
     return total - current;
 };
 
+/**
+ * Calculates the remaining content to be consumed from form data.
+ * Uses form-specific calculation functions that convert audio hours to minutes.
+ * 
+ * @param format - The book format ('physical', 'ebook', or 'audio')
+ * @param totalQuantity - The total quantity (hours for audio, pages/chapters for others)
+ * @param totalMinutes - Additional minutes for audio format (optional)
+ * @param currentProgress - The current progress (hours for audio, pages/chapters for others)
+ * @param currentMinutes - Additional minutes for current progress in audio format (optional)
+ * @returns The remaining content in appropriate units (minutes for audio, pages/chapters for others)
+ */
 export const calculateRemainingFromForm = (
     format: 'physical' | 'ebook' | 'audio',
     totalQuantity: number | string,
@@ -82,6 +146,22 @@ export const calculateRemainingFromForm = (
     return total - current;
 };
 
+/**
+ * Generates a human-readable estimate of the time required to finish the remaining content.
+ * Provides different estimates based on the book format and remaining content.
+ * 
+ * @param format - The book format ('physical', 'ebook', or 'audio')
+ * @param remaining - The remaining content (minutes for audio, pages/chapters for others)
+ * @returns A formatted string with time estimate and appropriate emoji, or empty string if no remaining content
+ * 
+ * @example
+ * // For physical/ebook
+ * getReadingEstimate('physical', 80) // "📖 About 2 hours of reading time"
+ * 
+ * @example
+ * // For audio
+ * getReadingEstimate('audio', 150) // "🎧 About 2 hours and 30 minutes of listening time"
+ */
 export const getReadingEstimate = (
     format: 'physical' | 'ebook' | 'audio',
     remaining: number
@@ -106,6 +186,23 @@ export const getReadingEstimate = (
     }
 };
 
+/**
+ * Calculates the daily pace required to finish the remaining content by a deadline.
+ * Provides format-specific guidance on daily reading/listening goals.
+ * 
+ * @param format - The book format ('physical', 'ebook', or 'audio')
+ * @param deadline - The target completion date
+ * @param remaining - The remaining content (minutes for audio, pages/chapters for others)
+ * @returns A formatted string with daily pace recommendation and appropriate emoji, or warning if deadline passed
+ * 
+ * @example
+ * // For physical/ebook
+ * getPaceEstimate('physical', new Date('2024-12-31'), 100) // "📅 You'll need to read 10 pages/day to finish on time"
+ * 
+ * @example
+ * // For audio
+ * getPaceEstimate('audio', new Date('2024-12-31'), 300) // "📅 You'll need to listen 1 hour/day to finish on time"
+ */
 export const getPaceEstimate = (
     format: 'physical' | 'ebook' | 'audio',
     deadline: Date,
