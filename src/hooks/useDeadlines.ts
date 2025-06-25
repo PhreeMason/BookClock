@@ -25,20 +25,20 @@ export const useAddDeadline = () => {
             
             // Generate IDs
             const { data: deadlineId, error: deadlineIdError } = await supabase.rpc('generate_prefixed_id', { prefix: 'rd' });
+            const finalDeadlineId = deadlineIdError ? `rd_${crypto.randomUUID()}` : deadlineId;
             if (deadlineIdError) {
-                console.error('Error generating deadline ID:', deadlineIdError);
-                throw new Error(`Failed to generate deadline ID: ${deadlineIdError.message}`);
+                console.warn('RPC ID generation failed, using crypto fallback for deadline ID:', deadlineIdError);
             }
             
             const { data: progressId, error: progressIdError } = await supabase.rpc('generate_prefixed_id', { prefix: 'rdp' });
+            const finalProgressId = progressIdError ? `rdp_${crypto.randomUUID()}` : progressId;
             if (progressIdError) {
-                console.error('Error generating progress ID:', progressIdError);
-                throw new Error(`Failed to generate progress ID: ${progressIdError.message}`);
+                console.warn('RPC ID generation failed, using crypto fallback for progress ID:', progressIdError);
             }
             
-            deadlineDetails.id = deadlineId;
-            progressDetails.id = progressId;
-            progressDetails.reading_deadline_id = deadlineId;
+            deadlineDetails.id = finalDeadlineId;
+            progressDetails.id = finalProgressId;
+            progressDetails.reading_deadline_id = finalDeadlineId;
 
             const { data, error } = await supabase.from('reading_deadlines').insert({
                 ...deadlineDetails,
@@ -71,6 +71,55 @@ export const useAddDeadline = () => {
         },
         onError: (error) => {
             console.error("Error adding deadline:", error);
+        },
+    })
+}
+
+export const useUpdateDeadlineProgress = () => {
+    const supabase = useSupabase();
+    const user = useUser();
+    const userId = user?.user?.id;
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationKey: ['updateDeadlineProgress'],
+        mutationFn: async (progressDetails: { deadlineId: string; currentProgress: number }) => {
+            if (!userId) {
+                throw new Error("User not authenticated");
+            }
+            
+            // Generate progress ID using RPC with crypto fallback
+            const { data: progressId, error: progressIdError } = await supabase.rpc('generate_prefixed_id', { prefix: 'rdp' });
+            const finalProgressId = progressIdError ? `rdp_${crypto.randomUUID()}` : progressId;
+            if (progressIdError) {
+                console.warn('RPC ID generation failed, using crypto fallback for progress ID:', progressIdError);
+            }
+            
+            // Create new progress entry
+            const { data, error } = await supabase
+                .from('reading_deadline_progress')
+                .insert({
+                    id: finalProgressId,
+                    reading_deadline_id: progressDetails.deadlineId,
+                    current_progress: progressDetails.currentProgress,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .select()
+                .single();
+
+            if (error) {
+                throw error;
+            }
+
+            return data;
+        },
+        onSuccess: () => {
+            // Invalidate and refetch deadlines after successful update
+            queryClient.invalidateQueries({ queryKey: ['deadlines', userId] });
+        },
+        onError: (error) => {
+            console.error("Error updating deadline progress:", error);
         },
     })
 }

@@ -1,43 +1,56 @@
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useThemeColor, type ColorValue } from '@/hooks/useThemeColor';
 import React from 'react';
 import { Pressable, PressableProps, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
 
 interface ThemedButtonProps extends PressableProps {
   title: string;
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'success';
   style?: ViewStyle;
   textStyle?: TextStyle;
+  // Color props for custom theming
+  backgroundColor?: ColorValue;
+  textColor?: ColorValue;
+  borderColor?: ColorValue;
 }
+
+// Default color mapping for variants
+const variantColors: Record<string, { bg: ColorValue; text: ColorValue; border?: ColorValue }> = {
+  primary: { bg: 'primary', text: 'primaryForeground' },
+  secondary: { bg: 'card', text: 'text', border: 'border' },
+  danger: { bg: 'transparent', text: 'destructive', border: 'destructive' },
+  ghost: { bg: 'transparent', text: 'text' },
+  success: { bg: 'success', text: 'successForeground' },
+};
 
 export function ThemedButton({
   title,
   variant = 'primary',
   style,
   textStyle,
+  backgroundColor,
+  textColor,
+  borderColor,
   ...props
 }: ThemedButtonProps) {
-  const backgroundColor = useThemeColor(
-    {},
-    variant === 'primary'
-      ? 'primary'
-      : variant === 'secondary'
-      ? 'card'
-      : 'background'
-  );
-  const color = useThemeColor(
-    {},
-    variant === 'primary' ? 'primaryForeground' : 'text'
-  );
-  const borderColor = useThemeColor({}, 'border');
+  // Get variant colors or fallback to primary
+  const variantConfig = variantColors[variant] || variantColors.primary;
+  
+  // Use provided colors or fall back to variant-based colors
+  const bgColor = useThemeColor({}, backgroundColor || variantConfig.bg);
+  const txtColor = useThemeColor({}, textColor || variantConfig.text);
+  const brdColor = useThemeColor({}, borderColor || variantConfig.border || 'border');
+
+  // Determine if button should have border
+  const shouldShowBorder = variant === 'secondary' || variant === 'ghost' || variant === 'danger' || borderColor;
 
   return (
     <Pressable
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor,
-          borderColor,
-          borderWidth: variant === 'secondary' ? 1 : 0,
+          backgroundColor: bgColor,
+          borderColor: brdColor,
+          borderWidth: shouldShowBorder ? 1 : 0,
         },
         pressed && styles.pressed,
         props.disabled && styles.disabled,
@@ -45,7 +58,7 @@ export function ThemedButton({
       ]}
       {...props}
     >
-      <Text style={[styles.text, { color }, textStyle]}>{title}</Text>
+      <Text style={[styles.text, { color: txtColor }, textStyle]}>{title}</Text>
     </Pressable>
   );
 }

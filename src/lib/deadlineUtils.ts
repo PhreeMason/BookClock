@@ -1,7 +1,13 @@
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { calculateTotalQuantity } from './deadlineCalculations';
 
-// Sort function for deadlines
+/**
+ * Sorts deadlines by priority: first by due date (earliest first), then by updated_at (most recent first), 
+ * and finally by created_at (most recent first).
+ * @param a - First deadline to compare
+ * @param b - Second deadline to compare
+ * @returns A negative value if a should come before b, positive if a should come after b, or 0 if equal
+ */
 export const sortDeadlines = (a: ReadingDeadlineWithProgress, b: ReadingDeadlineWithProgress) => {
     // First sort by due date (deadline_date)
     const aDueDate = new Date(a.deadline_date);
@@ -23,6 +29,12 @@ export const sortDeadlines = (a: ReadingDeadlineWithProgress, b: ReadingDeadline
     return bCreatedAt.getTime() - aCreatedAt.getTime(); // Most recent first
 };
 
+/**
+ * Separates deadlines into active and overdue categories based on their due dates.
+ * Both categories are sorted using the sortDeadlines function.
+ * @param deadlines - Array of deadlines to separate
+ * @returns Object containing active and overdue deadline arrays
+ */
 export const separateDeadlines = (deadlines: ReadingDeadlineWithProgress[]) => {
     const now = new Date();
     
@@ -46,6 +58,12 @@ export const separateDeadlines = (deadlines: ReadingDeadlineWithProgress[]) => {
     return { active, overdue };
 };
 
+/**
+ * Calculates the number of days remaining until a deadline.
+ * Returns a positive number for future dates and negative for past dates.
+ * @param deadlineDate - The deadline date as a string
+ * @returns Number of days left (positive) or overdue (negative)
+ */
 export const calculateDaysLeft = (deadlineDate: string): number => {
     const now = new Date();
     const deadline = new Date(deadlineDate);
@@ -54,6 +72,11 @@ export const calculateDaysLeft = (deadlineDate: string): number => {
     return diffDays;
 };
 
+/**
+ * Calculates the current progress for a deadline by finding the most recent progress entry.
+ * @param deadline - The deadline with its progress entries
+ * @returns The current progress value, or 0 if no progress entries exist
+ */
 export const calculateProgress = (deadline: ReadingDeadlineWithProgress): number => {
     if (deadline.progress.length === 0) return 0;
     
@@ -65,13 +88,22 @@ export const calculateProgress = (deadline: ReadingDeadlineWithProgress): number
     return latestProgress.current_progress || 0;
 };
 
+/**
+ * Calculates the progress percentage for a deadline based on current progress and total quantity.
+ * @param deadline - The deadline to calculate percentage for
+ * @returns Progress percentage rounded to the nearest whole number
+ */
 export const calculateProgressPercentage = (deadline: ReadingDeadlineWithProgress): number => {
     const currentProgress = calculateProgress(deadline);
     const totalQuantity = calculateTotalQuantity(deadline.format, deadline.total_quantity);
     return Math.round((currentProgress / totalQuantity) * 100);
 };
 
-// Helper function to get the appropriate unit for display based on format
+/**
+ * Returns the appropriate unit for display based on the reading format.
+ * @param format - The reading format (physical, ebook, or audio)
+ * @returns The unit string ('minutes' for audio, 'pages' for physical/ebook)
+ */
 export const getUnitForFormat = (format: 'physical' | 'ebook' | 'audio'): string => {
     switch (format) {
         case 'audio':
@@ -83,7 +115,14 @@ export const getUnitForFormat = (format: 'physical' | 'ebook' | 'audio'): string
     }
 };
 
-// Helper function to format progress display based on format
+/**
+ * Formats progress display based on the reading format.
+ * For audio books, converts minutes to hours and minutes format.
+ * For physical/ebook, returns the progress as-is.
+ * @param format - The reading format (physical, ebook, or audio)
+ * @param progress - The progress value to format
+ * @returns Formatted progress string
+ */
 export const formatProgressDisplay = (format: 'physical' | 'ebook' | 'audio', progress: number): string => {
     if (format === 'audio') {
         const hours = Math.floor(progress / 60);
@@ -96,7 +135,13 @@ export const formatProgressDisplay = (format: 'physical' | 'ebook' | 'audio', pr
     return `${progress}`;
 };
 
-// Calculate total reading time per day needed for all active deadlines
+/**
+ * Calculates the total reading time per day needed for all active deadlines.
+ * Converts pages to estimated minutes using an average reading speed of 40 pages per hour.
+ * @param activeDeadlines - Array of active deadlines
+ * @param getDeadlineCalculations - Function that calculates units per day for a deadline
+ * @returns Formatted string showing total daily reading time needed or "No active deadlines"
+ */
 export const getTotalReadingTimePerDay = (
     activeDeadlines: ReadingDeadlineWithProgress[],
     getDeadlineCalculations: (deadline: ReadingDeadlineWithProgress) => {

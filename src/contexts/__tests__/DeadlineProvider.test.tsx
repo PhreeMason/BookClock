@@ -282,7 +282,7 @@ describe('DeadlineProvider', () => {
         </DeadlineProvider>
       );
 
-      expect(screen.getByText('Urgency Color: #EF4444')).toBeTruthy();
+      expect(screen.getByText('Urgency Color: #ef4444')).toBeTruthy();
     });
 
     it('should provide correct status messages', () => {

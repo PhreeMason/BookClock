@@ -1,3 +1,4 @@
+import { palette } from '@/constants/palette';
 import { useAddDeadline, useGetDeadlines } from '@/hooks/useDeadlines';
 import {
     calculateCurrentProgress,
@@ -93,11 +94,11 @@ export const DeadlineProvider: React.FC<DeadlineProviderProps> = ({ children }) 
 
   const getUrgencyColor = (urgencyLevel: string): string => {
     switch (urgencyLevel) {
-      case 'overdue': return '#DC2626';
-      case 'urgent': return '#EF4444';
-      case 'good': return '#4ADE80';
-      case 'approaching': return '#FB923C';
-      default: return '#4ECDC4';
+      case 'overdue': return palette.red[300];
+      case 'urgent': return palette.red.DEFAULT;
+      case 'good': return palette.green.DEFAULT;
+      case 'approaching': return palette.orange.DEFAULT;
+      default: return palette.celadon.DEFAULT;
     }
   };
 

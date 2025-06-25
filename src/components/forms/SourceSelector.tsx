@@ -9,16 +9,14 @@ interface SourceSelectorProps {
 }
 
 export const SourceSelector = ({ selectedSource, onSelectSource }: SourceSelectorProps) => {
+    const primaryColor = useThemeColor({}, 'primary');
+    const cardColor = useThemeColor({}, 'card');
+    
     const sources = [
         { key: 'arc', label: '📚 ARC' },
         { key: 'library', label: '📖 Library' },
         { key: 'personal', label: '📗 Personal' }
     ];
-
-    const cardColor = useThemeColor({}, 'card');
-    const mutedTextColor = useThemeColor({}, 'textMuted');
-    const primaryColor = useThemeColor({}, 'primary');
-    const primaryBackgroundColor = useThemeColor({light: 'rgba(92, 46, 184, 0.1)', dark: 'rgba(74, 222, 128, 0.1)'}, 'primary');
 
     return (
         <View style={styles.sourceSelector}>
@@ -30,16 +28,18 @@ export const SourceSelector = ({ selectedSource, onSelectSource }: SourceSelecto
                         style={[
                             styles.sourceChip,
                             { 
-                                backgroundColor: isSelected ? primaryBackgroundColor : cardColor,
+                                backgroundColor: isSelected ? `${primaryColor}20` : cardColor, // primary with opacity or card
                             }
                         ]}
                         onPress={() => onSelectSource(source.key as 'arc' | 'library' | 'personal')}
                     >
-                        <ThemedText style={[
-                            styles.sourceChipText,
-                            { color: isSelected ? primaryColor : mutedTextColor },
-                            isSelected && styles.sourceChipTextSelected
-                        ]}>
+                        <ThemedText 
+                            color={isSelected ? 'primary' : 'textMuted'}
+                            style={[
+                                styles.sourceChipText,
+                                isSelected && styles.sourceChipTextSelected
+                            ]}
+                        >
                             {source.label}
                         </ThemedText>
                     </TouchableOpacity>

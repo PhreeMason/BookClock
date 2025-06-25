@@ -16,9 +16,6 @@ type HeaderProps = {
 const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderProps) => {
     const today = Date.now()
     const formattedDate = dayjs(today).format('dddd, MMMM DD')
-    const backgroundColor = useThemeColor({}, 'background');
-    const mutedColor = useThemeColor({}, 'textMuted');
-    const borderColor = useThemeColor({}, 'border');
     const iconColor = useThemeColor({}, 'icon');
 
     const handleSettingsPress = () => {
@@ -26,18 +23,18 @@ const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderP
     };
 
     return (
-        <ThemedView style={[styles.container, { borderBottomColor: borderColor, backgroundColor }]}>
-            <ThemedView style={[styles.dateRow, { backgroundColor }]}>
+        <ThemedView backgroundColor="background" borderColor="border" style={styles.container}>
+            <ThemedView backgroundColor="background" style={styles.dateRow}>
                 <ThemedText style={styles.dateText}>{formattedDate}</ThemedText>
-                <ThemedText style={[styles.statusSummary, { color: mutedColor}]}>
+                <ThemedText color="textMuted" style={styles.statusSummary}>
                     {activeCount} active • {attentionCount} needs attention
                 </ThemedText>
-                <ThemedText style={[styles.readingTimeSummary, { color: mutedColor}]}>
+                <ThemedText color="textMuted" style={styles.readingTimeSummary}>
                     {totalReadingTimePerDay}
                 </ThemedText>
             </ThemedView>
             <TouchableOpacity 
-                style={[styles.settings, { backgroundColor }]} 
+                style={styles.settings} 
                 onPress={handleSettingsPress}
             >
                 <IconSymbol size={28} name="gearshape.fill" color={iconColor} />

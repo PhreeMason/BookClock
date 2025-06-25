@@ -1,3 +1,4 @@
+
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useClerk } from '@clerk/clerk-expo';
 import * as Linking from 'expo-linking';
@@ -24,7 +25,7 @@ export const SignOutButton = () => {
   return (
     <TouchableOpacity onPress={handleSignOut} style={styles.button}>
       <IconSymbol name="rectangle.portrait.and.arrow.right" size={20} color={dangerColor} />
-      <ThemedText style={[styles.text, { color: dangerColor }]}>Sign Out</ThemedText>
+      <ThemedText color="danger" style={styles.text}>Sign Out</ThemedText>
     </TouchableOpacity>
   )
 }
