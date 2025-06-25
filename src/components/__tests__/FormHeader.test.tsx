@@ -27,8 +27,8 @@ jest.mock('@/components/ThemedView', () => ({
 
 // Mock the useThemeColor hook
 jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn((props, colorName) => {
-    switch (colorName) {
+  useThemeColor: jest.fn((props, backgroundColor) => {
+    switch (backgroundColor) {
       case 'textMuted':
         return '#5b33af';
       case 'success':

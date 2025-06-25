@@ -42,7 +42,7 @@ export const DeadlineFormStep1 = ({
 
     return (
         <View style={{ flex: 1, gap: 24 }}>
-            <ThemedText colorName="textMuted" style={{lineHeight: 24, fontSize: 16}}>
+            <ThemedText color="textMuted" style={{lineHeight: 24, fontSize: 16}}>
                 Add a book with a deadline to track your reading progress.
             </ThemedText>
 
@@ -70,7 +70,7 @@ export const DeadlineFormStep1 = ({
                     selectedFormat={selectedFormat}
                     onSelectFormat={onFormatChange}
                 />
-                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
+                <ThemedText color="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     This affects how we calculate your reading pace
                 </ThemedText>
             </View>
@@ -90,6 +90,7 @@ export const DeadlineFormStep1 = ({
                         <CustomInput
                             control={control}
                             name="totalQuantity"
+                            inputType="integer"
                             placeholder={getTotalQuantityPlaceholder()}
                             keyboardType="numeric"
                         />
@@ -99,12 +100,13 @@ export const DeadlineFormStep1 = ({
                             <CustomInput
                                 control={control}
                                 name="totalMinutes"
+                                inputType="integer"
                                 placeholder="Minutes (optional)"
                                 keyboardType="numeric"
                             />
                         </View> : null}
                 </View>
-                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
+                <ThemedText color="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     We'll use this to calculate your daily reading pace
                 </ThemedText>
             </View>

@@ -9,8 +9,6 @@ export type LoaderProps = {
     size?: 'small' | 'large';
     text?: string;
     fullScreen?: boolean;
-    lightColor?: string;
-    darkColor?: string;
     indicatorColor?: ColorValue;
 };
 
@@ -18,14 +16,12 @@ export function Loader({
     size = 'large',
     text,
     fullScreen = false,
-    lightColor,
-    darkColor,
     indicatorColor = 'primary'
 }: LoaderProps) {
-    const color = useThemeColor({ light: lightColor, dark: darkColor }, indicatorColor);
+    const color = useThemeColor({}, indicatorColor);
 
     return (
-        <ThemedView colorName="background" style={[styles.container, fullScreen && styles.fullScreen]}>
+        <ThemedView backgroundColor="background" style={[styles.container, fullScreen && styles.fullScreen]}>
             <ActivityIndicator size={size} color={color} />
             {text && (
                 <ThemedText style={styles.text} type="defaultSemiBold">

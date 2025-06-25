@@ -50,7 +50,7 @@ export function UserAvatar({
   };
 
   return (
-    <ThemedView colorName="card" style={avatarStyle} testID="user-avatar-container">
+    <ThemedView backgroundColor="card" style={avatarStyle} testID="user-avatar-container">
       {user?.imageUrl ? (
         <Image 
           source={{ uri: user.imageUrl }} 

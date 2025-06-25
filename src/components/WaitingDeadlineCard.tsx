@@ -11,9 +11,9 @@ const WaitingDeadlineCard = () => {
     const textMutedColor = useThemeColor({}, 'textMuted');
     
     return (
-        <ThemedView colorName="card" style={[styles.content, { backgroundColor: cardColor, borderColor: borderColor }]}>
+        <ThemedView style={[styles.content, { backgroundColor: cardColor, borderColor: borderColor }]}>
             <Text style={styles.icon}>📚</Text>
-            <ThemedView colorName="background" style={[styles.textContainer, { backgroundColor: cardColor }]}>
+            <ThemedView style={[styles.textContainer, { backgroundColor: cardColor }]}>
                 <ThemedText style={[styles.title, { color: textColor }]}>The Atlas Six</ThemedText>
                 <ThemedText style={[styles.description, { color: textMutedColor }]}>ARC requested • Awaiting Approval</ThemedText>
             </ThemedView>
