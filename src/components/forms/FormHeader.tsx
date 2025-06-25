@@ -17,7 +17,7 @@ export const FormHeader = ({ title, onBack, showBack, onSkip, showSkip }: FormHe
     const successColor = useThemeColor({}, 'success');
     
     return (
-        <ThemedView colorName="card" style={[styles.header, { borderBottomColor: borderColor }]}>
+        <ThemedView backgroundColor="card" style={[styles.header, { borderBottomColor: borderColor }]}>
             <TouchableOpacity
                 style={styles.backButton}
                 onPress={onBack}

@@ -21,7 +21,7 @@ export default function SettingsScreen() {
     };
 
     return (
-        <ThemedView colorName="background" style={styles.container}>
+        <ThemedView backgroundColor="background" style={styles.container}>
             {/* Header */}
             <View style={[styles.header, { borderBottomColor: borderColor }]}>
                 <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
@@ -35,7 +35,7 @@ export default function SettingsScreen() {
 
             <ThemedScrollView backgroundColor="background" style={styles.content}>
                 {/* User Profile Section */}
-                <ThemedView colorName="card" borderColor="border" style={styles.section}>
+                <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                     <View style={styles.profileHeader}>
                         <UserAvatar size={80} />
                         <View style={styles.profileInfo}>
@@ -51,7 +51,7 @@ export default function SettingsScreen() {
 
                 {/* Settings Options */}
                 <View style={styles.settingsSection}>
-                    <ThemedView colorName="card" borderColor="border" style={styles.section}>
+                    <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                         <TouchableOpacity style={styles.settingItem}>
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="person.fill" size={20} color={iconColor} />
@@ -84,7 +84,7 @@ export default function SettingsScreen() {
 
                 {/* Sign Out Section */}
                 <View style={styles.signOutSection}>
-                    <ThemedView colorName="card" borderColor="border" style={styles.section}>
+                    <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                         <SignOutButton />
                     </ThemedView>
                 </View>

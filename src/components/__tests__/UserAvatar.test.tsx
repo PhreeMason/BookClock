@@ -24,8 +24,8 @@ jest.mock('../ThemedView', () => ({
 
 // Mock the useThemeColor hook
 jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn((props, colorName) => {
-    switch (colorName) {
+  useThemeColor: jest.fn((props, backgroundColor) => {
+    switch (backgroundColor) {
       case 'primary':
         return '#5c2eb8';
       case 'primaryForeground':

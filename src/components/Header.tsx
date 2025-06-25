@@ -23,8 +23,8 @@ const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderP
     };
 
     return (
-        <ThemedView colorName="background" borderColor="border" style={styles.container}>
-            <ThemedView colorName="background" style={styles.dateRow}>
+        <ThemedView backgroundColor="background" borderColor="border" style={styles.container}>
+            <ThemedView backgroundColor="background" style={styles.dateRow}>
                 <ThemedText style={styles.dateText}>{formattedDate}</ThemedText>
                 <ThemedText color="textMuted" style={styles.statusSummary}>
                     {activeCount} active • {attentionCount} needs attention

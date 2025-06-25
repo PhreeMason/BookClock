@@ -99,6 +99,7 @@ export const DeadlineFormStep2 = ({
                         <CustomInput
                             control={control}
                             name="currentProgress"
+                            inputType="integer"
                             placeholder='0'
                             keyboardType="numeric"
                         />
@@ -108,6 +109,7 @@ export const DeadlineFormStep2 = ({
                             <CustomInput
                                 control={control}
                                 name="currentMinutes"
+                                inputType="integer"
                                 placeholder='0'
                                 keyboardType="numeric"
                             />
