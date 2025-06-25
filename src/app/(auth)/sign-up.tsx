@@ -5,7 +5,7 @@ import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingV
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { isClerkAPIResponseError, useSignUp } from '@clerk/clerk-expo';
+import { isClerkAPIResponseError, useClerk, useSignUp } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
@@ -36,6 +36,7 @@ const mapClerkErrorToFormField = (error: any) => {
 export default function SignUpScreen() {
     const { isLoaded, signUp, setActive } = useSignUp();
     const router = useRouter();
+    const { signOut } = useClerk()
 
     const [pendingVerification, setPendingVerification] = React.useState(false);
     const [code, setCode] = React.useState('');
@@ -54,6 +55,7 @@ export default function SignUpScreen() {
         if (!isLoaded) return;
 
         try {
+            await signOut(); // Ensure any previous session is cleared
             await signUp.create({
                 emailAddress: data.email,
                 password: data.password,
@@ -102,10 +104,10 @@ export default function SignUpScreen() {
         const textMutedColor = useThemeColor({}, 'textMuted');
         
         return (
-            <ThemedView colorName="background" style={styles.container}>
+            <ThemedView backgroundColor="background" style={styles.container}>
                 <ThemedText type="title" style={styles.title}>Verify your email</ThemedText>
 
-                <ThemedView colorName="card" style={styles.form}>
+                <ThemedView backgroundColor="card" style={styles.form}>
                     <TextInput
                         style={styles.input}
                         value={code}
@@ -130,7 +132,7 @@ export default function SignUpScreen() {
         <ThemedKeyboardAvoidingView style={styles.container}>
             <ThemedText type="title" style={styles.title}>Sign up</ThemedText>
 
-            <ThemedView colorName="card" style={styles.form}>
+            <ThemedView backgroundColor="card" style={styles.form}>
                 <CustomInput
                     control={control}
                     name="email"
@@ -162,13 +164,13 @@ export default function SignUpScreen() {
                 />
             </ThemedView>
 
-            <ThemedView colorName="card" style={styles.footer}>
+            <ThemedView backgroundColor="card" style={styles.footer}>
                 <ThemedText>Already have an account? </ThemedText>
                 <Link href="/(auth)/sign-in">
                     <ThemedText type="link">Sign in</ThemedText>
                 </Link>
             </ThemedView>
-            <ThemedView colorName="card" style={{ flexDirection: 'row', gap: 10, marginHorizontal: 'auto' }}>
+            <ThemedView backgroundColor="card" style={{ flexDirection: 'row', gap: 10, marginHorizontal: 'auto' }}>
                 <SignInWith strategy='oauth_google' />
                 <SignInWith strategy='oauth_apple' />
             </ThemedView>
@@ -199,7 +201,6 @@ const styles = StyleSheet.create({
     button: {
         borderRadius: 8,
         padding: 16,
-        alignItems: 'center',
         marginTop: 8,
     },
     footer: {

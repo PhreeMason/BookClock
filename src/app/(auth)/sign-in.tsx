@@ -4,7 +4,7 @@ import { ThemedButton } from '@/components/ThemedButton';
 import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { isClerkAPIResponseError, useSignIn } from '@clerk/clerk-expo';
+import { isClerkAPIResponseError, useClerk, useSignIn } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
@@ -35,6 +35,7 @@ const mapClerkErrorToFormField = (error: any) => {
 export default function Page() {
     const { signIn, setActive, isLoaded } = useSignIn();
     const router = useRouter();
+    const { signOut } = useClerk()
 
     const {
         control,
@@ -49,6 +50,7 @@ export default function Page() {
         if (!isLoaded) return;
 
         try {
+            await signOut(); // Ensure any previous session is cleared
             const signInAttempt = await signIn.create({
                 identifier: data.email,
                 password: data.password,
@@ -81,7 +83,7 @@ export default function Page() {
         <ThemedKeyboardAvoidingView style={styles.container}>
             <ThemedText type="title" style={styles.title}>Sign in</ThemedText>
 
-            <ThemedView colorName="card" style={styles.form}>
+            <ThemedView backgroundColor="card" style={styles.form}>
                 <CustomInput
                     control={control}
                     name="email"
@@ -113,13 +115,13 @@ export default function Page() {
                 />
             </ThemedView>
 
-            <ThemedView colorName="card" style={styles.footer}>
+            <ThemedView backgroundColor="card" style={styles.footer}>
                 <ThemedText>Don't have an account? </ThemedText>
                 <Link href="/(auth)/sign-up">
                     <ThemedText type="link">Sign up</ThemedText>
                 </Link>
             </ThemedView>
-            <ThemedView colorName="card" style={{ flexDirection: 'row', gap: 10, marginHorizontal: 'auto' }}>
+            <ThemedView backgroundColor="card" style={{ flexDirection: 'row', gap: 10, marginHorizontal: 'auto' }}>
                 <SignInWith strategy='oauth_google' />
                 <SignInWith strategy='oauth_apple' />
             </ThemedView>
@@ -150,7 +152,6 @@ const styles = StyleSheet.create({
     button: {
         borderRadius: 8,
         padding: 16,
-        alignItems: 'center',
         marginTop: 8,
     },
     footer: {

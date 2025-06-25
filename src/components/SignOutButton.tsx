@@ -1,3 +1,4 @@
+
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useClerk } from '@clerk/clerk-expo';
 import * as Linking from 'expo-linking';
