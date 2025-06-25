@@ -33,6 +33,12 @@ export const DeadlineFormStep2 = ({
     paceEstimate,
     watchedValues
 }: DeadlineFormStep2Props) => {
+    const cardColor = useThemeColor({}, 'card');
+    const borderColor = useThemeColor({}, 'border');
+    const dangerColor = useThemeColor({}, 'danger');
+    const primaryColor = useThemeColor({}, 'primary');
+    const dividerColor = useThemeColor({}, 'textMuted');
+    
     const getProgressLabel = () => {
         switch (selectedFormat) {
             case 'audio':
@@ -42,27 +48,21 @@ export const DeadlineFormStep2 = ({
         }
     };
 
-    const cardBackgroundColor = useThemeColor({}, 'card');
-    const borderColor = useThemeColor({}, 'border');
-    const dangerColor = useThemeColor({}, 'danger');
-    const successColor = useThemeColor({}, 'primary'); // Assuming primary is a success-like color
-    const cardOverlay = useThemeColor({}, 'cardOverlay');
-
     return (
         <View style={{flex: 1, gap: 24}}>
-            <ThemedText colorName="textMuted" style={{fontSize: 16}}>
+            <ThemedText color="textMuted" style={{fontSize: 16}}>
                 When do you need to finish, and what are the details?
             </ThemedText>
 
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Deadline Date *</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>Deadline Date *</ThemedText>
                 <Controller
                     control={control}
                     name="deadline"
                     render={({ field: { value } }) => (
                         <>
                             <TouchableOpacity
-                                style={[styles.dateInput, {backgroundColor: cardBackgroundColor, borderColor: borderColor}]}
+                                style={[styles.dateInput, {backgroundColor: cardColor, borderColor: borderColor}]}
                                 onPress={onDatePickerToggle}
                             >
                                 <ThemedText>
@@ -85,20 +85,21 @@ export const DeadlineFormStep2 = ({
                         </>
                     )}
                 />
-                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
+                <ThemedText color="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     When do you need to finish reading this book? (Past dates will be marked as overdue)
                 </ThemedText>
             </View>
 
-            <View style={styles.sectionDivider} />
+            <View style={[styles.sectionDivider, {backgroundColor: dividerColor}]} />
 
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>{getProgressLabel()}</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>{getProgressLabel()}</ThemedText>
                 <View style={{ flexDirection: 'row', gap: 10 }}>
                     <View style={{ flex: 1 }}>
                         <CustomInput
                             control={control}
                             name="currentProgress"
+                            inputType="integer"
                             placeholder='0'
                             keyboardType="numeric"
                         />
@@ -108,47 +109,48 @@ export const DeadlineFormStep2 = ({
                             <CustomInput
                                 control={control}
                                 name="currentMinutes"
+                                inputType="integer"
                                 placeholder='0'
                                 keyboardType="numeric"
                             />
                         </View> : null}
                 </View>
-                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
+                <ThemedText color="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     How much have you already finished?
                 </ThemedText>
             </View>
 
-            <View style={styles.sectionDivider} />
+            <View style={[styles.sectionDivider, {backgroundColor: dividerColor}]} />
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Deadline Flexibility</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>Deadline Flexibility</ThemedText>
                 <PrioritySelector
                     selectedPriority={selectedPriority}
                     onSelectPriority={onPriorityChange}
                 />
-                <ThemedText colorName="textMuted" style={{marginTop: 6, lineHeight: 18}}>
+                <ThemedText color="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     Can this deadline be adjusted if needed?
                 </ThemedText>
             </View>
 
-            <View style={styles.sectionDivider} />
+            <View style={[styles.sectionDivider, {backgroundColor: dividerColor}]} />
 
             {paceEstimate && (
                 <View style={[
                     styles.estimateContainer,
                     {
-                        backgroundColor: paceEstimate.includes('⚠️') ? 'rgba(239, 68, 68, 0.1)' : cardOverlay,
-                        borderColor: paceEstimate.includes('⚠️') ? dangerColor : successColor,
+                        backgroundColor: paceEstimate.includes('⚠️') ? `${dangerColor}20` : `${primaryColor}20`,
+                        borderColor: paceEstimate.includes('⚠️') ? dangerColor : primaryColor,
                     }
                 ]}>
-                    <ThemedText style={{color: paceEstimate.includes('⚠️') ? dangerColor : successColor}}>
+                    <ThemedText color={paceEstimate.includes('⚠️') ? 'danger' : 'primary'}>
                         {paceEstimate}
                     </ThemedText>
                 </View>
             )}
 
-            <View style={[styles.summaryCard, {backgroundColor: cardBackgroundColor, borderColor: borderColor}]}>
-                <ThemedText type="defaultSemiBold" style={[styles.summaryTitle, {color: successColor}]}>✓ Ready to Add</ThemedText>
-                <ThemedText colorName="textMuted" style={styles.summaryText}>
+            <View style={[styles.summaryCard, {backgroundColor: cardColor, borderColor: borderColor}]}>
+                <ThemedText color="primary" style={styles.summaryTitle}>✓ Ready to Add</ThemedText>
+                <ThemedText color="textMuted" style={styles.summaryText}>
                     {watchedValues.bookTitle && watchedValues.deadline
                         ? `${watchedValues.bookTitle} • Due ${watchedValues.deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
                         : 'Complete the form above to see your reading plan'
@@ -162,7 +164,6 @@ export const DeadlineFormStep2 = ({
 const styles = StyleSheet.create({
     sectionDivider: {
         height: 1,
-        backgroundColor: '#404040',
         marginVertical: 16,
         opacity: 0.5,
     },

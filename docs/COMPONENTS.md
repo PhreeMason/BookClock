@@ -183,28 +183,73 @@ const MyComponent = () => (
 **Use Case:** Theme-aware scroll view that automatically applies background colors based on the current theme (light/dark mode) with bouncing enabled by default.
 
 ### ThemedView
-**API:** Extends `ViewProps` with optional `lightColor` and `darkColor` props  
-**Use Case:** Basic theme-aware container view that automatically applies background colors based on the current theme context.
+**API:** 
+- Extends `ViewProps`
+- Props:
+  - `backgroundColor?: ColorValue` - Background color (defaults to 'background')
+  - `borderColor?: ColorValue` - Border color
+
+**Use Case:** Basic theme-aware container view that automatically applies background and border colors based on the current theme context. Handles core container styling concerns.
+
+**Examples:**
+```typescript
+// Simple background
+<ThemedView backgroundColor="card" />
+
+// Background + border
+<ThemedView backgroundColor="card" borderColor="border" />
+
+// Default background (uses 'background' theme color)
+<ThemedView />
+
+// With custom styling
+<ThemedView backgroundColor="primary" style={{ padding: 20, borderRadius: 8 }} />
+```
 
 ### ThemedText
 **API:**
 - Extends `TextProps`.
 - Props:
-  - `type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link'`
-  - `colorName?: keyof typeof Colors.light`
+  - `type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 'header' | 'body' | 'bodyMuted' | 'caption' | 'captionMuted' | 'label' | 'labelMuted' | 'button' | 'small' | 'smallMuted'`
+  - `color?: ColorValue` - Text color (overrides automatic type colors)
 
-**Use Case:** The primary component for displaying all text. It automatically handles theme colors and provides consistent, predefined typography styles.
+**Use Case:** The primary component for displaying all text. It provides semantic typography types with automatic theming and consistent styling across the app.
 
-**Example:**
+**Semantic Types:**
+- `default` (16px) - Standard body text
+- `title` (32px, bold) - Page titles
+- `header` (20px, bold) - Section headers
+- `subtitle` (20px, bold) - Subsection headers
+- `body` (16px) - Regular body text
+- `bodyMuted` (16px, muted) - Secondary body text
+- `caption` (14px) - Small descriptive text
+- `captionMuted` (14px, muted) - Small secondary text
+- `label` (14px, 500, uppercase) - Form labels
+- `labelMuted` (12px, muted, uppercase) - Secondary labels
+- `button` (16px, 600) - Button text styling
+- `small` (12px) - Small text
+- `smallMuted` (12px, muted) - Small secondary text
+- `defaultSemiBold` (16px, 600) - Semi-bold default text
+- `link` (16px) - Link styling
+
+**Examples:**
 ```typescript
-// For standard text
-<ThemedText>Some default text.</ThemedText>
+// Semantic usage (recommended)
+<ThemedText type="header">Section Title</ThemedText>
+<ThemedText type="bodyMuted">Secondary information</ThemedText>
+<ThemedText type="label">Form Label</ThemedText>
+<ThemedText type="captionMuted">Help text</ThemedText>
 
-// For a subtitle with a muted color
-<ThemedText type="subtitle" colorName="textMuted">
-  This is a subtitle.
-</ThemedText>
+// With custom colors
+<ThemedText type="button" color="primary">Action Button</ThemedText>
+
+// Override specific properties
+<ThemedText type="header" style={{ fontSize: 18 }}>Custom sized header</ThemedText>
 ```
+
+**Color Priority:** `color` prop > automatic type color > default 'text' color
+
+**Note:** For background colors and borders, wrap ThemedText in a ThemedView instead.
 
 ## Utility Components
 

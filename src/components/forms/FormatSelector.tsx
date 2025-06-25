@@ -9,16 +9,14 @@ interface FormatSelectorProps {
 }
 
 export const FormatSelector = ({ selectedFormat, onSelectFormat }: FormatSelectorProps) => {
+    const primaryColor = useThemeColor({}, 'primary');
+    const cardColor = useThemeColor({}, 'card');
+    
     const formats = [
         { key: 'physical', label: 'Physical' },
         { key: 'ebook', label: 'E-book' },
         { key: 'audio', label: 'Audio' }
     ];
-
-    const cardColor = useThemeColor({}, 'card');
-    const mutedTextColor = useThemeColor({}, 'textMuted');
-    const primaryColor = useThemeColor({}, 'primary');
-    const primaryBackgroundColor = useThemeColor({light: 'rgba(92, 46, 184, 0.1)', dark: 'rgba(74, 222, 128, 0.1)'}, 'primary');
 
     return (
         <View style={styles.formatSelector} testID="format-selector">
@@ -31,16 +29,18 @@ export const FormatSelector = ({ selectedFormat, onSelectFormat }: FormatSelecto
                         style={[
                             styles.formatChip,
                             { 
-                                backgroundColor: isSelected ? primaryBackgroundColor : cardColor,
+                                backgroundColor: isSelected ? `${primaryColor}20` : cardColor, // primary with opacity or card
                             }
                         ]}
                         onPress={() => onSelectFormat(format.key as 'physical' | 'ebook' | 'audio')}
                     >
-                        <ThemedText style={[
-                            styles.formatChipText,
-                            { color: isSelected ? primaryColor : mutedTextColor },
-                            isSelected && styles.formatChipTextSelected
-                        ]}>
+                        <ThemedText 
+                            color={isSelected ? 'primary' : 'textMuted'}
+                            style={[
+                                styles.formatChipText,
+                                isSelected && styles.formatChipTextSelected
+                            ]}
+                        >
                             {format.label}
                         </ThemedText>
                     </TouchableOpacity>
