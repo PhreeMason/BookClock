@@ -57,8 +57,8 @@ describe('ThemedText', () => {
     );
   });
 
-  it('applies defaultSemiBold type styles', () => {
-    const { getByText } = render(<ThemedText type="defaultSemiBold">Semi Bold Text</ThemedText>);
+  it('applies semiBold type styles', () => {
+    const { getByText } = render(<ThemedText type="semiBold">Semi Bold Text</ThemedText>);
     const textElement = getByText('Semi Bold Text');
     
     expect(textElement.props.style).toEqual(
@@ -74,20 +74,6 @@ describe('ThemedText', () => {
   it('applies subtitle type styles', () => {
     const { getByText } = render(<ThemedText type="subtitle">Subtitle Text</ThemedText>);
     const textElement = getByText('Subtitle Text');
-    
-    expect(textElement.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          fontSize: 20,
-          fontWeight: 'bold',
-        }),
-      ])
-    );
-  });
-
-  it('applies header type styles', () => {
-    const { getByText } = render(<ThemedText type="header">Header Text</ThemedText>);
-    const textElement = getByText('Header Text');
     
     expect(textElement.props.style).toEqual(
       expect.arrayContaining([
