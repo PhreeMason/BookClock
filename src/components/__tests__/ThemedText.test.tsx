@@ -85,6 +85,163 @@ describe('ThemedText', () => {
     );
   });
 
+  it('applies header type styles', () => {
+    const { getByText } = render(<ThemedText type="header">Header Text</ThemedText>);
+    const textElement = getByText('Header Text');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 20,
+          fontWeight: 'bold',
+        }),
+      ])
+    );
+  });
+
+  it('applies body type styles', () => {
+    const { getByText } = render(<ThemedText type="body">Body Text</ThemedText>);
+    const textElement = getByText('Body Text');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 16,
+        }),
+      ])
+    );
+  });
+
+  it('applies bodyMuted type styles with muted color', () => {
+    const { getByText } = render(<ThemedText type="bodyMuted">Muted Body Text</ThemedText>);
+    const textElement = getByText('Muted Body Text');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 16,
+        }),
+      ])
+    );
+    
+    expect(mockUseThemeColor).toHaveBeenCalledWith(
+      {},
+      'textMuted'
+    );
+  });
+
+  it('applies caption type styles', () => {
+    const { getByText } = render(<ThemedText type="caption">Caption Text</ThemedText>);
+    const textElement = getByText('Caption Text');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 14,
+        }),
+      ])
+    );
+  });
+
+  it('applies captionMuted type styles with muted color', () => {
+    const { getByText } = render(<ThemedText type="captionMuted">Muted Caption</ThemedText>);
+    const textElement = getByText('Muted Caption');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 14,
+        }),
+      ])
+    );
+    
+    expect(mockUseThemeColor).toHaveBeenCalledWith(
+      {},
+      'textMuted'
+    );
+  });
+
+  it('applies label type styles', () => {
+    const { getByText } = render(<ThemedText type="label">Label Text</ThemedText>);
+    const textElement = getByText('Label Text');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 14,
+          fontWeight: '500',
+          textTransform: 'uppercase',
+          letterSpacing: 0.5,
+        }),
+      ])
+    );
+  });
+
+  it('applies labelMuted type styles with muted color', () => {
+    const { getByText } = render(<ThemedText type="labelMuted">Muted Label</ThemedText>);
+    const textElement = getByText('Muted Label');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 12,
+          textTransform: 'uppercase',
+          letterSpacing: 0.5,
+        }),
+      ])
+    );
+    
+    expect(mockUseThemeColor).toHaveBeenCalledWith(
+      {},
+      'textMuted'
+    );
+  });
+
+  it('applies button type styles', () => {
+    const { getByText } = render(<ThemedText type="button">Button Text</ThemedText>);
+    const textElement = getByText('Button Text');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 16,
+          fontWeight: '600',
+        }),
+      ])
+    );
+  });
+
+  it('applies small type styles', () => {
+    const { getByText } = render(<ThemedText type="small">Small Text</ThemedText>);
+    const textElement = getByText('Small Text');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 12,
+        }),
+      ])
+    );
+  });
+
+  it('applies smallMuted type styles with muted color', () => {
+    const { getByText } = render(<ThemedText type="smallMuted">Small Muted Text</ThemedText>);
+    const textElement = getByText('Small Muted Text');
+    
+    expect(textElement.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fontSize: 12,
+        }),
+      ])
+    );
+    
+    expect(mockUseThemeColor).toHaveBeenCalledWith(
+      {},
+      'textMuted'
+    );
+  });
+
   it('applies link type styles', () => {
     const { getByText } = render(<ThemedText type="link">Link Text</ThemedText>);
     const textElement = getByText('Link Text');
@@ -111,27 +268,20 @@ describe('ThemedText', () => {
     );
   });
 
+  it('calls useThemeColor with custom color', () => {
+    render(<ThemedText color="textMuted">Color Test</ThemedText>);
+    
+    expect(mockUseThemeColor).toHaveBeenCalledWith(
+      {},
+      'textMuted'
+    );
+  });
+
   it('calls useThemeColor with correct parameters', () => {
     render(<ThemedText>Theme Test</ThemedText>);
     
     expect(mockUseThemeColor).toHaveBeenCalledWith(
-      { light: undefined, dark: undefined },
-      'text'
-    );
-  });
-
-  it('calls useThemeColor with custom light and dark colors', () => {
-    const lightColor = '#ffffff';
-    const darkColor = '#000000';
-    
-    render(
-      <ThemedText lightColor={lightColor} darkColor={darkColor}>
-        Custom Colors
-      </ThemedText>
-    );
-    
-    expect(mockUseThemeColor).toHaveBeenCalledWith(
-      { light: lightColor, dark: darkColor },
+      {},
       'text'
     );
   });
@@ -199,11 +349,11 @@ describe('ThemedText', () => {
     );
   });
 
-  it('handles undefined type gracefully', () => {
+  it('handles invalid type gracefully', () => {
     const { getByText } = render(
-      <ThemedText type={undefined as any}>Undefined Type</ThemedText>
+      <ThemedText type={'invalidType' as any}>Invalid Type</ThemedText>
     );
-    const textElement = getByText('Undefined Type');
+    const textElement = getByText('Invalid Type');
     
     // Should default to 'default' type styles
     expect(textElement.props.style).toEqual(
