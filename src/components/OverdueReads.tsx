@@ -32,7 +32,7 @@ const OverdueReads = () => {
         <ThemedScrollView>
             <ThemedView backgroundColor="card" style={styles.container}>
                 <ThemedText
-                    type='defaultSemiBold'
+                    type='semiBold'
                     color='textMuted'
                     style={styles.pageTitle}
                 >

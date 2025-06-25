@@ -47,7 +47,7 @@ export const DeadlineFormStep1 = ({
             </ThemedText>
 
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Book Title *</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>Book Title *</ThemedText>
                 <CustomInput
                     control={control}
                     name="bookTitle"
@@ -56,7 +56,7 @@ export const DeadlineFormStep1 = ({
             </View>
 
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Author</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>Author</ThemedText>
                 <CustomInput
                     control={control}
                     name="bookAuthor"
@@ -65,7 +65,7 @@ export const DeadlineFormStep1 = ({
             </View>
 
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Format</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>Format</ThemedText>
                 <FormatSelector
                     selectedFormat={selectedFormat}
                     onSelectFormat={onFormatChange}
@@ -76,7 +76,7 @@ export const DeadlineFormStep1 = ({
             </View>
 
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Where is this book from?</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>Where is this book from?</ThemedText>
                 <SourceSelector
                     selectedSource={selectedSource}
                     onSelectSource={onSourceChange}
@@ -84,7 +84,7 @@ export const DeadlineFormStep1 = ({
             </View>
 
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>{getTotalQuantityLabel()}</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>{getTotalQuantityLabel()}</ThemedText>
                 <View style={{ flexDirection: 'row', gap: 10 }}>
                     <View style={{ flex: 1 }}>
                         <CustomInput

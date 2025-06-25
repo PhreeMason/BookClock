@@ -55,7 +55,7 @@ export const DeadlineFormStep2 = ({
             </ThemedText>
 
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Deadline Date *</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>Deadline Date *</ThemedText>
                 <Controller
                     control={control}
                     name="deadline"
@@ -93,7 +93,7 @@ export const DeadlineFormStep2 = ({
             <View style={[styles.sectionDivider, {backgroundColor: dividerColor}]} />
 
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>{getProgressLabel()}</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>{getProgressLabel()}</ThemedText>
                 <View style={{ flexDirection: 'row', gap: 10 }}>
                     <View style={{ flex: 1 }}>
                         <CustomInput
@@ -122,7 +122,7 @@ export const DeadlineFormStep2 = ({
 
             <View style={[styles.sectionDivider, {backgroundColor: dividerColor}]} />
             <View>
-                <ThemedText type="defaultSemiBold" style={{marginBottom: 8}}>Deadline Flexibility</ThemedText>
+                <ThemedText type="semiBold" style={{marginBottom: 8}}>Deadline Flexibility</ThemedText>
                 <PrioritySelector
                     selectedPriority={selectedPriority}
                     onSelectPriority={onPriorityChange}

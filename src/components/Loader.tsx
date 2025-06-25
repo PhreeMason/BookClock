@@ -24,7 +24,7 @@ export function Loader({
         <ThemedView backgroundColor="background" style={[styles.container, fullScreen && styles.fullScreen]}>
             <ActivityIndicator size={size} color={color} />
             {text && (
-                <ThemedText style={styles.text} type="defaultSemiBold">
+                <ThemedText style={styles.text} type="semiBold">
                     {text}
                 </ThemedText>
             )}

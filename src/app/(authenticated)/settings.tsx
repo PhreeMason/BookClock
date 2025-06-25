@@ -27,7 +27,7 @@ export default function SettingsScreen() {
                 <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
                     <IconSymbol name="chevron.left" size={Platform.OS === 'ios' ? 24 : 40} color={iconColor} />
                 </TouchableOpacity>
-                <ThemedText type="defaultSemiBold" style={styles.headerTitle}>
+                <ThemedText type="semiBold" style={styles.headerTitle}>
                     Settings
                 </ThemedText>
                 <View style={styles.headerSpacer} />
@@ -39,7 +39,7 @@ export default function SettingsScreen() {
                     <View style={styles.profileHeader}>
                         <UserAvatar size={80} />
                         <View style={styles.profileInfo}>
-                            <ThemedText type="defaultSemiBold" style={styles.userName}>
+                            <ThemedText type="semiBold" style={styles.userName}>
                                 {user?.fullName || user?.firstName || 'User'}
                             </ThemedText>
                             <ThemedText color="textMuted" style={styles.userEmail}>

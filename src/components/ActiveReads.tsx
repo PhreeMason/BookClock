@@ -34,7 +34,7 @@ const ActiveReads = () => {
         <ThemedScrollView>
             <ThemedView backgroundColor="card" style={styles.container}>
                 <ThemedText
-                    type='defaultSemiBold'
+                    type='semiBold'
                     color='textMuted'
                     style={styles.pageTitle}>ACTIVE DEADLINES</ThemedText>
                 {activeDeadlines.length > 0 ? (

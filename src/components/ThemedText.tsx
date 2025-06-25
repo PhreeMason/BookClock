@@ -6,10 +6,8 @@ export type ThemedTextProps = TextProps & {
   type?: 
     | 'default' 
     | 'title' 
-    | 'defaultSemiBold' 
     | 'subtitle' 
     | 'link'
-    | 'header'
     | 'body'
     | 'bodyMuted'
     | 'caption'
@@ -18,7 +16,10 @@ export type ThemedTextProps = TextProps & {
     | 'labelMuted'
     | 'button'
     | 'small'
-    | 'smallMuted';
+    | 'smallMuted'
+    | 'semiBold'
+    | 'error'
+    | 'success';
   color?: ColorValue;
 };
 
@@ -28,6 +29,8 @@ const typeColors: Record<string, ColorValue> = {
   captionMuted: 'textMuted',
   labelMuted: 'textMuted',
   smallMuted: 'textMuted',
+  error: 'error',
+  success: 'success',
 };
 
 export function ThemedText({
@@ -39,12 +42,30 @@ export function ThemedText({
   const textColorName = color || typeColors[type] || 'text';
   const textColor = useThemeColor({}, textColorName);
 
+  // Types that use default styling (fontSize: 16)
+  const usesDefaultStyle = ['link', 'body', 'bodyMuted', 'error', 'success'].includes(type);
+  // Types that use caption styling (fontSize: 14)
+  const usesCaptionStyle = ['caption', 'captionMuted'].includes(type);
+  // Types that use small styling (fontSize: 12)
+  const usesSmallStyle = ['small', 'smallMuted'].includes(type);
+  
+  let styleToApply;
+  if (usesDefaultStyle) {
+    styleToApply = styles.default;
+  } else if (usesCaptionStyle) {
+    styleToApply = styles.caption;
+  } else if (usesSmallStyle) {
+    styleToApply = styles.small;
+  } else {
+    styleToApply = styles[type as keyof typeof styles] || styles.default;
+  }
+
   return (
     <Text
       style={[
         { fontFamily: 'Inter' },
         { color: textColor },
-        styles[type] || styles.default,
+        styleToApply,
         style,
       ]}
       {...rest}
@@ -56,7 +77,7 @@ const styles = StyleSheet.create({
   default: {
     fontSize: 16,
   },
-  defaultSemiBold: {
+  semiBold: {
     fontSize: 16,
     fontWeight: '600',
   },
@@ -68,25 +89,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  header: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  link: {
-    fontSize: 16,
-  },
-  body: {
-    fontSize: 16,
-  },
-  bodyMuted: {
-    fontSize: 16,
-  },
+  // link, body, bodyMuted, error, and success use default styles (fontSize: 16)
   caption: {
     fontSize: 14,
   },
-  captionMuted: {
-    fontSize: 14,
-  },
+  // captionMuted uses caption styles (fontSize: 14)
   label: {
     fontSize: 14,
     fontWeight: '500',
@@ -105,7 +112,5 @@ const styles = StyleSheet.create({
   small: {
     fontSize: 12,
   },
-  smallMuted: {
-    fontSize: 12,
-  },
+  // smallMuted uses small styles (fontSize: 12)
 });
