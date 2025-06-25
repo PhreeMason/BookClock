@@ -6,6 +6,10 @@ import { StyleSheet, View } from 'react-native'
 import { ThemedText } from './ThemedText'
 import { ThemedView } from './ThemedView'
 
+const makeUpperCaseFirstLetter = (str: string) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 const BookDetailsSection = (
     { deadline }: { deadline: ReadingDeadlineWithProgress }
 ) => {
@@ -29,11 +33,11 @@ const BookDetailsSection = (
                 </View>
                 <View style={styles.detailRow}>
                     <ThemedText color="textMuted">Priority</ThemedText>
-                    <ThemedText style={styles.detailsValue}>{deadline.flexibility.charAt(0).toUpperCase() + deadline.flexibility.slice(1)}</ThemedText>
+                    <ThemedText style={styles.detailsValue}>{makeUpperCaseFirstLetter(deadline.flexibility)}</ThemedText>
                 </View>
                 <View style={styles.detailRow}>
                     <ThemedText color="textMuted">Source</ThemedText>
-                    <ThemedText style={styles.detailsValue}>{deadline.source}</ThemedText>
+                    <ThemedText style={styles.detailsValue}>{makeUpperCaseFirstLetter(deadline.source)}</ThemedText>
                 </View>
                 <View style={styles.detailRow}>
                     <ThemedText color="textMuted">Added</ThemedText>
