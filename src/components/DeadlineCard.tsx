@@ -4,8 +4,9 @@
 import { ThemedText } from '@/components/ThemedText';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { ImageBackground, StyleSheet, View } from 'react-native';
+import { ImageBackground, Pressable, StyleSheet, View } from 'react-native';
 
 const urgencyBorderColorMap = {
   'overdue': '#DC2626',
@@ -16,10 +17,12 @@ const urgencyBorderColorMap = {
 
 interface DeadlineCardProps {
   deadline: ReadingDeadlineWithProgress;
+  disableNavigation?: boolean;
 }
 
-export function DeadlineCard({ deadline }: DeadlineCardProps) {
+export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCardProps) {
   const { getDeadlineCalculations, formatUnitsPerDay } = useDeadlines();
+  const router = useRouter();
 
   //  🎧 vs 📱 vs 📖
   const formatEmojiMap = {
@@ -79,23 +82,33 @@ export function DeadlineCard({ deadline }: DeadlineCardProps) {
     </View>
   );
 
+  const handlePress = () => {
+    if (!disableNavigation) {
+      router.push(`/deadline/${deadline.id}/view`);
+    }
+  };
+
   return (
-    <View style={[styles.card, { borderColor }]}>
-      {true ? (
-        <ImageBackground
-          source={{ uri: 'https://m.media-amazon.com/images/I/91rnexU88KL._SL1500_.jpg' }}
-          style={styles.backgroundImage}
-          blurRadius={50}
-        >
-          {renderBookContent()}
-        </ImageBackground>
-      ) : (
-        <View style={styles.placeholderBackground}>
-          <ThemedText style={styles.placeholderText}>📚</ThemedText>
-          {renderBookContent()}
-        </View>
-      )}
-    </View>
+    <Pressable onPress={handlePress} style={({ pressed }) => [
+      { opacity: pressed ? 0.8 : 1 }
+    ]}>
+      <View style={[styles.card, { borderColor }]}>
+        {true ? (
+          <ImageBackground
+            source={{ uri: 'https://m.media-amazon.com/images/I/91rnexU88KL._SL1500_.jpg' }}
+            style={styles.backgroundImage}
+            blurRadius={50}
+          >
+            {renderBookContent()}
+          </ImageBackground>
+        ) : (
+          <View style={styles.placeholderBackground}>
+            <ThemedText style={styles.placeholderText}>📚</ThemedText>
+            {renderBookContent()}
+          </View>
+        )}
+      </View>
+    </Pressable>
   );
 }
 

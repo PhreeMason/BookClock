@@ -1,0 +1,75 @@
+import BookDetailsSection from '@/components/BookDetailsSection';
+import DeadlineActionButtons from '@/components/DeadlineActionButtons';
+import DeadlineHeroSection from '@/components/DeadlineHeroSection';
+import DeadlineViewHeader from '@/components/DeadlineViewHeader';
+import ReadingProgress from '@/components/ReadingProgress';
+import { ThemedScrollView } from '@/components/ThemedScrollView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { useDeadlines } from '@/contexts/DeadlineProvider';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React from 'react';
+import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
+
+const DeadlineView = () => {
+    const { id } = useLocalSearchParams<{ id: string }>();
+    const router = useRouter();
+    const { deadlines } = useDeadlines();
+
+    // Find the deadline by ID
+    const deadline = deadlines.find(d => d.id === id);
+
+    if (!deadline) {
+        return (
+            <ThemedView style={styles.container}>
+                <ThemedText>Deadline not found</ThemedText>
+            </ThemedView>
+        );
+    }
+
+    const handleEdit = () => {
+        Toast.show({
+            type: 'info',
+            text1: 'Edit Deadline',
+            text2: 'This feature is coming soon!',
+            autoHide: true,
+            visibilityTime: 2000,
+            position: 'top',
+        });
+    };
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <DeadlineViewHeader
+                onBack={() => router.back()}
+                onEdit={handleEdit}
+            />
+
+            <ThemedScrollView style={styles.content}>
+                <DeadlineHeroSection deadline={deadline} />
+                
+                <ReadingProgress deadline={deadline} />
+                
+                <BookDetailsSection deadline={deadline} />
+
+                <DeadlineActionButtons
+                    deadline={deadline}
+                />
+            </ThemedScrollView>
+        </SafeAreaView>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    content: {
+        flex: 1,
+        padding: 20,
+    },
+});
+
+export default DeadlineView;
