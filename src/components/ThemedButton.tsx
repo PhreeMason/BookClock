@@ -17,7 +17,7 @@ interface ThemedButtonProps extends PressableProps {
 const variantColors: Record<string, { bg: ColorValue; text: ColorValue; border?: ColorValue }> = {
   primary: { bg: 'primary', text: 'primaryForeground' },
   secondary: { bg: 'card', text: 'text', border: 'border' },
-  danger: { bg: 'destructive', text: 'destructiveForeground' },
+  danger: { bg: 'transparent', text: 'destructive', border: 'destructive' },
   ghost: { bg: 'transparent', text: 'text' },
   success: { bg: 'success', text: 'successForeground' },
 };
@@ -41,7 +41,7 @@ export function ThemedButton({
   const brdColor = useThemeColor({}, borderColor || variantConfig.border || 'border');
 
   // Determine if button should have border
-  const shouldShowBorder = variant === 'secondary' || variant === 'ghost' || borderColor;
+  const shouldShowBorder = variant === 'secondary' || variant === 'ghost' || variant === 'danger' || borderColor;
 
   return (
     <Pressable
