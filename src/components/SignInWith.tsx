@@ -1,4 +1,4 @@
-import { useSSO } from '@clerk/clerk-expo';
+import { useClerk, useSSO } from '@clerk/clerk-expo';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { useCallback } from 'react';
@@ -24,6 +24,7 @@ const strategyIcons = {
 
 export default function SignInWith({ strategy }: SignInWithProps) {
     useWarmUpBrowser();
+    const { signOut } = useClerk()
 
     // Use the `useSSO()` hook to access the `startSSOFlow()` method
     const { startSSOFlow } = useSSO();
@@ -31,6 +32,8 @@ export default function SignInWith({ strategy }: SignInWithProps) {
     const onPress = useCallback(async () => {
         try {
             // Start the authentication process by calling `startSSOFlow()`
+            await signOut()
+            
             const { createdSessionId, setActive, signIn, signUp } =
                 await startSSOFlow({
                     strategy,
