@@ -1,6 +1,6 @@
+import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingView';
 import { ThemedScrollView } from '@/components/ThemedScrollView';
 import { ThemedView } from '@/components/ThemedView';
-import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingView';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
@@ -255,6 +255,7 @@ const NewDeadLine = () => {
                         variant="secondary"
                         onPress={goBack}
                         style={{flex: 1}}
+                        disabled={isSubmitting}
                     />
                 )}
                 <ThemedButton
