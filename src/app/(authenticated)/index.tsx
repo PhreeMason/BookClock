@@ -2,7 +2,7 @@ import ActiveReads from '@/components/ActiveReads';
 import Header from '@/components/Header';
 import OverdueReads from '@/components/OverdueReads';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useTheme } from '@/theme';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -10,9 +10,10 @@ const TopTabs = createMaterialTopTabNavigator();
 
 export default function MyTabs() {
     const { activeCount, overdueCount, getTotalReadingTimePerDay } = useDeadlines();
-    const backgroundColor = useThemeColor({}, 'background');
-    const textColor = useThemeColor({}, 'text');
-    const teaGreen400 = useThemeColor({}, 'teaGreen.400');
+    const { theme } = useTheme();
+    const backgroundColor = theme.background;
+    const textColor = theme.text;
+    const accentColor = theme.accent;
 
     
     return (
@@ -26,7 +27,7 @@ export default function MyTabs() {
                 screenOptions={{
                     tabBarLabelStyle: { fontSize: 18, fontWeight: '600' },
                     tabBarStyle: { backgroundColor },
-                    tabBarIndicatorStyle: { backgroundColor: teaGreen400 },
+                    tabBarIndicatorStyle: { backgroundColor: accentColor },
                     tabBarActiveTintColor: textColor,
                     tabBarInactiveTintColor: textColor,
                 }}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { ThemedButton } from '../ThemedButton';
+import { ThemedButton } from '../themed';
 
 interface QuickActionButtonsProps {
   unitsPerDay: number;

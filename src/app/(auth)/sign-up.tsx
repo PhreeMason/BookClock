@@ -1,10 +1,7 @@
 import CustomInput from '@/components/CustomInput';
 import SignInWith from '@/components/SignInWith';
-import { ThemedButton } from '@/components/ThemedButton';
-import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { ThemedButton, ThemedText, ThemedView, ThemedKeyboardAvoidingView } from '@/components/themed';
+import { useTheme } from '@/theme';
 import { isClerkAPIResponseError, useClerk, useSignUp } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
@@ -101,7 +98,8 @@ export default function SignUpScreen() {
     };
 
     if (pendingVerification) {
-        const textMutedColor = useThemeColor({}, 'textMuted');
+        const { theme } = useTheme();
+        const textMutedColor = theme.textMuted;
         
         return (
             <ThemedView backgroundColor="background" style={styles.container}>
@@ -119,8 +117,7 @@ export default function SignUpScreen() {
                     <ThemedButton
                         title="Verify"
                         style={styles.button}
-                        backgroundColor="buttonPrimary"
-                        textColor="buttonText"
+                        variant="primary"
                         onPress={onVerifyPress}
                     />
                 </ThemedView>
@@ -158,8 +155,7 @@ export default function SignUpScreen() {
                 <ThemedButton
                     title="Continue"
                     style={styles.button}
-                    backgroundColor="buttonPrimary"
-                    textColor="buttonText"
+                    variant="primary"
                     onPress={handleSubmit(onSignUpPress)}
                 />
             </ThemedView>

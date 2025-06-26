@@ -1,5 +1,5 @@
 import CustomInput from '@/components/CustomInput';
-import { ThemedText } from '@/components/ThemedText';
+import { ThemedText } from '@/components/themed';
 import { DeadlineFormData } from '@/lib/deadlineFormSchema';
 import React from 'react';
 import { Control } from 'react-hook-form';

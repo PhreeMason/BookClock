@@ -8,8 +8,8 @@ import { useForm } from 'react-hook-form'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { z } from 'zod'
-import { ThemedButton } from './ThemedButton'
-import { ThemedView } from './ThemedView'
+import { ThemedButton } from './themed'
+import { ThemedView } from './themed'
 import ProgressBar from './progress/ProgressBar'
 import ProgressHeader from './progress/ProgressHeader'
 import ProgressInput from './progress/ProgressInput'
@@ -35,21 +35,22 @@ const ReadingProgress = ({
     const progressSchema = createProgressUpdateSchema(totalQuantity, deadline.format);
     const updateProgressMutation = useUpdateDeadlineProgress();
 
+    type FormData = z.infer<typeof progressSchema>;
+    
     const {
         control,
         handleSubmit,
-        formState: { isValid },
         setValue,
         getValues,
-    } = useForm<z.infer<typeof progressSchema>>({
+    } = useForm({
         resolver: zodResolver(progressSchema),
         defaultValues: {
             currentProgress: currentProgress,
         },
-        mode: 'onChange',
+        mode: 'onSubmit',
     });
 
-    const onSubmitProgress = (data: z.infer<typeof progressSchema>) => {
+    const onSubmitProgress = (data: any) => {
         updateProgressMutation.mutate({
             deadlineId: deadline.id,
             currentProgress: data.currentProgress,
@@ -74,8 +75,20 @@ const ReadingProgress = ({
 
     const handleQuickUpdate = (increment: number) => {
         const currentFormValue = getValues('currentProgress');
-        const newProgress = Math.max(0, Math.min(totalQuantity, currentFormValue + increment));
-        setValue('currentProgress', newProgress, { shouldValidate: true });
+        
+        // Convert form value to number, handling both strings and numbers
+        let numericValue: number;
+        if (typeof currentFormValue === 'string') {
+            const parsed = parseFloat(currentFormValue);
+            numericValue = isNaN(parsed) ? currentProgress : parsed;
+        } else if (typeof currentFormValue === 'number') {
+            numericValue = isNaN(currentFormValue) ? currentProgress : currentFormValue;
+        } else {
+            numericValue = currentProgress;
+        }
+        
+        const newProgress = Math.max(0, Math.min(totalQuantity, numericValue + increment));
+        setValue('currentProgress', newProgress, { shouldValidate: false });
     };
 
     return (
@@ -113,7 +126,7 @@ const ReadingProgress = ({
                     variant="primary"
                     style={styles.updateProgressBtn}
                     onPress={handleSubmit(onSubmitProgress)}
-                    disabled={!isValid || updateProgressMutation.isPending}
+                    disabled={updateProgressMutation.isPending}
                 />
             </View>
         </ThemedView>

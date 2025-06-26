@@ -1,6 +1,6 @@
 import CustomInput from '@/components/CustomInput';
-import { ThemedText } from '@/components/ThemedText';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { ThemedText } from '@/components/themed';
+import { useTheme } from '@/theme';
 import { DeadlineFormData } from '@/lib/deadlineFormSchema';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React from 'react';
@@ -33,11 +33,12 @@ export const DeadlineFormStep2 = ({
     paceEstimate,
     watchedValues
 }: DeadlineFormStep2Props) => {
-    const cardColor = useThemeColor({}, 'card');
-    const borderColor = useThemeColor({}, 'border');
-    const dangerColor = useThemeColor({}, 'danger');
-    const primaryColor = useThemeColor({}, 'primary');
-    const dividerColor = useThemeColor({}, 'textMuted');
+    const { theme } = useTheme();
+    const cardColor = theme.surface;
+    const borderColor = theme.border;
+    const dangerColor = theme.danger;
+    const primaryColor = theme.primary;
+    const dividerColor = theme.textMuted;
     
     const getProgressLabel = () => {
         switch (selectedFormat) {

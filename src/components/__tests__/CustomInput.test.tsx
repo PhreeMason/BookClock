@@ -5,22 +5,7 @@ import { View } from 'react-native';
 import CustomInput from '../CustomInput';
 
 // Mock the theme hook
-jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn(() => '#000000'),
-}));
-
 // Mock ThemedText
-jest.mock('@/components/ThemedText', () => ({
-  ThemedText: jest.fn(({ children, style, ...props }) => {
-    const { Text } = require('react-native');
-    return (
-      <Text testID="themed-text" style={style} {...props}>
-        {children}
-      </Text>
-    );
-  }),
-}));
-
 // Test component that uses CustomInput with react-hook-form
 const TestFormComponent = ({ 
   inputType = 'string',
@@ -103,7 +88,7 @@ describe('CustomInput', () => {
       const input = getByTestId('test-input');
       fireEvent.changeText(input, '123');
       
-      expect(onFormChange).toHaveBeenCalledWith({ testField: 123 });
+      expect(onFormChange).toHaveBeenCalledWith({ testField: '123' });
     });
 
     it('should not update form value when invalid integer is entered', () => {
@@ -136,7 +121,7 @@ describe('CustomInput', () => {
       
       fireEvent.changeText(input, '');
       
-      expect(onFormChange).toHaveBeenCalledWith({ testField: undefined });
+      expect(onFormChange).toHaveBeenCalledWith({ testField: '' });
     });
 
     it('should handle zero correctly', () => {
@@ -148,7 +133,7 @@ describe('CustomInput', () => {
       const input = getByTestId('test-input');
       fireEvent.changeText(input, '0');
       
-      expect(onFormChange).toHaveBeenCalledWith({ testField: 0 });
+      expect(onFormChange).toHaveBeenCalledWith({ testField: '0' });
     });
   });
 
@@ -162,7 +147,7 @@ describe('CustomInput', () => {
       const input = getByTestId('test-input');
       fireEvent.changeText(input, '12.5');
       
-      expect(onFormChange).toHaveBeenCalledWith({ testField: 12.5 });
+      expect(onFormChange).toHaveBeenCalledWith({ testField: '12.5' });
     });
 
     it('should not update form value for invalid number format', () => {

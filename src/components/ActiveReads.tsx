@@ -1,11 +1,8 @@
 import DeadlineCard from '@/components/DeadlineCard'
-import { ThemedScrollView } from '@/components/ThemedScrollView'
-import { ThemedText } from '@/components/ThemedText'
-import { ThemedView } from '@/components/ThemedView'
+import { ThemedScrollView, ThemedText, ThemedView, ThemedButton } from '@/components/themed'
 import { useDeadlines } from '@/contexts/DeadlineProvider'
 import { Link } from 'expo-router'
 import { StyleSheet } from 'react-native'
-import { ThemedButton } from './ThemedButton'
 
 const ActiveReads = () => {
     const { activeDeadlines, isLoading, error } = useDeadlines()
