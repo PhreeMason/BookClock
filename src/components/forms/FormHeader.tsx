@@ -1,6 +1,5 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { ThemedText, ThemedView } from '@/components/themed';
+import { useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
@@ -13,8 +12,9 @@ interface FormHeaderProps {
 }
 
 export const FormHeader = ({ title, onBack, showBack, onSkip, showSkip }: FormHeaderProps) => {
-    const borderColor = useThemeColor({}, 'textMuted');
-    const successColor = useThemeColor({}, 'success');
+    const { theme } = useTheme();
+    const borderColor = theme.textMuted;
+    const successColor = theme.success;
     
     return (
         <ThemedView backgroundColor="card" style={[styles.header, { borderBottomColor: borderColor }]}>

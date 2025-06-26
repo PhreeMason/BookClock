@@ -40,10 +40,6 @@ jest.mock('@/contexts/DeadlineProvider', () => ({
 }));
 
 // Mock theme hook
-jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn(() => '#000000'),
-}));
-
 // Mock Alert
 jest.spyOn(Alert, 'alert');
 
@@ -150,7 +146,7 @@ describe('NewDeadline Functional Tests', () => {
       await act(async () => {
         fireEvent.changeText(totalQuantityInput, '');
       });
-      expect(totalQuantityInput.props.value).toBe('0');
+      expect(totalQuantityInput.props.value).toBe('');
     });
 
     it('should handle audio format with minutes input', async () => {

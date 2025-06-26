@@ -82,3 +82,30 @@ npm test
 
 # Run tests in watch mode
 npm run test:watch
+
+### User Pace Calculation (Two-Tier System)
+# Tier 1: Recent Data Available
+- Condition: ≥3 reading days in past 7 days
+- Calculation: Rolling 7-day average of reading days only
+- Method: Sum pages from reading days ÷ number of reading days
+- Example: 150 pages across 5 reading days = 30 pages/day
+
+# Tier 2: Insufficient Recent Data
+- Condition: <3 reading days in past 7 days
+- Fallback: Use 25 pages/day default
+- Reasoning: Conservative approach prevents overcommitment
+
+### Optional User Override (Phase 2)
+- Setting: "Custom pace" option in settings
+- Default: Auto-calculate (recommended)
+- Fallback hierarchy: Custom pace → Recent data → 25 pages/day default
+
+### Status Color Categories (Pace-Based)
+- Green: Current pace ≥ required pace AND >0 days remaining
+- Orange: Current pace < required pace AND gap ≤100% current pace AND >0 days remaining
+- Red: Overdue OR impossible pace (>100% increase needed) OR 0% progress with <3 days remaining
+
+### Core Calculations
+- Required daily pace = Pages remaining ÷ Days remaining
+- Reading day definition = Any day with >0 pages logged
+- Minimum data threshold = 3 reading days for reliable pace calculation

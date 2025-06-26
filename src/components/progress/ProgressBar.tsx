@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ThemedText } from '../ThemedText';
-import { ThemedView } from '../ThemedView';
+import { ThemedText, ThemedView } from '../themed';
 
 interface ProgressBarProps {
   progressPercentage: number;
@@ -22,9 +21,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
   return (
     <View style={styles.progressBarContainer}>
-      <ThemedView backgroundColor="primary" style={styles.progressBar}>
+      <ThemedView backgroundColor="accent" style={styles.progressBar}>
         <ThemedView
-          backgroundColor="primaryForeground"
+          backgroundColor="primary"
           style={[styles.progressFill, { width: `${progressPercentage}%` }]}
         />
       </ThemedView>

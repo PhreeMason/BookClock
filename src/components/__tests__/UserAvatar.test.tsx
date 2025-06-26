@@ -8,14 +8,11 @@ jest.mock('@clerk/clerk-expo', () => ({
 }));
 
 // Mock the themed components
-jest.mock('../ThemedText', () => ({
+jest.mock('../themed', () => ({
   ThemedText: ({ children, style, ...props }: any) => {
     const MockedThemedText = require('react-native').Text;
     return <MockedThemedText style={style} {...props}>{children}</MockedThemedText>;
   },
-}));
-
-jest.mock('../ThemedView', () => ({
   ThemedView: ({ children, style, ...props }: any) => {
     const MockedThemedView = require('react-native').View;
     return <MockedThemedView style={style} {...props}>{children}</MockedThemedView>;
@@ -23,19 +20,6 @@ jest.mock('../ThemedView', () => ({
 }));
 
 // Mock the useThemeColor hook
-jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn((props, backgroundColor) => {
-    switch (backgroundColor) {
-      case 'primary':
-        return '#5c2eb8';
-      case 'primaryForeground':
-        return '#b3f5b9';
-      default:
-        return '#000000';
-    }
-  }),
-}));
-
 // Import the mocked hook to control its behavior in tests
 const mockUseUser = require('@clerk/clerk-expo').useUser;
 
@@ -212,7 +196,7 @@ describe('UserAvatar', () => {
           width: 40,
           height: 40,
           borderRadius: 20,
-          backgroundColor: '#5c2eb8',
+          backgroundColor: '#0066cc',
           alignItems: 'center',
           justifyContent: 'center',
         })

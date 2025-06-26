@@ -1,6 +1,6 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { ThemedText } from '@/components/themed';
+import { ThemedView } from '@/components/themed';
+import { useTheme } from '@/theme';
 import { useUser } from '@clerk/clerk-expo';
 import React from 'react';
 import { Image } from 'react-native';
@@ -17,8 +17,9 @@ export function UserAvatar({
   textColor
 }: UserAvatarProps) {
   const { user } = useUser();
-  const defaultBgColor = useThemeColor({}, 'primary');
-  const defaultTextColor = useThemeColor({}, 'primaryForeground');
+  const { theme } = useTheme();
+  const defaultBgColor = theme.primary;
+  const defaultTextColor = '#ffffff';
 
   // Helper function to get user initials
   const getUserInitials = () => {

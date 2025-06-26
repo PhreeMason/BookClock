@@ -1,10 +1,10 @@
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useTheme } from '@/theme';
 import dayjs from 'dayjs';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
+import { ThemedText } from './themed';
+import { ThemedView } from './themed';
 import { IconSymbol } from './ui/IconSymbol';
 
 type HeaderProps = {
@@ -16,7 +16,8 @@ type HeaderProps = {
 const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderProps) => {
     const today = Date.now()
     const formattedDate = dayjs(today).format('dddd, MMMM DD')
-    const iconColor = useThemeColor({}, 'icon');
+    const { theme } = useTheme();
+    const iconColor = theme.primary;
 
     const handleSettingsPress = () => {
         router.push('/settings');
