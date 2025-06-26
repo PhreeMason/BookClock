@@ -64,6 +64,7 @@ export const DeadlineFormStep2 = ({
                             <TouchableOpacity
                                 style={[styles.dateInput, {backgroundColor: cardColor, borderColor: borderColor}]}
                                 onPress={onDatePickerToggle}
+                                testID="date-picker-button"
                             >
                                 <ThemedText>
                                     {value.toLocaleDateString('en-US', {
@@ -79,6 +80,7 @@ export const DeadlineFormStep2 = ({
                                         mode="date"
                                         display="inline"
                                         onChange={onDateChange}
+                                        testID='input-deadline'
                                     />
                                 )}
                             </TouchableOpacity>

@@ -55,32 +55,13 @@ export default function CustomInput<T extends FieldValues>({
                                     return;
                                 }
 
-                                // For integer type, use parseInt and validate it's a whole number
-                                if (inputType === 'integer') {
-                                    const numValue = parseInt(text, 10);
-                                    // Only accept if the parsed value matches the input (no decimals/extra chars)
-                                    if (!isNaN(numValue) && numValue.toString() === text.trim()) {
-                                        onChange(numValue);
-                                    } else {
-                                        // Invalid integer input - don't update form value
-                                        return;
-                                    }
+                                // For numeric types, convert to number and let Zod handle validation
+                                const numValue = inputType === 'integer' ? parseInt(text, 10) : parseFloat(text);
+                                if (!isNaN(numValue)) {
+                                    onChange(numValue);
                                 } else {
-                                    // For number type, use parseFloat but validate format
-                                    const numValue = parseFloat(text);
-                                    if (!isNaN(numValue) && text.trim() !== '') {
-                                        // Additional validation: ensure it's a valid number format
-                                        const isValidNumberFormat = /^-?\d*\.?\d*$/.test(text.trim());
-                                        if (isValidNumberFormat) {
-                                            onChange(numValue);
-                                        } else {
-                                            // Invalid number format - don't update form value
-                                            return;
-                                        }
-                                    } else {
-                                        // Invalid number input - don't update form value
-                                        return;
-                                    }
+                                    // Let Zod handle invalid formats, but don't update with NaN
+                                    return;
                                 }
                             } else {
                                 // String input - always update
