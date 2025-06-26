@@ -98,39 +98,7 @@ jest.mock('@/components/forms', () => ({
   }),
 }));
 
-// Mock the themed components
-jest.mock('@/components/ThemedScrollView', () => {
-  const { ScrollView } = require('react-native');
-  return {
-    ThemedScrollView: jest.fn(({ children, style, ...props }) => (
-      <ScrollView testID="themed-scroll-view" style={style} {...props}>
-        {children}
-      </ScrollView>
-    )),
-  };
-});
-
-jest.mock('@/components/ThemedView', () => {
-  const { View } = require('react-native');
-  return {
-    ThemedView: jest.fn(({ children, style, ...props }) => (
-      <View testID="themed-view" style={style} {...props}>
-        {children}
-      </View>
-    )),
-  };
-});
-
-jest.mock('@/components/ThemedText', () => {
-  const { Text } = require('react-native');
-  return {
-    ThemedText: jest.fn(({ children, style, ...props }) => (
-      <Text testID="themed-text" style={style} {...props}>
-        {children}
-      </Text>
-    )),
-  };
-});
+// Themed components are mocked globally in setup.ts
 
 // Mock the calculation functions
 jest.mock('@/lib/deadlineCalculations', () => ({

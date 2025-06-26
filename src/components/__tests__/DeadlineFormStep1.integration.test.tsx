@@ -7,22 +7,7 @@ import { DeadlineFormStep1 } from '../forms/DeadlineFormStep1';
 import { DeadlineFormData, deadlineFormSchema } from '@/lib/deadlineFormSchema';
 
 // Mock the theme hook
-jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn(() => '#000000'),
-}));
-
 // Mock ThemedText
-jest.mock('@/components/ThemedText', () => ({
-  ThemedText: jest.fn(({ children, style, ...props }) => {
-    const { Text } = require('react-native');
-    return (
-      <Text testID="themed-text" style={style} {...props}>
-        {children}
-      </Text>
-    );
-  }),
-}));
-
 // Mock CustomInput to properly pass through testID
 jest.mock('@/components/CustomInput', () => {
   const React = require('react');

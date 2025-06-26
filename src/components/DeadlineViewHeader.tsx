@@ -1,8 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { ThemedButton } from './ThemedButton';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
+import { ThemedButton, ThemedText, ThemedView } from './themed';
 
 interface DeadlineViewHeaderProps {
   title?: string;
@@ -16,12 +14,10 @@ const DeadlineViewHeader: React.FC<DeadlineViewHeaderProps> = ({
   onEdit,
 }) => {
   return (
-    <ThemedView backgroundColor="card" style={styles.header}>
+    <ThemedView backgroundColor="background" style={styles.header}>
       <ThemedButton
         title="← Back"
         variant="ghost"
-        backgroundColor="transparent"
-        textColor="primary"
         onPress={onBack}
       />
       <ThemedText type="subtitle">
@@ -30,8 +26,6 @@ const DeadlineViewHeader: React.FC<DeadlineViewHeaderProps> = ({
       <ThemedButton
         title="Edit"
         variant="ghost"
-        backgroundColor="transparent"
-        textColor="primary"
         onPress={onEdit}
       />
     </ThemedView>

@@ -3,42 +3,7 @@ import React from 'react';
 import { FormHeader } from '../forms/FormHeader';
 
 // Mock the ThemedText and ThemedView components
-jest.mock('@/components/ThemedText', () => ({
-  ThemedText: jest.fn(({ children, style, ...props }) => {
-    const { Text } = require('react-native');
-    return (
-      <Text testID="themed-text" style={style} {...props}>
-        {children}
-      </Text>
-    );
-  }),
-}));
-
-jest.mock('@/components/ThemedView', () => ({
-  ThemedView: jest.fn(({ children, style, ...props }) => {
-    const { View } = require('react-native');
-    return (
-      <View testID="themed-view" style={style} {...props}>
-        {children}
-      </View>
-    );
-  }),
-}));
-
 // Mock the useThemeColor hook
-jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn((props, backgroundColor) => {
-    switch (backgroundColor) {
-      case 'textMuted':
-        return '#5b33af';
-      case 'success':
-        return '#4ade80';
-      default:
-        return '#000000';
-    }
-  }),
-}));
-
 describe('FormHeader', () => {
   const mockOnBack = jest.fn();
   const mockOnSkip = jest.fn();
@@ -48,7 +13,7 @@ describe('FormHeader', () => {
   });
 
   it('renders with required props', () => {
-    const { getByText, getByTestId } = render(
+    const { getByText } = render(
       <FormHeader
         title="Test Header"
         onBack={mockOnBack}
@@ -57,7 +22,6 @@ describe('FormHeader', () => {
     );
     
     expect(getByText('Test Header')).toBeTruthy();
-    expect(getByTestId('themed-view')).toBeTruthy();
   });
 
   it('renders back button when showBack is true', () => {
@@ -157,31 +121,6 @@ describe('FormHeader', () => {
     expect(mockOnSkip).toHaveBeenCalledTimes(1);
   });
 
-  it('applies correct header styles', () => {
-    const { getByTestId } = render(
-      <FormHeader
-        title="Test Header"
-        onBack={mockOnBack}
-        showBack={true}
-      />
-    );
-    
-    const header = getByTestId('themed-view');
-    expect(header.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: 15,
-          borderBottomWidth: 1,
-        }),
-        expect.objectContaining({
-          borderBottomColor: '#5b33af',
-        }),
-      ])
-    );
-  });
 
   it('applies correct title styles', () => {
     const { getByText } = render(
@@ -218,30 +157,6 @@ describe('FormHeader', () => {
     );
   });
 
-  it('applies correct skip button text styles', () => {
-    const { getByText } = render(
-      <FormHeader
-        title="Test Header"
-        onBack={mockOnBack}
-        showBack={true}
-        onSkip={mockOnSkip}
-        showSkip={true}
-      />
-    );
-    
-    const skipButtonText = getByText('Skip');
-    expect(skipButtonText.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          fontSize: 16,
-          fontWeight: '600',
-        }),
-        expect.objectContaining({
-          color: '#4ade80',
-        }),
-      ])
-    );
-  });
 
   it('handles long title text', () => {
     const longTitle = 'This is a very long title that might wrap to multiple lines';

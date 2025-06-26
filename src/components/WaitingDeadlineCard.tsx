@@ -1,14 +1,15 @@
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
+import { ThemedText } from './themed';
+import { ThemedView } from './themed';
 
 const WaitingDeadlineCard = () => {
-    const cardColor = useThemeColor({}, 'card');
-    const borderColor = useThemeColor({}, 'textMuted');
-    const textColor = useThemeColor({}, 'text');
-    const textMutedColor = useThemeColor({}, 'textMuted');
+    const { theme } = useTheme();
+    const cardColor = theme.surface;
+    const borderColor = theme.textMuted;
+    const textColor = theme.text;
+    const textMutedColor = theme.textMuted;
     
     return (
         <ThemedView style={[styles.content, { backgroundColor: cardColor, borderColor: borderColor }]}>

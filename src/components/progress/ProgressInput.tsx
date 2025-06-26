@@ -1,4 +1,4 @@
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useTheme } from '@/theme';
 import React, { useEffect, useState } from 'react';
 import { Control, UseFormSetValue } from 'react-hook-form';
 import { StyleSheet, TextInput, View } from 'react-native';
@@ -17,10 +17,11 @@ const ProgressInput: React.FC<ProgressInputProps> = ({
   setValue,
   currentProgress
 }) => {
-  const textMutedColor = useThemeColor({}, 'textMuted');
-  const cardColor = useThemeColor({}, 'card');
-  const textColor = useThemeColor({}, 'text');
-  const borderColor = useThemeColor({}, 'border');
+  const { theme } = useTheme();
+  const textMutedColor = theme.textMuted;
+  const cardColor = theme.surface;
+  const textColor = theme.text;
+  const borderColor = theme.border;
 
   // Helper functions for audiobook time conversion
   const convertMinutesToTimeString = (totalMinutes: number): string => {
@@ -68,8 +69,8 @@ const ProgressInput: React.FC<ProgressInputProps> = ({
   // Handle input change for time format
   const handleInputChange = (text: string) => {
     setDisplayValue(text);
-    const minutesValue = convertTimeStringToMinutes(text);
-    setValue('currentProgress', minutesValue, { shouldValidate: true });
+    // Always pass the text directly to the form - let the schema handle validation
+    setValue('currentProgress', text, { shouldValidate: false });
   };
 
   if (format === 'audio') {

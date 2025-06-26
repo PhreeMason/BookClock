@@ -1,5 +1,5 @@
-import { ThemedText } from '@/components/ThemedText';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { ThemedText } from '@/components/themed';
+import { useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -9,8 +9,9 @@ interface SourceSelectorProps {
 }
 
 export const SourceSelector = ({ selectedSource, onSelectSource }: SourceSelectorProps) => {
-    const primaryColor = useThemeColor({}, 'primary');
-    const cardColor = useThemeColor({}, 'card');
+    const { theme } = useTheme();
+    const primaryColor = theme.primary;
+    const cardColor = theme.surface;
     
     const sources = [
         { key: 'arc', label: '📚 ARC' },

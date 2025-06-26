@@ -1,14 +1,15 @@
 
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useTheme } from '@/theme';
 import { useClerk } from '@clerk/clerk-expo';
 import * as Linking from 'expo-linking';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { ThemedText } from './ThemedText';
+import { ThemedText } from './themed';
 import { IconSymbol } from './ui/IconSymbol';
 
 export const SignOutButton = () => {
   const { signOut } = useClerk()
-  const dangerColor = useThemeColor({}, 'danger');
+  const { theme } = useTheme();
+  const dangerColor = theme.danger;
   
   const handleSignOut = async () => {
     try {

@@ -1,5 +1,5 @@
-import { ThemedText } from '@/components/ThemedText';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { ThemedText } from '@/components/themed';
+import { useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -9,9 +9,10 @@ interface PrioritySelectorProps {
 }
 
 export const PrioritySelector = ({ selectedPriority, onSelectPriority }: PrioritySelectorProps) => {
-    const primaryColor = useThemeColor({}, 'primary');
-    const cardColor = useThemeColor({}, 'card');
-    const textMutedColor = useThemeColor({}, 'textMuted');
+    const { theme } = useTheme();
+    const primaryColor = theme.primary;
+    const cardColor = theme.surface;
+    const textMutedColor = theme.textMuted;
     
     const priorities = [
         { key: 'flexible', label: 'Flexible', icon: '🕐' },

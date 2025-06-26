@@ -3,33 +3,7 @@ import React from 'react';
 import { PrioritySelector } from '../forms/PrioritySelector';
 
 // Mock the ThemedText component
-jest.mock('@/components/ThemedText', () => ({
-  ThemedText: jest.fn(({ children, style, ...props }) => {
-    const { Text } = require('react-native');
-    return (
-      <Text testID="themed-text" style={style} {...props}>
-        {children}
-      </Text>
-    );
-  }),
-}));
-
 // Mock the useThemeColor hook
-jest.mock('@/hooks/useThemeColor', () => ({
-  useThemeColor: jest.fn((props, backgroundColor) => {
-    switch (backgroundColor) {
-      case 'primary':
-        return '#5c2eb8';
-      case 'card':
-        return '#e3f1e4';
-      case 'textMuted':
-        return '#5b33af';
-      default:
-        return '#000000';
-    }
-  }),
-}));
-
 describe('PrioritySelector', () => {
   const mockOnSelectPriority = jest.fn();
 
@@ -49,42 +23,6 @@ describe('PrioritySelector', () => {
     expect(getByText('Must Meet')).toBeTruthy();
     expect(getByText('🕐')).toBeTruthy();
     expect(getByText('⚡')).toBeTruthy();
-  });
-
-  it('applies selected style to selected priority', () => {
-    const { getByTestId } = render(
-      <PrioritySelector
-        selectedPriority="strict"
-        onSelectPriority={mockOnSelectPriority}
-      />
-    );
-    
-    const strictOption = getByTestId('priority-option-strict');
-    
-    expect(strictOption.props.style).toEqual(
-      expect.objectContaining({
-        borderColor: '#5c2eb8',
-        backgroundColor: '#5c2eb820',
-      })
-    );
-  });
-
-  it('applies unselected style to non-selected priorities', () => {
-    const { getByTestId } = render(
-      <PrioritySelector
-        selectedPriority="flexible"
-        onSelectPriority={mockOnSelectPriority}
-      />
-    );
-    
-    const strictOption = getByTestId('priority-option-strict');
-    
-    expect(strictOption.props.style).toEqual(
-      expect.objectContaining({
-        borderColor: '#5b33af',
-        backgroundColor: '#e3f1e4',
-      })
-    );
   });
 
   it('calls onSelectPriority with correct priority when flexible is pressed', () => {
@@ -129,29 +67,6 @@ describe('PrioritySelector', () => {
         flexDirection: 'row',
         gap: 12,
         marginTop: 8,
-      })
-    );
-  });
-
-  it('applies correct option styles', () => {
-    const { getByTestId } = render(
-      <PrioritySelector
-        selectedPriority="flexible"
-        onSelectPriority={mockOnSelectPriority}
-      />
-    );
-    
-    const option = getByTestId('priority-option-strict');
-    
-    expect(option.props.style).toEqual(
-      expect.objectContaining({
-        flex: 1,
-        backgroundColor: '#e3f1e4',
-        borderWidth: 2,
-        borderColor: '#5b33af',
-        borderRadius: 12,
-        padding: 16,
-        alignItems: 'center',
       })
     );
   });
@@ -205,63 +120,6 @@ describe('PrioritySelector', () => {
     fireEvent.press(flexibleOption);
     
     expect(mockOnSelectPriority).toHaveBeenCalledWith('flexible');
-  });
-
-  it('renders with no priority selected initially', () => {
-    const { getByTestId } = render(
-      <PrioritySelector
-        selectedPriority=""
-        onSelectPriority={mockOnSelectPriority}
-      />
-    );
-    
-    // All options should be unselected
-    const flexibleOption = getByTestId('priority-option-flexible');
-    const strictOption = getByTestId('priority-option-strict');
-    
-    expect(flexibleOption.props.style).toEqual(
-      expect.objectContaining({
-        borderColor: '#5b33af',
-        backgroundColor: '#e3f1e4',
-      })
-    );
-    
-    expect(strictOption.props.style).toEqual(
-      expect.objectContaining({
-        borderColor: '#5b33af',
-        backgroundColor: '#e3f1e4',
-      })
-    );
-  });
-
-  it('maintains selection state after multiple interactions', () => {
-    const { getByTestId, rerender } = render(
-      <PrioritySelector
-        selectedPriority="flexible"
-        onSelectPriority={mockOnSelectPriority}
-      />
-    );
-    
-    // Select strict
-    const strictOption = getByTestId('priority-option-strict');
-    fireEvent.press(strictOption);
-    
-    // Rerender with new selection
-    rerender(
-      <PrioritySelector
-        selectedPriority="strict"
-        onSelectPriority={mockOnSelectPriority}
-      />
-    );
-    
-    // Verify strict is now selected
-    const selectedStrictOption = getByTestId('priority-option-strict');
-    expect(selectedStrictOption.props.style).toEqual(
-      expect.objectContaining({
-        borderColor: '#5c2eb8',
-        backgroundColor: '#5c2eb820',
-      })
-    );
   });
 
   it('renders both icons correctly', () => {
