@@ -141,7 +141,6 @@ const NewDeadLine = () => {
             },
             // Error callback
             (error) => {
-                console.error('Failed to add deadline:', error);
                 setIsSubmitting(false);
                 Toast.show({
                     type: 'error',

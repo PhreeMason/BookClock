@@ -51,6 +51,7 @@ export const DeadlineFormStep1 = ({
                 <CustomInput
                     control={control}
                     name="bookTitle"
+                    testID='input-bookTitle'
                     placeholder="Enter the book title"
                 />
             </View>
@@ -60,6 +61,7 @@ export const DeadlineFormStep1 = ({
                 <CustomInput
                     control={control}
                     name="bookAuthor"
+                    testID='input-bookAuthor'
                     placeholder="Author name (optional)"
                 />
             </View>
@@ -93,6 +95,7 @@ export const DeadlineFormStep1 = ({
                             inputType="integer"
                             placeholder={getTotalQuantityPlaceholder()}
                             keyboardType="numeric"
+                            testID='input-totalQuantity'
                         />
                     </View>
                     {selectedFormat === 'audio' ?
@@ -103,6 +106,7 @@ export const DeadlineFormStep1 = ({
                                 inputType="integer"
                                 placeholder="Minutes (optional)"
                                 keyboardType="numeric"
+                                testID='input-totalMinutes'
                             />
                         </View> : null}
                 </View>
