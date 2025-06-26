@@ -1,9 +1,6 @@
 import CustomInput from '@/components/CustomInput';
 import SignInWith from '@/components/SignInWith';
-import { ThemedButton } from '@/components/ThemedButton';
-import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedButton, ThemedText, ThemedView, ThemedKeyboardAvoidingView } from '@/components/themed';
 import { isClerkAPIResponseError, useClerk, useSignIn } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
@@ -109,8 +106,7 @@ export default function Page() {
                 <ThemedButton
                     title="Continue"
                     style={styles.button}
-                    backgroundColor="buttonPrimary"
-                    textColor="buttonText"
+                    variant="primary"
                     onPress={handleSubmit(onSignInPress)}
                 />
             </ThemedView>

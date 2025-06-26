@@ -1,12 +1,10 @@
-import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingView';
-import { ThemedScrollView } from '@/components/ThemedScrollView';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedButton, ThemedKeyboardAvoidingView, ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import {
@@ -16,6 +14,8 @@ import {
     FormProgressBar,
     StepIndicators
 } from '@/components/forms';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useTheme } from '@/theme';
 
 import {
     calculateCurrentProgressFromForm,
@@ -24,8 +24,8 @@ import {
     getPaceEstimate
 } from '@/lib/deadlineCalculations';
 
-import { ThemedButton } from '@/components/ThemedButton';
 import { DeadlineFormData, deadlineFormSchema } from '@/lib/deadlineFormSchema';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const NewDeadLine = () => {
     const [currentStep, setCurrentStep] = useState(1);
@@ -36,6 +36,8 @@ const NewDeadLine = () => {
     const [paceEstimate, setPaceEstimate] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { addDeadline } = useDeadlines();
+    const { theme } = useTheme();
+    const backgroundColor = theme.background;
 
     const formSteps = ['Book Details', 'Set Deadline'];
     const totalSteps = formSteps.length;
@@ -87,9 +89,9 @@ const NewDeadLine = () => {
         if (isSubmitting) {
             return;
         }
-        
+
         setIsSubmitting(true);
-        
+
         // Calculate total quantity accounting for format
         const finalTotalQuantity = calculateTotalQuantityFromForm(
             selectedFormat,
@@ -163,14 +165,14 @@ const NewDeadLine = () => {
                 'source',
                 'totalQuantity',
             ];
-            
+
             // Add totalMinutes validation for audio format
             if (selectedFormat === 'audio') {
                 fieldsToValidate.push('totalMinutes');
             }
-            
+
             const result = await trigger(fieldsToValidate);
-            
+
             if (result) {
                 setCurrentStep(currentStep + 1);
             }
@@ -185,6 +187,10 @@ const NewDeadLine = () => {
         } else {
             router.back();
         }
+    };
+
+    const goBackToIndex = () => {
+        router.push('/');
     };
 
     const onDateChange = (event: any, selectedDate?: Date) => {
@@ -210,68 +216,101 @@ const NewDeadLine = () => {
     };
 
     return (
-        <ThemedKeyboardAvoidingView style={styles.container}>
-            <FormProgressBar currentStep={currentStep} totalSteps={totalSteps} />
-            <StepIndicators currentStep={currentStep} totalSteps={totalSteps} />
-            <ThemedScrollView 
-                style={styles.content} 
-                contentContainerStyle={{paddingBottom: 48}}
-                keyboardShouldPersistTaps="handled"
-            >
-                <FormHeader
-                    title={formSteps[currentStep - 1]}
-                    onBack={goBack}
-                    showBack={currentStep > 1}
-                />
+        <SafeAreaView style={{flex: 1 , backgroundColor}}>
+            <ThemedKeyboardAvoidingView style={styles.container}>
+                <ThemedView backgroundColor="card" style={styles.mainHeader}>
+                    <TouchableOpacity
+                        style={styles.backToIndexButton}
+                        onPress={goBackToIndex}
+                    >
+                        <IconSymbol size={24} name="chevron.left" color={theme.primary} />
+                    </TouchableOpacity>
+                    <ThemedText style={styles.mainHeaderTitle}>New Deadline</ThemedText>
+                    <ThemedView style={styles.placeholder} />
+                </ThemedView>
 
-                {currentStep === 1 ? (
-                    <DeadlineFormStep1
-                        control={control}
-                        selectedFormat={selectedFormat}
-                        selectedSource={selectedSource}
-                        onFormatChange={handleFormatChange}
-                        onSourceChange={handleSourceChange}
+                <FormProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+                <StepIndicators currentStep={currentStep} totalSteps={totalSteps} />
+                <ThemedScrollView
+                    style={styles.content}
+                    contentContainerStyle={{ paddingBottom: 48 }}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <FormHeader
+                        title={formSteps[currentStep - 1]}
+                        onBack={goBack}
+                        showBack={currentStep > 1}
                     />
-                ) : (
-                    <DeadlineFormStep2
-                        control={control}
-                        selectedFormat={selectedFormat}
-                        selectedPriority={selectedPriority}
-                        onPriorityChange={handlePriorityChange}
-                        showDatePicker={showDatePicker}
-                        onDatePickerToggle={() => setShowDatePicker(true)}
-                        onDateChange={onDateChange}
-                        deadline={watchedValues.deadline}
-                        paceEstimate={paceEstimate}
-                        watchedValues={watchedValues}
-                    />
-                )}
-            </ThemedScrollView>
 
-            <ThemedView style={styles.navButtons}>
-                {currentStep > 1 && (
+                    {currentStep === 1 ? (
+                        <DeadlineFormStep1
+                            control={control}
+                            selectedFormat={selectedFormat}
+                            selectedSource={selectedSource}
+                            onFormatChange={handleFormatChange}
+                            onSourceChange={handleSourceChange}
+                        />
+                    ) : (
+                        <DeadlineFormStep2
+                            control={control}
+                            selectedFormat={selectedFormat}
+                            selectedPriority={selectedPriority}
+                            onPriorityChange={handlePriorityChange}
+                            showDatePicker={showDatePicker}
+                            onDatePickerToggle={() => setShowDatePicker(true)}
+                            onDateChange={onDateChange}
+                            deadline={watchedValues.deadline}
+                            paceEstimate={paceEstimate}
+                            watchedValues={watchedValues}
+                        />
+                    )}
+                </ThemedScrollView>
+
+                <ThemedView style={styles.navButtons}>
+                    {currentStep > 1 && (
+                        <ThemedButton
+                            title="Back"
+                            variant="secondary"
+                            onPress={goBack}
+                            style={{ flex: 1 }}
+                            disabled={isSubmitting}
+                        />
+                    )}
                     <ThemedButton
-                        title="Back"
-                        variant="secondary"
-                        onPress={goBack}
-                        style={{flex: 1}}
+                        title={isSubmitting ? 'Adding...' : (currentStep === totalSteps ? 'Add Book' : 'Continue')}
+                        onPress={nextStep}
                         disabled={isSubmitting}
+                        style={{ flex: 1 }}
                     />
-                )}
-                <ThemedButton
-                    title={isSubmitting ? 'Adding...' : (currentStep === totalSteps ? 'Add Book' : 'Continue')}
-                    onPress={nextStep}
-                    disabled={isSubmitting}
-                    style={{flex: 1}}
-                />
-            </ThemedView>
-        </ThemedKeyboardAvoidingView>
+                </ThemedView>
+            </ThemedKeyboardAvoidingView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    mainHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingTop: 16,
+        paddingBottom: 12,
+        borderBottomWidth: 1,
+    },
+    backToIndexButton: {
+        padding: 8,
+        borderRadius: 8,
+    },
+    mainHeaderTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+    },
+    placeholder: {
+        width: 40,
     },
     content: {
         flex: 1,

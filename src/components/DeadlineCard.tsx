@@ -1,7 +1,4 @@
-// industry average for reading speed
-// 250 words per minute or 40 pages per hour
-// color code the countdown number instead of the card border
-import { ThemedText } from '@/components/ThemedText';
+import { ThemedText } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { useRouter } from 'expo-router';
@@ -95,7 +92,7 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
       <View style={[styles.card, { borderColor }]}>
         {true ? (
           <ImageBackground
-            source={{ uri: 'https://m.media-amazon.com/images/I/91rnexU88KL._SL1500_.jpg' }}
+            source={{ uri: 'https://m.media-amazon.com/images/I/716qKfyCzpL._SL1500_.jpg' }}
             style={styles.backgroundImage}
             blurRadius={50}
           >

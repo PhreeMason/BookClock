@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { ThemedButton } from './ThemedButton';
-import { ThemedView } from './ThemedView';
+import { ThemedButton } from './themed';
+import { ThemedView } from './themed';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 interface DeadlineActionButtonsProps {
@@ -67,8 +67,7 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
     <ThemedView style={styles.actionButtons}>
       <ThemedButton
         title="✓ Mark as Complete"
-        backgroundColor="success"
-        textColor="primary"
+        variant="success"
         style={styles.completeBtn}
         onPress={handleComplete}
       />

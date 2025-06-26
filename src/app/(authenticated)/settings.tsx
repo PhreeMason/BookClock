@@ -1,10 +1,9 @@
 import { SignOutButton } from '@/components/SignOutButton';
-import { ThemedScrollView } from '@/components/ThemedScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { UserAvatar } from '@/components/UserAvatar';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { useTheme } from '@/theme';
 import { useUser } from '@clerk/clerk-expo';
 import { router } from 'expo-router';
 import React from 'react';
@@ -12,9 +11,10 @@ import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function SettingsScreen() {
     const { user } = useUser();
-    const borderColor = useThemeColor({}, 'border');
-    const iconColor = useThemeColor({}, 'icon');
-    const textMutedColor = useThemeColor({}, 'textMuted');
+    const { theme } = useTheme();
+    const borderColor = theme.border;
+    const iconColor = theme.primary;
+    const textMutedColor = theme.textMuted;
 
     const handleBackPress = () => {
         router.back();
@@ -59,9 +59,9 @@ export default function SettingsScreen() {
                             </View>
                             <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
                         </TouchableOpacity>
-                        
+
                         <View style={[styles.divider, { backgroundColor: borderColor }]} />
-                        
+
                         <TouchableOpacity style={styles.settingItem}>
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="bell.fill" size={20} color={iconColor} />
@@ -69,9 +69,9 @@ export default function SettingsScreen() {
                             </View>
                             <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
                         </TouchableOpacity>
-                        
+
                         <View style={[styles.divider, { backgroundColor: borderColor }]} />
-                        
+
                         <TouchableOpacity style={styles.settingItem}>
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="moon.fill" size={20} color={iconColor} />
@@ -81,7 +81,8 @@ export default function SettingsScreen() {
                         </TouchableOpacity>
                     </ThemedView>
                 </View>
-
+                {/* Theme Switcher */}
+                <ThemeSwitcher />
                 {/* Sign Out Section */}
                 <View style={styles.signOutSection}>
                     <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>

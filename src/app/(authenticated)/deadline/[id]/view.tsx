@@ -3,10 +3,9 @@ import DeadlineActionButtons from '@/components/DeadlineActionButtons';
 import DeadlineHeroSection from '@/components/DeadlineHeroSection';
 import DeadlineViewHeader from '@/components/DeadlineViewHeader';
 import ReadingProgress from '@/components/ReadingProgress';
-import { ThemedScrollView } from '@/components/ThemedScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
+import { useTheme } from '@/theme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
@@ -17,8 +16,9 @@ const DeadlineView = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const { deadlines } = useDeadlines();
+    const { theme } = useTheme();
+    const backgroundColor = theme.background;
 
-    // Find the deadline by ID
     const deadline = deadlines.find(d => d.id === id);
 
     if (!deadline) {
@@ -41,7 +41,7 @@ const DeadlineView = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <DeadlineViewHeader
                 onBack={() => router.back()}
                 onEdit={handleEdit}
@@ -49,9 +49,9 @@ const DeadlineView = () => {
 
             <ThemedScrollView style={styles.content}>
                 <DeadlineHeroSection deadline={deadline} />
-                
+
                 <ReadingProgress deadline={deadline} />
-                
+
                 <BookDetailsSection deadline={deadline} />
 
                 <DeadlineActionButtons

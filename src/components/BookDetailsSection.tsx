@@ -1,10 +1,9 @@
-import { palette } from '@/constants/palette'
 import { ReadingDeadlineWithProgress } from '@/types/deadline'
+import { useTheme } from '@/theme'
 import dayjs from 'dayjs'
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
-import { ThemedText } from './ThemedText'
-import { ThemedView } from './ThemedView'
+import { StyleSheet } from 'react-native'
+import { ThemedText, ThemedView } from './themed'
 
 const makeUpperCaseFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -13,37 +12,38 @@ const makeUpperCaseFirstLetter = (str: string) => {
 const BookDetailsSection = (
     { deadline }: { deadline: ReadingDeadlineWithProgress }
 ) => {
+    const { theme } = useTheme();
     return (
         <ThemedView backgroundColor="card" style={styles.section}>
-            <View style={styles.sectionTitle}>
+            <ThemedView style={styles.sectionTitle}>
                 <ThemedText style={styles.sectionIcon}>📚</ThemedText>
                 <ThemedText type="subtitle">Book Details</ThemedText>
-            </View>
+            </ThemedView>
 
-            <View style={styles.detailsGrid}>
-                <View style={[styles.detailRow]}>
+            <ThemedView style={styles.detailsGrid}>
+                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
                     <ThemedText color="textMuted">Author</ThemedText>
                     <ThemedText style={styles.detailsValue}>{deadline.author || 'Unknown'}</ThemedText>
-                </View>
-                <View style={[styles.detailRow]}>
+                </ThemedView>
+                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
                     <ThemedText color="textMuted">Format</ThemedText>
                     <ThemedText style={styles.detailsValue}>
                         {deadline.format.charAt(0).toUpperCase() + deadline.format.slice(1)}
                     </ThemedText>
-                </View>
-                <View style={styles.detailRow}>
+                </ThemedView>
+                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
                     <ThemedText color="textMuted">Priority</ThemedText>
                     <ThemedText style={styles.detailsValue}>{makeUpperCaseFirstLetter(deadline.flexibility)}</ThemedText>
-                </View>
-                <View style={styles.detailRow}>
+                </ThemedView>
+                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
                     <ThemedText color="textMuted">Source</ThemedText>
                     <ThemedText style={styles.detailsValue}>{makeUpperCaseFirstLetter(deadline.source)}</ThemedText>
-                </View>
-                <View style={styles.detailRow}>
+                </ThemedView>
+                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
                     <ThemedText color="textMuted">Added</ThemedText>
                     <ThemedText style={styles.detailsValue}>{dayjs(deadline.created_at || '').format('MMMM DD, YYYY')}</ThemedText>
-                </View>
-            </View>
+                </ThemedView>
+            </ThemedView>
         </ThemedView>
     )
 }
@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: palette.celadon[600],
     },
     detailsValue: {
         fontWeight: '600',

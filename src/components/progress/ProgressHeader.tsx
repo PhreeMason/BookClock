@@ -1,13 +1,13 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { ThemedText } from '../ThemedText';
+import { StyleSheet } from 'react-native';
+import { ThemedText, ThemedView } from '../themed';
 
 const ProgressHeader: React.FC = () => {
   return (
-    <View style={styles.sectionTitle}>
+    <ThemedView style={styles.sectionTitle}>
       <ThemedText style={styles.sectionIcon}>📊</ThemedText>
       <ThemedText type="subtitle">Reading Progress</ThemedText>
-    </View>
+    </ThemedView>
   );
 };
 

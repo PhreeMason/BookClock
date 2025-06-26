@@ -1,9 +1,9 @@
 import DeadlineCard from '@/components/DeadlineCard';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { StyleSheet } from 'react-native';
-import { ThemedScrollView } from './ThemedScrollView';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
+import { ThemedScrollView } from './themed';
+import { ThemedText } from './themed';
+import { ThemedView } from './themed';
 
 const OverdueReads = () => {
     const { overdueDeadlines, isLoading, error } = useDeadlines();

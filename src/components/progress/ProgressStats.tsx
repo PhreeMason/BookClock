@@ -1,8 +1,8 @@
-import { palette } from '@/constants/palette';
 import { formatProgressDisplay } from '@/lib/deadlineUtils';
+import { useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ThemedText } from '../ThemedText';
+import { ThemedText } from '../themed';
 
 interface ProgressStatsProps {
   currentProgress: number;
@@ -19,11 +19,12 @@ const ProgressStats: React.FC<ProgressStatsProps> = ({
   format,
   urgencyLevel
 }) => {
+  const { theme } = useTheme();
   const urgencyColorMap = {
-    'overdue': palette.red.DEFAULT,
-    'urgent': palette.red[300],
-    'good': palette.green.DEFAULT,
-    'approaching': palette.orange.DEFAULT,
+    'overdue': theme.danger,
+    'urgent': theme.warning,
+    'good': theme.success,
+    'approaching': theme.warning,
   };
 
   return (
@@ -32,9 +33,9 @@ const ProgressStats: React.FC<ProgressStatsProps> = ({
         <ThemedText type="subtitle" style={[styles.statNumber, { color: urgencyColorMap[urgencyLevel] }]}>
           {formatProgressDisplay(format, currentProgress)}
         </ThemedText>
-        <ThemedText type="small" color="textMuted" style={styles.statLabel}>
+        <ThemedText type="caption" color="textMuted" style={styles.statLabel}>
          OF{' '}
-         <ThemedText type="small" color="textMuted" style={{fontSize: 12}} >{formatProgressDisplay(format, totalQuantity)} </ThemedText>
+         <ThemedText type="caption" color="textMuted" style={{fontSize: 12}} >{formatProgressDisplay(format, totalQuantity)} </ThemedText>
          {format === 'audio' ? 'LISTENED' : 'READ'}
         </ThemedText>
       </View>
@@ -42,7 +43,7 @@ const ProgressStats: React.FC<ProgressStatsProps> = ({
         <ThemedText type="subtitle" style={[styles.statNumber, { color: urgencyColorMap[urgencyLevel] }]}>
           {formatProgressDisplay(format, remaining)}
         </ThemedText>
-        <ThemedText type="small" color="textMuted" style={styles.statLabel}>
+        <ThemedText type="caption" color="textMuted" style={styles.statLabel}>
           {format === 'audio' ? 'REMAINING' : 'LEFT'}
         </ThemedText>
       </View>

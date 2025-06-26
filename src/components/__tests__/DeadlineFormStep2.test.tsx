@@ -5,17 +5,6 @@ import { View } from 'react-native';
 import { DeadlineFormStep2 } from '../forms/DeadlineFormStep2';
 
 // Mock the ThemedText component
-jest.mock('@/components/ThemedText', () => ({
-  ThemedText: jest.fn(({ children, style, ...props }) => {
-    const { Text } = require('react-native');
-    return (
-      <Text testID="themed-text" style={style} {...props}>
-        {children}
-      </Text>
-    );
-  }),
-}));
-
 // Mock the CustomInput component
 jest.mock('@/components/CustomInput', () => {
   const { TextInput } = require('react-native');
