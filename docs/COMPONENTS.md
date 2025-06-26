@@ -19,12 +19,58 @@ The `Colors.ts` file exports a `Colors` object that contains color palettes for 
 - `border`: The color for borders and dividers.
 - `primary`: The primary accent color, used for buttons and important elements.
 - `primaryForeground`: The color for text and icons on a primary-colored background.
+- `destructive`: Red color for danger/delete actions.
+- `destructiveForeground`: Text color for destructive buttons.
+- `successForeground`: Text color for success buttons.
 - `icon`: The default color for icons.
 - `tabIconDefault`: The color for inactive tab bar icons.
 - `tabIconSelected`: The color for the active tab bar icon.
 
 ### Using Themed Components
 The core of our design system is a set of theme-aware components that automatically adapt to light and dark modes. You should always prefer these components over standard React Native components.
+
+---
+
+## Themed Components
+
+### ThemedButton
+**API:**
+- Props: `TouchableOpacityProps & { variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'success'; backgroundColor?: string; textColor?: string; borderColor?: string; children: React.ReactNode }`
+
+**Use Case:** Primary button component with multiple variants and theme support. Supports custom colors while falling back to variant defaults.
+
+**Variants:**
+- `primary`: Blue background with white text (default)
+- `secondary`: Card background with border and regular text
+- `danger`: Red background with white text for destructive actions
+- `ghost`: Transparent background with border and regular text
+- `success`: Green background with white text for positive actions
+
+**Example:**
+```typescript
+<ThemedButton variant="success" onPress={handleComplete}>
+  Mark as Complete
+</ThemedButton>
+<ThemedButton variant="danger" onPress={handleDelete}>
+  Delete
+</ThemedButton>
+```
+
+### ThemedText
+**API:** Extends `TextProps` with theme-aware styling
+**Use Case:** Primary text component that automatically adapts to light/dark themes.
+
+### ThemedView
+**API:** Extends `ViewProps` with theme-aware styling
+**Use Case:** Primary container component with automatic theme adaptation.
+
+### ThemedScrollView
+**API:** Extends `ScrollViewProps` with theme-aware styling
+**Use Case:** Scrollable container with theme support.
+
+### ThemedKeyboardAvoidingView
+**API:** Extends `KeyboardAvoidingViewProps` with theme-aware styling
+**Use Case:** Keyboard-avoiding container with theme support.
 
 ---
 
@@ -44,6 +90,135 @@ import {
   DeadlineFormStep2 
 } from '@/components/forms';
 ```
+## Progress Tracking Components
+**Location:** `@/components/progress/`
+
+**Import Pattern:**
+```typescript
+import { 
+  ProgressHeader,
+  ProgressStats,
+  ProgressBar,
+  ProgressInput,
+  QuickActionButtons
+} from '@/components/progress';
+```
+
+### ProgressHeader
+**API:**
+- Props: `{}`
+
+**Use Case:** Simple header component for progress tracking screens with consistent icon and title styling.
+
+### ProgressStats
+**API:**
+- Props: `{ currentProgress: number; totalQuantity: number; remaining: number; format: 'physical' | 'ebook' | 'audio'; urgencyLevel: string }`
+
+**Use Case:** Displays current, total, and remaining progress statistics with format-aware display and update functionality.
+
+**Features:**
+- Format-aware labels (READ/LISTENED, TOTAL/TOTAL TIME, LEFT/REMAINING)
+- Urgency-based color coding
+- Automatic progress calculations
+
+### ProgressBar
+**API:**
+- Props: `{ currentProgress: number; totalQuantity: number; progressPercentage: number; format: 'physical' | 'ebook' | 'audio'; deadlineDate: string }`
+
+**Use Case:** Visual progress bar with percentage display and deadline information.
+
+**Features:**
+- Format-specific progress text display
+- Vertical text layout with progress values and percentage
+- Deadline date display with proper formatting
+- Visual progress indicator
+
+### ProgressInput
+**API:**
+- Props: `{ format: 'physical' | 'ebook' | 'audio'; control: Control<any>; setValue: UseFormSetValue<any>; currentProgress: number }`
+
+**Use Case:** Smart input component that handles both regular numeric input and audiobook time formatting.
+
+**Features:**
+- Audiobook time format conversion (minutes ↔ "Xh Ym" format)
+- Flexible input parsing ("2h 30m", "2h", "30m", or plain numbers)
+- Form integration with proper state management
+- Format-specific placeholder text
+
+### QuickActionButtons
+**API:**
+- Props: `{ unitsPerDay: number; onQuickUpdate: (amount: number) => void }`
+
+**Use Case:** Three quick increment buttons for rapid progress updates based on daily reading pace.
+
+**Features:**
+- Dynamic button values based on reading pace
+- Consistent styling and layout
+- Haptic feedback integration
+
+---
+
+## Deadline View Components
+**Location:** `@/components/`
+
+### DeadlineViewHeader
+**API:**
+- Props: `{ title: string; onBack: () => void; onEdit: () => void }`
+
+**Use Case:** Reusable header component for deadline detail views with back navigation and edit functionality.
+
+**Features:**
+- Consistent header styling across deadline views
+- Back button with proper navigation
+- Edit button for deadline modification
+
+### DeadlineActionButtons
+**API:**
+- Props: `{ deadline: ReadingDeadlineWithProgress; onComplete: () => void; onSetAside: () => void; onDelete: () => void }`
+
+**Use Case:** Action button group for deadline management (complete, set aside, delete) with proper variant styling.
+
+**Features:**
+- Success variant for completion action
+- Secondary variant for set aside action
+- Danger variant for delete action
+- Consistent spacing and layout
+
+### DeadlineHeroSection
+**API:**
+- Props: `{ deadline: ReadingDeadlineWithProgress }`
+
+**Use Case:** Hero section wrapper around DeadlineCard for detail views with enhanced styling.
+
+**Features:**
+- Maintains existing DeadlineCard functionality
+- Enhanced visual presentation for detail views
+- Modular and reusable design
+
+---
+
+## Reading Progress Component
+
+### ReadingProgress
+**API:**
+- Props: `{ deadline: ReadingDeadlineWithProgress }`
+
+**Use Case:** Comprehensive progress tracking component with format-aware display and update functionality.
+
+**Features:**
+- Modular architecture using progress sub-components
+- Audiobook time formatting with proper conversion utilities
+- Progress update functionality with toast notifications
+- Quick action buttons for rapid updates
+- Form validation and error handling
+- Loading states and user feedback
+
+**Example:**
+```typescript
+<ReadingProgress deadline={selectedDeadline} />
+```
+
+---
 
 ## Core UI Components
 
@@ -100,41 +275,11 @@ const MyComponent = () => {
 **API:**
 - Props: None (uses DeadlineProvider context)
 
-**Use Case:** Component for displaying overdue reading deadlines. Used in the main tab navigation to show tasks that need immediate attention.
+**Use Case:** Component for displaying overdue reading deadlines with appropriate urgency styling and messaging.
 
-### BookList
-**API:**
-- Props: `{ books: Book[], onBookPress?: (book: Book) => void }`
+---
 
-**Use Case:** Displays a list of books with consistent styling and interaction handling.
-
-### BookListItem
-**API:**
-- Props: `{ book: Book, onPress?: (book: Book) => void }`
-
-**Use Case:** Individual book item component used within BookList for consistent book display and interaction.
-
-### SearchBar
-**API:**
-- Props: `{ onSearch: (query: string) => void, placeholder?: string }`
-
-**Use Case:** Search input component with clear functionality and consistent theming.
-
-### UserAvatar
-**API:**
-- Props: `{ size?: number, imageUrl?: string }`
-
-**Use Case:** Displays user avatar with fallback to initials or default image.
-
-### UserProfile
-**API:**
-- Props: None (uses authentication context)
-
-**Use Case:** User profile display component showing user information and settings access.
-
-### HapticTab
-**API:** Extends `BottomTabBarButtonProps` from React Navigation  
-**Use Case:** Enhanced tab bar button that provides haptic feedback on iOS devices when pressed. Automatically adds light impact feedback for better user experience in tab navigation.
+## Authentication Components
 
 ### SignInWith
 **API:**
@@ -144,126 +289,8 @@ const MyComponent = () => {
 **Use Case:** OAuth authentication component for Google and Apple sign-in. Handles the complete SSO flow with Clerk authentication, includes browser warm-up optimization for Android, and displays provider-specific icons.
 
 ### Collapsible
-**API:**
-- Props: `{children: React.Node, title: string}`
-
-**Use Case:** Creates an accordion container that opens and closes on user click.
-
-### SignOutButton
-**API:** No props required  
-**Use Case:** Simple sign-out button that handles user authentication logout via Clerk and redirects to the home page. Displays themed text with touch interaction.
-
-### ThemedButton
-**API:**
-- Props: `{ onPress: () => void, title: string, variant?: 'primary' | 'secondary' | 'danger' | 'ghost', style?: ViewStyle, textStyle?: TextStyle, disabled?: boolean }`
-
-**Use Case:** A reusable, themed button for primary actions. It automatically uses the `primary` and `primaryForeground` colors from the theme and supports multiple variants.
-
-**Example:**
-```typescript
-import { ThemedButton } from '@/components/ThemedButton';
-
-const MyComponent = () => (
-  <ThemedButton 
-    title="Submit" 
-    variant="primary"
-    onPress={() => console.log('Pressed!')} 
-  />
-);
-```
-
-## Themed Components
-
-### ThemedKeyboardAvoidingView
-**API:** Extends `KeyboardAvoidingViewProps` with optional `lightColor` and `darkColor` props  
-**Use Case:** Theme-aware keyboard avoiding view that automatically adjusts behavior based on platform (iOS: padding, Android: height) and applies theme colors.
-
-### ThemedScrollView
-**API:** Extends `ScrollViewProps` with optional `lightColor` and `darkColor` props  
-**Use Case:** Theme-aware scroll view that automatically applies background colors based on the current theme (light/dark mode) with bouncing enabled by default.
-
-### ThemedView
-**API:** 
-- Extends `ViewProps`
-- Props:
-  - `backgroundColor?: ColorValue` - Background color (defaults to 'background')
-  - `borderColor?: ColorValue` - Border color
-
-**Use Case:** Basic theme-aware container view that automatically applies background and border colors based on the current theme context. Handles core container styling concerns.
-
-**Examples:**
-```typescript
-// Simple background
-<ThemedView backgroundColor="card" />
-
-// Background + border
-<ThemedView backgroundColor="card" borderColor="border" />
-
-// Default background (uses 'background' theme color)
-<ThemedView />
-
-// With custom styling
-<ThemedView backgroundColor="primary" style={{ padding: 20, borderRadius: 8 }} />
-```
-
-### ThemedText
-**API:**
-- Extends `TextProps`.
-- Props:
-  - `type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link' | 'header' | 'body' | 'bodyMuted' | 'caption' | 'captionMuted' | 'label' | 'labelMuted' | 'button' | 'small' | 'smallMuted'`
-  - `color?: ColorValue` - Text color (overrides automatic type colors)
-
-**Use Case:** The primary component for displaying all text. It provides semantic typography types with automatic theming and consistent styling across the app.
-
-**Semantic Types:**
-- `default` (16px) - Standard body text
-- `title` (32px, bold) - Page titles
-- `header` (20px, bold) - Section headers
-- `subtitle` (20px, bold) - Subsection headers
-- `body` (16px) - Regular body text
-- `bodyMuted` (16px, muted) - Secondary body text
-- `caption` (14px) - Small descriptive text
-- `captionMuted` (14px, muted) - Small secondary text
-- `label` (14px, 500, uppercase) - Form labels
-- `labelMuted` (12px, muted, uppercase) - Secondary labels
-- `button` (16px, 600) - Button text styling
-- `small` (12px) - Small text
-- `smallMuted` (12px, muted) - Small secondary text
-- `defaultSemiBold` (16px, 600) - Semi-bold default text
-- `link` (16px) - Link styling
-
-**Examples:**
-```typescript
-// Semantic usage (recommended)
-<ThemedText type="header">Section Title</ThemedText>
-<ThemedText type="bodyMuted">Secondary information</ThemedText>
-<ThemedText type="label">Form Label</ThemedText>
-<ThemedText type="captionMuted">Help text</ThemedText>
-
-// With custom colors
-<ThemedText type="button" color="primary">Action Button</ThemedText>
-
-// Override specific properties
-<ThemedText type="header" style={{ fontSize: 18 }}>Custom sized header</ThemedText>
-```
-
-**Color Priority:** `color` prop > automatic type color > default 'text' color
-
-**Note:** For background colors and borders, wrap ThemedText in a ThemedView instead.
-
-## Utility Components
-
-### CustomInput
-**API:** Extends `TextInputProps` with form control integration
-- Props: `{ control: Control<T>, name: Path<T> }` + standard TextInput props
-
-**Use Case:** Form input component with React Hook Form integration and validation support.
-
-### Loader
-**API:**
-- Props: `{ size?: 'small' | 'large', text?: string, fullScreen?: boolean, lightColor?: string, darkColor?: string }`
-
-**Use Case:** Loading component with theme support and customizable appearance.
+**API:** Standard collapsible component with expand/collapse functionality
+**Use Case:** Expandable content sections with smooth animations.
 
 ### ParallaxScrollView
 **API:** Extends `ScrollViewProps` with parallax effects
@@ -271,8 +298,4 @@ const MyComponent = () => (
 
 ### ExternalLink
 **API:** Extends `TouchableOpacityProps` with URL handling
-**Use Case:** External link component that handles opening URLs in external browsers.
-
-### HelloWave
-**API:** No props required
-**Use Case:** Welcome/greeting component for user onboarding or welcome screens with animated wave emoji. 
+**Use Case:** Link component that opens URLs in external browser with proper handling.
