@@ -1,11 +1,12 @@
 import { ThemedScrollView } from '@/components/ThemedScrollView';
 import { ThemedView } from '@/components/ThemedView';
+import { ThemedKeyboardAvoidingView } from '@/components/ThemedKeyboardAvoidingView';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import {
@@ -209,12 +210,13 @@ const NewDeadLine = () => {
     };
 
     return (
-        <ThemedView style={styles.container}>
+        <ThemedKeyboardAvoidingView style={styles.container}>
             <FormProgressBar currentStep={currentStep} totalSteps={totalSteps} />
             <StepIndicators currentStep={currentStep} totalSteps={totalSteps} />
             <ThemedScrollView 
                 style={styles.content} 
                 contentContainerStyle={{paddingBottom: 48}}
+                keyboardShouldPersistTaps="handled"
             >
                 <FormHeader
                     title={formSteps[currentStep - 1]}
@@ -246,7 +248,7 @@ const NewDeadLine = () => {
                 )}
             </ThemedScrollView>
 
-            <View style={styles.navButtons}>
+            <ThemedView style={styles.navButtons}>
                 {currentStep > 1 && (
                     <ThemedButton
                         title="Back"
@@ -261,8 +263,8 @@ const NewDeadLine = () => {
                     disabled={isSubmitting}
                     style={{flex: 1}}
                 />
-            </View>
-        </ThemedView>
+            </ThemedView>
+        </ThemedKeyboardAvoidingView>
     );
 };
 
