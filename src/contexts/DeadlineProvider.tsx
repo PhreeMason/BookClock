@@ -1,4 +1,4 @@
-import { useAddDeadline, useGetDeadlines, useUpdateDeadline } from '@/hooks/useDeadlines';
+import { useAddDeadline, useGetDeadlines, useUpdateDeadline, useDeleteDeadline } from '@/hooks/useDeadlines';
 import {
     calculateCurrentProgress,
     calculateRemaining,
@@ -27,6 +27,7 @@ interface DeadlineContextType {
     deadlineDetails: ReadingDeadlineInsert;
     progressDetails: ReadingDeadlineProgressInsert;
   }, onSuccess?: () => void, onError?: (error: Error) => void) => void;
+  deleteDeadline: (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => void;
   
   // Calculations for individual deadlines
   getDeadlineCalculations: (deadline: ReadingDeadlineWithProgress) => {
@@ -69,6 +70,7 @@ export const DeadlineProvider: React.FC<DeadlineProviderProps> = ({ children }) 
   const { data: deadlines = [], error, isLoading } = useGetDeadlines();
   const { mutate: addDeadlineMutation } = useAddDeadline();
   const { mutate: updateDeadlineMutation } = useUpdateDeadline();
+  const { mutate: deleteDeadlineMutation } = useDeleteDeadline();
   
   // Separate deadlines by active and overdue status
   const { active: activeDeadlines, overdue: overdueDeadlines } = separateDeadlines(deadlines);
@@ -195,6 +197,18 @@ export const DeadlineProvider: React.FC<DeadlineProviderProps> = ({ children }) 
     });
   };
 
+  const deleteDeadline = (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => {
+    deleteDeadlineMutation(deadlineId, {
+      onSuccess: () => {
+        onSuccess?.();
+      },
+      onError: (error) => {
+        console.error("Error deleting deadline:", error);
+        onError?.(error);
+      }
+    });
+  };
+
   const value: DeadlineContextType = {
     // Data
     deadlines,
@@ -206,6 +220,7 @@ export const DeadlineProvider: React.FC<DeadlineProviderProps> = ({ children }) 
     // Actions
     addDeadline,
     updateDeadline,
+    deleteDeadline,
     
     // Calculations
     getDeadlineCalculations,

@@ -176,6 +176,54 @@ export const useUpdateDeadline = () => {
     })
 }
 
+export const useDeleteDeadline = () => {
+    const supabase = useSupabase();
+    const user = useUser();
+    const userId = user?.user?.id;
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationKey: ['deleteDeadline'],
+        mutationFn: async (deadlineId: string) => {
+            if (!userId) {
+                throw new Error("User not authenticated");
+            }
+            
+            // Delete associated progress entries first
+            const { error: progressError } = await supabase
+                .from('reading_deadline_progress')
+                .delete()
+                .eq('reading_deadline_id', deadlineId);
+
+            if (progressError) {
+                console.error('Error deleting progress entries:', progressError);
+                throw new Error(progressError.message);
+            }
+
+            // Delete the deadline
+            const { error: deadlineError } = await supabase
+                .from('reading_deadlines')
+                .delete()
+                .eq('id', deadlineId)
+                .eq('user_id', userId);
+
+            if (deadlineError) {
+                console.error('Error deleting deadline:', deadlineError);
+                throw new Error(deadlineError.message);
+            }
+            
+            return deadlineId;
+        },
+        onSuccess: () => {
+            // Invalidate and refetch deadlines after successful deletion
+            queryClient.invalidateQueries({ queryKey: ['deadlines', userId] });
+        },
+        onError: (error) => {
+            console.error("Error deleting deadline:", error);
+        },
+    })
+}
+
 export const useUpdateDeadlineProgress = () => {
     const supabase = useSupabase();
     const user = useUser();

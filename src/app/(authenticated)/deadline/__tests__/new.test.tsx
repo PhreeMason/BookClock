@@ -170,6 +170,7 @@ describe('NewDeadLine', () => {
     useDeadlines.mockReturnValue({
       addDeadline: mockAddDeadline,
       updateDeadline: jest.fn(),
+      deleteDeadline: jest.fn(),
     });
   });
 
