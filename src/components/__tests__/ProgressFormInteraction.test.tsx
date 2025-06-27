@@ -271,7 +271,7 @@ describe('ProgressFormInteraction', () => {
 
       render(<ReadingProgress deadline={audioDeadline} />);
 
-      const input = screen.getByPlaceholderText('Enter time (e.g., 2h 30m)');
+      const input = screen.getByPlaceholderText('e.g., 3h 2m or 3:02');
       const quickButton = screen.getByText('+5');
 
       // User types time format

@@ -34,7 +34,7 @@ describe('StepIndicators', () => {
     expect(activeStep.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          backgroundColor: '#4ade80',
+          backgroundColor: '#0066cc',
         }),
       ])
     );
@@ -52,7 +52,7 @@ describe('StepIndicators', () => {
     expect(stepElements[0].props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          backgroundColor: '#4ade80',
+          backgroundColor: '#0066cc',
         }),
       ])
     );
@@ -60,7 +60,7 @@ describe('StepIndicators', () => {
     expect(stepElements[1].props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          backgroundColor: '#4ade80',
+          backgroundColor: '#0066cc',
         }),
       ])
     );
@@ -104,7 +104,7 @@ describe('StepIndicators', () => {
     expect(stepElements[0].props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          backgroundColor: '#4ade80',
+          backgroundColor: '#0066cc',
         }),
       ])
     );
@@ -123,7 +123,7 @@ describe('StepIndicators', () => {
       expect(step.props.style).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            backgroundColor: '#4ade80',
+            backgroundColor: '#0066cc',
           }),
         ])
       );
@@ -172,7 +172,7 @@ describe('StepIndicators', () => {
     expect(stepStyles).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          backgroundColor: '#4ade80',
+          backgroundColor: '#0066cc',
         }),
       ])
     );
@@ -205,7 +205,7 @@ describe('StepIndicators', () => {
       expect(step.props.style).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            backgroundColor: '#4ade80',
+            backgroundColor: '#0066cc',
           }),
         ])
       );
