@@ -5,7 +5,7 @@ import { ThemedText } from './ThemedText';
 
 export type ThemedButtonProps = TouchableOpacityProps & {
   title: string;
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'success';
+  variant?: 'primary' | 'secondary' | 'danger' | 'dangerOutline' | 'ghost' | 'success';
   size?: 'sm' | 'md' | 'lg';
   textColor?: string;
 };
@@ -42,6 +42,13 @@ export function ThemedButton({
           ...baseStyle,
           backgroundColor: theme.danger,
         };
+      case 'dangerOutline':
+        return {
+          ...baseStyle,
+          backgroundColor: 'transparent',
+          borderWidth: 1,
+          borderColor: theme.danger,
+        };
       case 'success':
         return {
           ...baseStyle,
@@ -73,6 +80,8 @@ export function ThemedButton({
       case 'danger':
       case 'success':
         return '#ffffff';
+      case 'dangerOutline':
+        return theme.danger;
       case 'ghost':
         return theme.text;
       default:
