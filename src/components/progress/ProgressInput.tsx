@@ -1,8 +1,7 @@
-import { useTheme } from '@/theme';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Control, UseFormSetValue } from 'react-hook-form';
-import { StyleSheet, TextInput, View } from 'react-native';
 import CustomInput from '../CustomInput';
+import AudiobookProgressInput from './AudiobookProgressInput';
 
 interface ProgressInputProps {
   format: 'physical' | 'ebook' | 'audio';
@@ -17,82 +16,15 @@ const ProgressInput: React.FC<ProgressInputProps> = ({
   setValue,
   currentProgress
 }) => {
-  const { theme } = useTheme();
-  const textMutedColor = theme.textMuted;
-  const cardColor = theme.surface;
-  const textColor = theme.text;
-  const borderColor = theme.border;
-
-  // Helper functions for audiobook time conversion
-  const convertMinutesToTimeString = (totalMinutes: number): string => {
-    if (format === 'audio') {
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
-      if (hours > 0) {
-        return `${hours}h ${minutes}m`;
-      }
-      return `${minutes}m`;
-    }
-    return totalMinutes.toString();
-  };
-
-  const convertTimeStringToMinutes = (timeString: string): number => {
-    if (format === 'audio') {
-      // Parse formats like "2h 30m", "2h", "30m", or plain numbers
-      const hourMatch = timeString.match(/(\d+)h/);
-      const minuteMatch = timeString.match(/(\d+)m/);
-      
-      const hours = hourMatch ? parseInt(hourMatch[1]) : 0;
-      const minutes = minuteMatch ? parseInt(minuteMatch[1]) : 0;
-      
-      // If no h or m found, treat as plain minutes
-      if (!hourMatch && !minuteMatch) {
-        const plainNumber = parseInt(timeString) || 0;
-        return plainNumber;
-      }
-      
-      return hours * 60 + minutes;
-    }
-    return parseInt(timeString) || 0;
-  };
-
-  // State for display value in input field
-  const [displayValue, setDisplayValue] = useState<string>(
-    convertMinutesToTimeString(currentProgress)
-  );
-
-  // Update display value when currentProgress changes
-  useEffect(() => {
-    setDisplayValue(convertMinutesToTimeString(currentProgress));
-  }, [currentProgress, format]);
-
-  // Handle input change for time format
-  const handleInputChange = (text: string) => {
-    setDisplayValue(text);
-    // Always pass the text directly to the form - let the schema handle validation
-    setValue('currentProgress', text, { shouldValidate: false });
-  };
-
   if (format === 'audio') {
     return (
-      <View style={styles.inputContainer}>
-        <TextInput
-          value={displayValue}
-          onChangeText={handleInputChange}
-          placeholder="Enter time (e.g., 2h 30m)"
-          keyboardType="default"
-          placeholderTextColor={textMutedColor}
-          style={[
-            styles.customInput,
-            { 
-              backgroundColor: cardColor,
-              color: textColor,
-              borderColor: borderColor
-            }
-          ]}
-        />
-        <View style={{ height: 18 }} />
-      </View>
+      <AudiobookProgressInput
+        value={currentProgress}
+        onChange={(minutes) => {
+          setValue('currentProgress', minutes, { shouldValidate: true });
+        }}
+        testID="audiobook-progress-input"
+      />
     );
   }
 
@@ -106,18 +38,5 @@ const ProgressInput: React.FC<ProgressInputProps> = ({
     />
   );
 };
-
-const styles = StyleSheet.create({
-  inputContainer: {
-    marginBottom: 16,
-  },
-  customInput: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-  },
-});
 
 export default ProgressInput;
