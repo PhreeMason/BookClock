@@ -11,7 +11,7 @@ export const FormProgressBar = ({ currentStep, totalSteps }: FormProgressBarProp
     const progress = (currentStep / totalSteps) * 100;
     const { theme } = useTheme();
     const progressBgColor = theme.textMuted;
-    const progressFillColor = theme.success;
+    const progressFillColor = theme.primary;
     
     return (
         <View style={styles.progressContainer} testID="progress-container">
