@@ -1,29 +1,30 @@
 import React from 'react';
-import { Control, UseFormSetValue } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 import CustomInput from '../CustomInput';
 import AudiobookProgressInput from './AudiobookProgressInput';
 
 interface ProgressInputProps {
   format: 'physical' | 'ebook' | 'audio';
   control: Control<any>;
-  setValue: UseFormSetValue<any>;
-  currentProgress: number;
 }
 
 const ProgressInput: React.FC<ProgressInputProps> = ({
   format,
-  control,
-  setValue,
-  currentProgress
+  control
 }) => {
   if (format === 'audio') {
     return (
-      <AudiobookProgressInput
-        value={currentProgress}
-        onChange={(minutes) => {
-          setValue('currentProgress', minutes, { shouldValidate: true });
-        }}
-        testID="audiobook-progress-input"
+      <Controller
+        control={control}
+        name="currentProgress"
+        render={({ field: { value, onChange, onBlur } }) => (
+          <AudiobookProgressInput
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            testID="audiobook-progress-input"
+          />
+        )}
       />
     );
   }

@@ -13,7 +13,6 @@ import ProgressHeader from './progress/ProgressHeader'
 import ProgressInput from './progress/ProgressInput'
 import ProgressStats from './progress/ProgressStats'
 import QuickActionButtons from './progress/QuickActionButtons'
-import { parseAudiobookTime } from './progress/AudiobookProgressInput'
 
 const ReadingProgress = ({
     deadline
@@ -77,16 +76,11 @@ const ReadingProgress = ({
         // Convert form value to number, handling both strings and numbers
         let numericValue: number;
         
-        // For audiobooks, the value should already be in minutes
-        // but we'll parse it just in case it's still a string
-        if (deadline.format === 'audio' && typeof currentFormValue === 'string') {
-            const parsed = parseAudiobookTime(currentFormValue);
-            numericValue = parsed !== null ? parsed : currentProgress;
+        if (typeof currentFormValue === 'number' && !isNaN(currentFormValue)) {
+            numericValue = currentFormValue;
         } else if (typeof currentFormValue === 'string') {
-            const parsed = parseFloat(currentFormValue);
+            const parsed = parseFloat(currentFormValue.trim());
             numericValue = isNaN(parsed) ? currentProgress : parsed;
-        } else if (typeof currentFormValue === 'number') {
-            numericValue = isNaN(currentFormValue) ? currentProgress : currentFormValue;
         } else {
             numericValue = currentProgress;
         }
@@ -116,8 +110,6 @@ const ReadingProgress = ({
                 <ProgressInput
                     format={deadline.format}
                     control={control}
-                    setValue={setValue}
-                    currentProgress={currentProgress}
                 />
 
                 <QuickActionButtons
