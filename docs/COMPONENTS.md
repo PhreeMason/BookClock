@@ -100,6 +100,7 @@ import {
   ProgressStats,
   ProgressBar,
   ProgressInput,
+  AudiobookProgressInput,
   QuickActionButtons
 } from '@/components/progress';
 ```
@@ -137,13 +138,33 @@ import {
 **API:**
 - Props: `{ format: 'physical' | 'ebook' | 'audio'; control: Control<any>; setValue: UseFormSetValue<any>; currentProgress: number }`
 
-**Use Case:** Smart input component that handles both regular numeric input and audiobook time formatting.
+**Use Case:** Router component that delegates to appropriate input based on format type.
 
 **Features:**
-- Audiobook time format conversion (minutes ↔ "Xh Ym" format)
-- Flexible input parsing ("2h 30m", "2h", "30m", or plain numbers)
-- Form integration with proper state management
-- Format-specific placeholder text
+- Uses `CustomInput` for physical and ebook formats (numeric input)
+- Uses `AudiobookProgressInput` for audio format (time parsing)
+- Form integration with react-hook-form
+- Automatic format detection and delegation
+
+### AudiobookProgressInput
+**API:**
+- Props: `{ value: number; onChange: (minutes: number) => void; onBlur?: () => void; placeholder?: string; testID?: string }`
+
+**Use Case:** Specialized input component for audiobook time formats with comprehensive parsing and validation.
+
+**Features:**
+- **Comprehensive Format Support:**
+  - Standard format: "3h 2m", "3H 2M", "3h2m"
+  - With leading zeros: "03h 02m", "3h 02m"
+  - Colon format: "3:02", "03:02:15" (ignores seconds)
+  - Decimal hours: "2.5h", "2,5h" (European format)
+  - Minutes only: "45m", "45M", "045m"
+  - Plain numbers: "182" (assumes minutes)
+  - Full words: "3 hours 2 minutes", "3 hr 2 min"
+- **Real-time Validation:** Visual feedback with red border for invalid input
+- **Auto-formatting:** Converts input to standard format on blur
+- **Error Recovery:** Restores last valid value for invalid input
+- **Always stores values as minutes** for database consistency
 
 ### QuickActionButtons
 **API:**
