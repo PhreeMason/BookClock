@@ -10,7 +10,7 @@ const ActiveReads = () => {
     if (isLoading) {
         return (
             <ThemedScrollView>
-                <ThemedView backgroundColor="surfaceHover" style={styles.container}>
+                <ThemedView backgroundColor="background" style={styles.container}>
                     <ThemedText>Loading active deadlines...</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
@@ -20,7 +20,7 @@ const ActiveReads = () => {
     if (error) {
         return (
             <ThemedScrollView>
-                <ThemedView backgroundColor="surfaceHover" style={styles.container}>
+                <ThemedView backgroundColor="background" style={styles.container}>
                     <ThemedText color="error" style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
@@ -28,8 +28,8 @@ const ActiveReads = () => {
     }
 
     return (
-        <ThemedScrollView backgroundColor="surfaceHover">
-            <ThemedView backgroundColor="surfaceHover" style={styles.container}>
+        <ThemedScrollView backgroundColor="background">
+            <ThemedView backgroundColor="background" style={styles.container}>
                 <ThemedText
                     type='semiBold'
                     color='textMuted'

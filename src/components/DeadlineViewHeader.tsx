@@ -14,7 +14,7 @@ const DeadlineViewHeader: React.FC<DeadlineViewHeaderProps> = ({
   onEdit,
 }) => {
   return (
-    <ThemedView backgroundColor="background" style={styles.header}>
+    <ThemedView backgroundColor="surfaceHover" style={styles.header}>
       <ThemedButton
         title="← Back"
         variant="ghost"

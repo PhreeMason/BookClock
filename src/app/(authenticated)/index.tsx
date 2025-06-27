@@ -11,7 +11,7 @@ const TopTabs = createMaterialTopTabNavigator();
 export default function MyTabs() {
     const { activeCount, overdueCount, getTotalReadingTimePerDay } = useDeadlines();
     const { theme } = useTheme();
-    const backgroundColor = theme.background;
+    const backgroundColor = theme.surfaceHover;
     const textColor = theme.text;
     const accentColor = theme.accent;
 

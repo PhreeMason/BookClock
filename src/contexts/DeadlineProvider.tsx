@@ -1,4 +1,4 @@
-import { useAddDeadline, useGetDeadlines } from '@/hooks/useDeadlines';
+import { useAddDeadline, useGetDeadlines, useUpdateDeadline } from '@/hooks/useDeadlines';
 import {
     calculateCurrentProgress,
     calculateRemaining,
@@ -21,6 +21,10 @@ interface DeadlineContextType {
   // Actions
   addDeadline: (params: {
     deadlineDetails: Omit<ReadingDeadlineInsert, 'user_id'>;
+    progressDetails: ReadingDeadlineProgressInsert;
+  }, onSuccess?: () => void, onError?: (error: Error) => void) => void;
+  updateDeadline: (params: {
+    deadlineDetails: ReadingDeadlineInsert;
     progressDetails: ReadingDeadlineProgressInsert;
   }, onSuccess?: () => void, onError?: (error: Error) => void) => void;
   
@@ -64,6 +68,7 @@ interface DeadlineProviderProps {
 export const DeadlineProvider: React.FC<DeadlineProviderProps> = ({ children }) => {
   const { data: deadlines = [], error, isLoading } = useGetDeadlines();
   const { mutate: addDeadlineMutation } = useAddDeadline();
+  const { mutate: updateDeadlineMutation } = useUpdateDeadline();
   
   // Separate deadlines by active and overdue status
   const { active: activeDeadlines, overdue: overdueDeadlines } = separateDeadlines(deadlines);
@@ -175,6 +180,21 @@ export const DeadlineProvider: React.FC<DeadlineProviderProps> = ({ children }) 
     });
   };
 
+  const updateDeadline = (params: {
+    deadlineDetails: ReadingDeadlineInsert;
+    progressDetails: ReadingDeadlineProgressInsert;
+  }, onSuccess?: () => void, onError?: (error: Error) => void) => {
+    updateDeadlineMutation(params, {
+      onSuccess: () => {
+        onSuccess?.();
+      },
+      onError: (error) => {
+        console.error("Error updating deadline:", error);
+        onError?.(error);
+      }
+    });
+  };
+
   const value: DeadlineContextType = {
     // Data
     deadlines,
@@ -185,6 +205,7 @@ export const DeadlineProvider: React.FC<DeadlineProviderProps> = ({ children }) 
     
     // Actions
     addDeadline,
+    updateDeadline,
     
     // Calculations
     getDeadlineCalculations,

@@ -169,6 +169,7 @@ describe('NewDeadLine', () => {
     const { useDeadlines } = require('@/contexts/DeadlineProvider');
     useDeadlines.mockReturnValue({
       addDeadline: mockAddDeadline,
+      updateDeadline: jest.fn(),
     });
   });
 

@@ -13,6 +13,7 @@ interface DeadlineFormStep1Props {
     selectedSource: 'arc' | 'library' | 'personal';
     onFormatChange: (format: 'physical' | 'ebook' | 'audio') => void;
     onSourceChange: (source: 'arc' | 'library' | 'personal') => void;
+    isEditMode?: boolean;
 }
 
 export const DeadlineFormStep1 = ({
@@ -20,7 +21,8 @@ export const DeadlineFormStep1 = ({
     selectedFormat,
     selectedSource,
     onFormatChange,
-    onSourceChange
+    onSourceChange,
+    isEditMode = false
 }: DeadlineFormStep1Props) => {
     const getTotalQuantityLabel = () => {
         switch (selectedFormat) {
@@ -71,9 +73,13 @@ export const DeadlineFormStep1 = ({
                 <FormatSelector
                     selectedFormat={selectedFormat}
                     onSelectFormat={onFormatChange}
+                    disabled={isEditMode}
                 />
                 <ThemedText color="textMuted" style={{marginTop: 6, lineHeight: 18}}>
-                    This affects how we calculate your reading pace
+                    {isEditMode 
+                        ? 'Format cannot be changed after creation'
+                        : 'This affects how we calculate your reading pace'
+                    }
                 </ThemedText>
             </View>
 
