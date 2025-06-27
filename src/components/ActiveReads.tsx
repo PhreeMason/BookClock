@@ -1,5 +1,5 @@
 import DeadlineCard from '@/components/DeadlineCard'
-import { ThemedScrollView, ThemedText, ThemedView, ThemedButton } from '@/components/themed'
+import { ThemedButton, ThemedScrollView, ThemedText, ThemedView } from '@/components/themed'
 import { useDeadlines } from '@/contexts/DeadlineProvider'
 import { Link } from 'expo-router'
 import { StyleSheet } from 'react-native'
@@ -10,7 +10,7 @@ const ActiveReads = () => {
     if (isLoading) {
         return (
             <ThemedScrollView>
-                <ThemedView backgroundColor="card" style={styles.container}>
+                <ThemedView backgroundColor="surfaceHover" style={styles.container}>
                     <ThemedText>Loading active deadlines...</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
@@ -20,7 +20,7 @@ const ActiveReads = () => {
     if (error) {
         return (
             <ThemedScrollView>
-                <ThemedView backgroundColor="card" style={styles.container}>
+                <ThemedView backgroundColor="surfaceHover" style={styles.container}>
                     <ThemedText color="error" style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
@@ -28,8 +28,8 @@ const ActiveReads = () => {
     }
 
     return (
-        <ThemedScrollView>
-            <ThemedView backgroundColor="card" style={styles.container}>
+        <ThemedScrollView backgroundColor="surfaceHover">
+            <ThemedView backgroundColor="surfaceHover" style={styles.container}>
                 <ThemedText
                     type='semiBold'
                     color='textMuted'

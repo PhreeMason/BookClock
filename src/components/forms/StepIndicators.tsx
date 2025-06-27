@@ -1,3 +1,4 @@
+import { useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -7,6 +8,9 @@ interface StepIndicatorsProps {
 }
 
 export const StepIndicators = ({ currentStep, totalSteps }: StepIndicatorsProps) => {
+    const { theme } = useTheme();
+    const backgroundColor = theme.primary;
+
     return (
         <View style={styles.stepsContainer} testID="steps-container">
             {Array.from({ length: totalSteps }, (_, index) => (
@@ -15,8 +19,8 @@ export const StepIndicators = ({ currentStep, totalSteps }: StepIndicatorsProps)
                     testID="step-indicator"
                     style={[
                         styles.step,
-                        index + 1 === currentStep && styles.stepActive,
-                        index + 1 < currentStep && styles.stepCompleted
+                        index + 1 === currentStep && { backgroundColor },
+                        index + 1 < currentStep && { backgroundColor }
                     ]}
                 />
             ))}
@@ -38,11 +42,5 @@ const styles = StyleSheet.create({
         height: 8,
         borderRadius: 4,
         backgroundColor: '#404040',
-    },
-    stepActive: {
-        backgroundColor: '#4ade80',
-    },
-    stepCompleted: {
-        backgroundColor: '#4ade80',
     },
 }); 
