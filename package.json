@@ -11,7 +11,7 @@
     "typecheck": "npx tsc --noEmit",
     "build:local": "npx eas build --platform android --profile preview --local",
     "supabase:genTypes": "npx supabase gen types --lang=typescript --project-id \"azghfvgabktnvdfjtxhl\" --schema public > src/types/supabase.ts",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^2.12.0",
@@ -61,7 +61,7 @@
     "react-native-webview": "13.13.5",
     "readable-stream": "^4.7.0",
     "stacktrace-parser": "^0.1.11",
-    "zod": "^3.25.42"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -78,10 +78,22 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFilesAfterEnv": ["<rootDir>/src/__tests__/setup.ts"],
-    "testPathIgnorePatterns": [
+    "setupFilesAfterEnv": [
       "<rootDir>/src/__tests__/setup.ts"
-    ]
+    ],
+    "globalTeardown": "<rootDir>/src/__tests__/teardown.ts",
+    "testPathIgnorePatterns": [
+      "<rootDir>/src/__tests__/setup.ts",
+      "<rootDir>/src/__tests__/teardown.ts"
+    ],
+    "clearMocks": true,
+    "restoreMocks": true,
+    "testTimeout": 10000,
+    "forceExit": true,
+    "detectOpenHandles": false,
+    "workerIdleMemoryLimit": "512MB",
+    "silent": false,
+    "verbose": false
   },
   "private": true
 }

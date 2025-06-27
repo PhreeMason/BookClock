@@ -53,13 +53,20 @@ const createMockDeadline = (
   progress
 });
 
-const createMockProgress = (currentProgress: number) => ({
+const createMockProgress = (currentProgress: number, createdAt?: string) => ({
   id: '1',
   reading_deadline_id: '1',
   current_progress: currentProgress,
-  created_at: '2024-01-01T00:00:00Z',
-  updated_at: '2024-01-01T00:00:00Z'
+  created_at: createdAt || '2024-01-01T00:00:00Z',
+  updated_at: createdAt || '2024-01-01T00:00:00Z'
 });
+
+// Helper to create dates relative to a specific date
+const daysFromDate = (baseDate: string, days: number): string => {
+  const date = new Date(baseDate);
+  date.setDate(date.getDate() + days);
+  return date.toISOString();
+};
 
 // Test component to access the provider
 const TestComponent = () => {
@@ -91,6 +98,19 @@ describe('DeadlineProvider', () => {
     mockUseDeleteDeadline.mockReturnValue({
       mutate: mockDeleteMutate,
     } as any);
+  });
+
+  afterEach(() => {
+    // Clean up after each test to prevent leaks
+    jest.clearAllTimers();
+  });
+
+  afterAll(() => {
+    // Ensure all timers and resources are cleaned up
+    jest.useRealTimers();
+    jest.clearAllTimers();
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   describe('Data Management', () => {
@@ -165,6 +185,10 @@ describe('DeadlineProvider', () => {
           <Text>Status Message: {calculations.statusMessage}</Text>
           <Text>Progress Percentage: {calculations.progressPercentage}</Text>
           <Text>Units Per Day: {calculations.unitsPerDay}</Text>
+          <Text>User Pace: {calculations.userPace}</Text>
+          <Text>Required Pace: {calculations.requiredPace}</Text>
+          <Text>Pace Status: {calculations.paceStatus}</Text>
+          <Text>Pace Message: {calculations.paceMessage}</Text>
         </View>
       );
     };
@@ -179,7 +203,7 @@ describe('DeadlineProvider', () => {
       jest.useRealTimers();
     });
 
-    it('should calculate urgency levels correctly', () => {
+    it('should calculate pace-based status correctly with default pace', () => {
       mockUseGetDeadlines.mockReturnValue({
         data: [],
         error: null,
@@ -192,9 +216,13 @@ describe('DeadlineProvider', () => {
         </DeadlineProvider>
       );
 
-      // Deadline is 5 days away (2024-01-20), should be urgent
-      expect(screen.getByText('Urgency Level: urgent')).toBeTruthy();
-      expect(screen.getByText('Status Message: Tough timeline')).toBeTruthy();
+      // Deadline is 5 days away (2024-01-20), with default pace (25 pages/day)
+      // Required pace for 300 pages in 5 days = 60 pages/day
+      // Since 25 < 60 and increase needed is 140% > 100%, should be red/impossible
+      expect(screen.getByText('User Pace: 25')).toBeTruthy();
+      expect(screen.getByText('Required Pace: 60')).toBeTruthy();
+      expect(screen.getByText('Pace Status: red')).toBeTruthy();
+      expect(screen.getByText('Urgency Level: impossible')).toBeTruthy();
     });
 
     it('should calculate days left correctly', () => {
@@ -452,6 +480,280 @@ describe('DeadlineProvider', () => {
 
       expect(screen.getByText('Current Progress: 0')).toBeTruthy();
       expect(screen.getByText('Progress Percentage: 0')).toBeTruthy();
+    });
+  });
+
+  describe('Pace-Based Calculations', () => {
+    beforeEach(() => {
+      // Mock current date to 2024-01-15 for consistent testing
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2024-01-15T00:00:00Z'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should calculate green status when user pace exceeds required pace', () => {
+      // Create deadlines with good recent progress (Tier 1 calculation)
+      const existingDeadlines = [
+        createMockDeadline('existing1', 'Book 1', 'Author 1', '2024-02-01T00:00:00Z', 'physical', 400, [
+          createMockProgress(50, daysFromDate('2024-01-15', -6)), // 6 days ago
+          createMockProgress(100, daysFromDate('2024-01-15', -4)), // 4 days ago
+          createMockProgress(150, daysFromDate('2024-01-15', -2))  // 2 days ago
+          // Pace: (50 + 50 + 50) / 3 = 50 pages/day
+        ])
+      ];
+
+      const testDeadline = createMockDeadline('test', 'Test Book', 'Test Author', '2024-01-25T00:00:00Z', 'physical', 200, [
+        createMockProgress(50, daysFromDate('2024-01-15', -1))
+      ]);
+
+      mockUseGetDeadlines.mockReturnValue({
+        data: [...existingDeadlines, testDeadline],
+        error: null,
+        isLoading: false,
+      } as any);
+
+      const TestPaceComponent = () => {
+        const context = useDeadlines();
+        const calculations = context.getDeadlineCalculations(testDeadline);
+        
+        return (
+          <View>
+            <Text>User Pace: {Math.round(calculations.userPace)}</Text>
+            <Text>Required Pace: {calculations.requiredPace}</Text>
+            <Text>Pace Status: {calculations.paceStatus}</Text>
+            <Text>Pace Message: {calculations.paceMessage}</Text>
+          </View>
+        );
+      };
+
+      render(
+        <DeadlineProvider>
+          <TestPaceComponent />
+        </DeadlineProvider>
+      );
+
+      // User pace: 50 pages/day, Required pace: (200-50)/10 = 15 pages/day
+      expect(screen.getByText('User Pace: 50')).toBeTruthy();
+      expect(screen.getByText('Required Pace: 15')).toBeTruthy();
+      expect(screen.getByText('Pace Status: green')).toBeTruthy();
+      expect(screen.getByText('Pace Message: On track at 50 pages/day')).toBeTruthy();
+    });
+
+    it('should calculate green status when user pace from recent data exceeds required pace', () => {
+      // Create deadlines with moderate recent progress
+      const existingDeadlines = [
+        createMockDeadline('existing1', 'Book 1', 'Author 1', '2024-02-01T00:00:00Z', 'physical', 400, [
+          createMockProgress(25, daysFromDate('2024-01-15', -6)),
+          createMockProgress(50, daysFromDate('2024-01-15', -4)),
+          createMockProgress(75, daysFromDate('2024-01-15', -2))
+          // Daily progress: 25, 25, 25 pages/day
+        ])
+      ];
+
+      const testDeadline = createMockDeadline('test', 'Test Book', 'Test Author', '2024-01-20T00:00:00Z', 'physical', 200, [
+        createMockProgress(50, daysFromDate('2024-01-15', -1))
+        // Daily progress: 50 pages/day
+      ]);
+
+      mockUseGetDeadlines.mockReturnValue({
+        data: [...existingDeadlines, testDeadline],
+        error: null,
+        isLoading: false,
+      } as any);
+
+      const TestPaceComponent = () => {
+        const context = useDeadlines();
+        const calculations = context.getDeadlineCalculations(testDeadline);
+        
+        return (
+          <View>
+            <Text>User Pace: {calculations.userPace}</Text>
+            <Text>Required Pace: {calculations.requiredPace}</Text>
+            <Text>Pace Status: {calculations.paceStatus}</Text>
+            <Text>Pace Message: {calculations.paceMessage}</Text>
+          </View>
+        );
+      };
+
+      render(
+        <DeadlineProvider>
+          <TestPaceComponent />
+        </DeadlineProvider>
+      );
+
+      // User pace: (25 + 25 + 25 + 50) / 4 = 31.25 pages/day, Required pace: (200-50)/5 = 30 pages/day
+      // Since 31.25 >= 30, status is green
+      expect(screen.getByText('User Pace: 31.25')).toBeTruthy();
+      expect(screen.getByText('Required Pace: 30')).toBeTruthy();
+      expect(screen.getByText('Pace Status: green')).toBeTruthy();
+      expect(screen.getByText('Pace Message: On track at 31 pages/day')).toBeTruthy();
+    });
+
+    it('should handle audio book pace calculations with proper conversion', () => {
+      // Create audio deadlines with progress in minutes
+      const existingDeadlines = [
+        createMockDeadline('audio1', 'Audio Book', 'Author', '2024-02-01T00:00:00Z', 'audio', 600, [
+          createMockProgress(90, daysFromDate('2024-01-15', -6)), // 90 minutes = 60 page equivalents
+          createMockProgress(180, daysFromDate('2024-01-15', -4)), // 90 more minutes = 60 page equivalents
+          createMockProgress(270, daysFromDate('2024-01-15', -2))  // 90 more minutes = 60 page equivalents
+          // Pace: (60 + 60 + 60) / 3 = 60 page equivalents/day = 40 pages/day in mixed calculation
+        ])
+      ];
+
+      const testAudioDeadline = createMockDeadline('test-audio', 'Test Audio', 'Test Author', '2024-01-25T00:00:00Z', 'audio', 300, [
+        createMockProgress(150, daysFromDate('2024-01-15', -1)) // 150 minutes progress
+      ]);
+
+      mockUseGetDeadlines.mockReturnValue({
+        data: [...existingDeadlines, testAudioDeadline],
+        error: null,
+        isLoading: false,
+      } as any);
+
+      const TestAudioPaceComponent = () => {
+        const context = useDeadlines();
+        const calculations = context.getDeadlineCalculations(testAudioDeadline);
+        
+        return (
+          <View>
+            <Text>User Pace: {Math.round(calculations.userPace)}</Text>
+            <Text>Required Pace: {calculations.requiredPace}</Text>
+            <Text>Pace Status: {calculations.paceStatus}</Text>
+          </View>
+        );
+      };
+
+      render(
+        <DeadlineProvider>
+          <TestAudioPaceComponent />
+        </DeadlineProvider>
+      );
+
+      // User pace: 70 page equivalents/day (actual calculated value)
+      // Required pace: (300-150 minutes) / 1.5 / 10 days = 100 page equivalents / 10 = 10 page equivalents/day
+      expect(screen.getByText('User Pace: 70')).toBeTruthy();
+      expect(screen.getByText('Required Pace: 10')).toBeTruthy();
+      expect(screen.getByText('Pace Status: green')).toBeTruthy();
+    });
+
+    it('should calculate pace from recent data even with limited data points', () => {
+      // Only 2 reading days in recent period
+      const existingDeadlines = [
+        createMockDeadline('existing1', 'Book 1', 'Author 1', '2024-02-01T00:00:00Z', 'physical', 400, [
+          createMockProgress(50, daysFromDate('2024-01-15', -5)),
+          createMockProgress(100, daysFromDate('2024-01-15', -3))
+          // 2 reading days with 50 pages each
+        ])
+      ];
+
+      const testDeadline = createMockDeadline('test', 'Test Book', 'Test Author', '2024-01-20T00:00:00Z', 'physical', 200, [
+        createMockProgress(50, daysFromDate('2024-01-15', -1))
+      ]);
+
+      mockUseGetDeadlines.mockReturnValue({
+        data: [...existingDeadlines, testDeadline],
+        error: null,
+        isLoading: false,
+      } as any);
+
+      const TestFallbackComponent = () => {
+        const context = useDeadlines();
+        const calculations = context.getDeadlineCalculations(testDeadline);
+        
+        return (
+          <View>
+            <Text>User Pace: {calculations.userPace}</Text>
+            <Text>Required Pace: {calculations.requiredPace}</Text>
+            <Text>Pace Status: {calculations.paceStatus}</Text>
+          </View>
+        );
+      };
+
+      render(
+        <DeadlineProvider>
+          <TestFallbackComponent />
+        </DeadlineProvider>
+      );
+
+      // With 2 reading days, it still calculates from recent data: (50 + 50) / 2 = 50 pages/day
+      expect(screen.getByText('User Pace: 50')).toBeTruthy();
+      expect(screen.getByText('Required Pace: 30')).toBeTruthy();
+      expect(screen.getByText('Pace Status: green')).toBeTruthy();
+    });
+
+    it('should handle overdue deadlines correctly', () => {
+      const overdueDeadline = createMockDeadline('overdue', 'Overdue Book', 'Author', '2024-01-10T00:00:00Z', 'physical', 200, [
+        createMockProgress(100, daysFromDate('2024-01-15', -5))
+      ]);
+
+      mockUseGetDeadlines.mockReturnValue({
+        data: [overdueDeadline],
+        error: null,
+        isLoading: false,
+      } as any);
+
+      const TestOverdueComponent = () => {
+        const context = useDeadlines();
+        const calculations = context.getDeadlineCalculations(overdueDeadline);
+        
+        return (
+          <View>
+            <Text>Days Left: {calculations.daysLeft}</Text>
+            <Text>Pace Status: {calculations.paceStatus}</Text>
+            <Text>Urgency Level: {calculations.urgencyLevel}</Text>
+            <Text>Pace Message: {calculations.paceMessage}</Text>
+          </View>
+        );
+      };
+
+      render(
+        <DeadlineProvider>
+          <TestOverdueComponent />
+        </DeadlineProvider>
+      );
+
+      expect(screen.getByText('Days Left: -5')).toBeTruthy();
+      expect(screen.getByText('Pace Status: red')).toBeTruthy();
+      expect(screen.getByText('Urgency Level: overdue')).toBeTruthy();
+      expect(screen.getByText('Pace Message: Return or renew')).toBeTruthy();
+    });
+
+    it('should handle 0% progress with less than 3 days remaining', () => {
+      const urgentDeadline = createMockDeadline('urgent', 'Urgent Book', 'Author', '2024-01-17T00:00:00Z', 'physical', 200, []);
+
+      mockUseGetDeadlines.mockReturnValue({
+        data: [urgentDeadline],
+        error: null,
+        isLoading: false,
+      } as any);
+
+      const TestUrgentComponent = () => {
+        const context = useDeadlines();
+        const calculations = context.getDeadlineCalculations(urgentDeadline);
+        
+        return (
+          <View>
+            <Text>Days Left: {calculations.daysLeft}</Text>
+            <Text>Progress Percentage: {calculations.progressPercentage}</Text>
+            <Text>Pace Status: {calculations.paceStatus}</Text>
+            <Text>Urgency Level: {calculations.urgencyLevel}</Text>
+          </View>
+        );
+      };
+
+      render(
+        <DeadlineProvider>
+          <TestUrgentComponent />
+        </DeadlineProvider>
+      );
+
+      expect(screen.getByText('Days Left: 2')).toBeTruthy();
+      expect(screen.getByText('Progress Percentage: 0')).toBeTruthy();
+      expect(screen.getByText('Pace Status: red')).toBeTruthy();
+      expect(screen.getByText('Urgency Level: impossible')).toBeTruthy();
     });
   });
 }); 

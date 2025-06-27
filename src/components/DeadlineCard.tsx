@@ -10,6 +10,7 @@ const urgencyBorderColorMap = {
   'urgent': '#EF4444',
   'good': '#4ADE80',
   'approaching': '#FB923C',
+  'impossible': '#DC2626', // Same as overdue
 }
 
 const backgroundImageUrl = {

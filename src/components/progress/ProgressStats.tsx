@@ -9,7 +9,7 @@ interface ProgressStatsProps {
   totalQuantity: number;
   remaining: number;
   format: 'physical' | 'ebook' | 'audio';
-  urgencyLevel: 'overdue' | 'urgent' | 'good' | 'approaching';
+  urgencyLevel: 'overdue' | 'urgent' | 'good' | 'approaching' | 'impossible';
 }
 
 const ProgressStats: React.FC<ProgressStatsProps> = ({
@@ -25,6 +25,7 @@ const ProgressStats: React.FC<ProgressStatsProps> = ({
     'urgent': theme.warning,
     'good': theme.success,
     'approaching': theme.warning,
+    'impossible': theme.danger, // Same as overdue
   };
 
   return (

@@ -21,8 +21,8 @@ jest.mock('@/contexts/DeadlineProvider', () => ({
   useDeadlines: jest.fn(),
 }));
 
-// Mock Alert
-jest.spyOn(Alert, 'alert');
+// Mock Alert after importing
+let mockAlert: jest.SpyInstance;
 
 // Mock data
 const mockDeadline: ReadingDeadlineWithProgress = {
@@ -48,6 +48,7 @@ describe('DeadlineActionButtons', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAlert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
     const { useDeadlines } = require('@/contexts/DeadlineProvider');
     useDeadlines.mockReturnValue({
       deleteDeadline: mockDeleteDeadline,
@@ -146,7 +147,7 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       expect(mockOnDelete).toHaveBeenCalled();
-      expect(Alert.alert).not.toHaveBeenCalled();
+      expect(mockAlert).not.toHaveBeenCalled();
     });
 
     it('should show confirmation alert when onDelete not provided', () => {
@@ -154,7 +155,7 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      expect(Alert.alert).toHaveBeenCalledWith(
+      expect(mockAlert).toHaveBeenCalledWith(
         'Delete Deadline',
         'Are you sure you want to delete "Test Book Title"? This action cannot be undone.',
         expect.any(Array)
@@ -168,14 +169,14 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const buttons = alertCall[2];
+      const alertCall = mockAlert.mock.calls[0];
+      const buttons = alertCall?.[2];
       
       expect(buttons).toHaveLength(2);
-      expect(buttons[0].text).toBe('Cancel');
-      expect(buttons[0].style).toBe('cancel');
-      expect(buttons[1].text).toBe('Delete');
-      expect(buttons[1].style).toBe('destructive');
+      expect(buttons?.[0]?.text).toBe('Cancel');
+      expect(buttons?.[0]?.style).toBe('cancel');
+      expect(buttons?.[1]?.text).toBe('Delete');
+      expect(buttons?.[1]?.style).toBe('destructive');
     });
 
     it('should not call deleteDeadline when Cancel is pressed', () => {
@@ -183,12 +184,12 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const cancelButton = alertCall[2][0];
+      const alertCall = mockAlert.mock.calls[0];
+      const cancelButton = alertCall?.[2]?.[0];
       
       // Simulate pressing Cancel
       if (cancelButton.onPress) {
-        cancelButton.onPress();
+        cancelButton?.onPress?.();
       }
       
       expect(mockDeleteDeadline).not.toHaveBeenCalled();
@@ -201,12 +202,12 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const deleteButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const deleteButton = alertCall?.[2]?.[1];
       
       // Simulate pressing Delete
       act(() => {
-        deleteButton.onPress();
+        deleteButton?.onPress?.();
       });
       
       expect(mockDeleteDeadline).toHaveBeenCalledWith(
@@ -221,12 +222,12 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const deleteButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const deleteButton = alertCall?.[2]?.[1];
       
       // Simulate pressing Delete
       await act(async () => {
-        deleteButton.onPress();
+        deleteButton?.onPress?.();
       });
       
       await waitFor(() => {
@@ -239,12 +240,12 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const deleteButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const deleteButton = alertCall?.[2]?.[1];
       
       // Simulate pressing Delete
       await act(async () => {
-        deleteButton.onPress();
+        deleteButton?.onPress?.();
       });
       
       await waitFor(() => {
@@ -265,12 +266,12 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const deleteButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const deleteButton = alertCall?.[2]?.[1];
       
       // Simulate pressing Delete
       act(() => {
-        deleteButton.onPress();
+        deleteButton?.onPress?.();
       });
       
       // Get the success callback
@@ -298,12 +299,12 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const deleteButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const deleteButton = alertCall?.[2]?.[1];
       
       // Simulate pressing Delete
       act(() => {
-        deleteButton.onPress();
+        deleteButton?.onPress?.();
       });
       
       // Get the success callback
@@ -334,12 +335,12 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const deleteButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const deleteButton = alertCall?.[2]?.[1];
       
       // Simulate pressing Delete
       act(() => {
-        deleteButton.onPress();
+        deleteButton?.onPress?.();
       });
       
       // Get the error callback
@@ -367,12 +368,12 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const deleteButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const deleteButton = alertCall?.[2]?.[1];
       
       // Simulate pressing Delete
       act(() => {
-        deleteButton.onPress();
+        deleteButton?.onPress?.();
       });
       
       // Get the error callback
@@ -400,12 +401,12 @@ describe('DeadlineActionButtons', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const deleteButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const deleteButton = alertCall?.[2]?.[1];
       
       // Simulate pressing Delete
       act(() => {
-        deleteButton.onPress();
+        deleteButton?.onPress?.();
       });
       
       // Button should be disabled

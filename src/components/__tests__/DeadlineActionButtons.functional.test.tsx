@@ -55,8 +55,8 @@ jest.mock('@clerk/clerk-expo', () => ({
   })),
 }));
 
-// Mock Alert
-jest.spyOn(Alert, 'alert');
+// Mock Alert after importing
+let mockAlert: jest.SpyInstance;
 
 // Mock data
 const mockDeadline: ReadingDeadlineWithProgress = {
@@ -88,6 +88,7 @@ describe('DeadlineActionButtons - Functional Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAlert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -100,6 +101,17 @@ describe('DeadlineActionButtons - Functional Tests', () => {
     const { useDeleteDeadline } = require('@/hooks/useDeadlines');
     useDeleteDeadline.mockReturnValue({
       mutate: mockDeleteMutate,
+    });
+  });
+
+  afterEach(async () => {
+    // Clear query cache to prevent test pollution
+    queryClient.clear();
+    mockAlert?.mockRestore();
+    
+    // Wait for any pending async operations
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
     });
   });
 
@@ -123,20 +135,20 @@ describe('DeadlineActionButtons - Functional Tests', () => {
       fireEvent.press(deleteButton);
 
       // Step 2: Confirmation dialog appears
-      expect(Alert.alert).toHaveBeenCalledWith(
+      expect(mockAlert).toHaveBeenCalledWith(
         'Delete Deadline',
         'Are you sure you want to delete "The Great Gatsby"? This action cannot be undone.',
         expect.any(Array)
       );
 
       // Step 3: User confirms deletion
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const confirmButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const confirmButton = alertCall?.[2]?.[1];
       expect(confirmButton.text).toBe('Delete');
       expect(confirmButton.style).toBe('destructive');
       
       act(() => {
-        confirmButton.onPress();
+        confirmButton?.onPress?.();
       });
 
       // Step 4: Button shows loading state
@@ -190,8 +202,8 @@ describe('DeadlineActionButtons - Functional Tests', () => {
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
 
       // User clicks Cancel
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const cancelButton = alertCall[2][0];
+      const alertCall = mockAlert.mock.calls[0];
+      const cancelButton = alertCall?.[2]?.[0];
       expect(cancelButton.text).toBe('Cancel');
       expect(cancelButton.style).toBe('cancel');
       
@@ -215,10 +227,10 @@ describe('DeadlineActionButtons - Functional Tests', () => {
       // Step 1: User initiates delete
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
       
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
-      const confirmButton = alertCall[2][1];
+      const alertCall = mockAlert.mock.calls[0];
+      const confirmButton = alertCall?.[2]?.[1];
       act(() => {
-        confirmButton.onPress();
+        confirmButton?.onPress?.();
       });
 
       // Step 2: Loading state
@@ -254,7 +266,7 @@ describe('DeadlineActionButtons - Functional Tests', () => {
       // Step 6: User can retry
       jest.clearAllMocks();
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
-      expect(Alert.alert).toHaveBeenCalled();
+      expect(mockAlert).toHaveBeenCalled();
     });
   });
 
@@ -267,7 +279,7 @@ describe('DeadlineActionButtons - Functional Tests', () => {
       fireEvent.press(deleteButton);
       
       // Alert is shown
-      expect(Alert.alert).toHaveBeenCalledTimes(1);
+      expect(mockAlert).toHaveBeenCalledTimes(1);
       
       // While alert is open, button presses do nothing
       // (In practice, the alert modal blocks interaction)
@@ -278,9 +290,9 @@ describe('DeadlineActionButtons - Functional Tests', () => {
 
       // Start deletion
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
-      const alertCall = (Alert.alert as jest.Mock).mock.calls[0];
+      const alertCall = mockAlert.mock.calls[0];
       act(() => {
-        alertCall[2][1].onPress();
+        alertCall?.[2]?.[1]?.onPress?.();
       });
 
       // During deletion, delete button should show loading text
@@ -305,7 +317,7 @@ describe('DeadlineActionButtons - Functional Tests', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
 
-      expect(Alert.alert).toHaveBeenCalledWith(
+      expect(mockAlert).toHaveBeenCalledWith(
         'Delete Deadline',
         expect.stringContaining('This is an extremely long book title'),
         expect.any(Array)
@@ -322,7 +334,7 @@ describe('DeadlineActionButtons - Functional Tests', () => {
 
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
 
-      expect(Alert.alert).toHaveBeenCalledWith(
+      expect(mockAlert).toHaveBeenCalledWith(
         'Delete Deadline',
         'Are you sure you want to delete "Book with "quotes" & special <characters>"? This action cannot be undone.',
         expect.any(Array)
@@ -340,7 +352,7 @@ describe('DeadlineActionButtons - Functional Tests', () => {
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
 
       // Should still show alert even with empty title
-      expect(Alert.alert).toHaveBeenCalled();
+      expect(mockAlert).toHaveBeenCalled();
     });
   });
 
@@ -360,7 +372,7 @@ describe('DeadlineActionButtons - Functional Tests', () => {
       expect(screen.getByText('🗑️ Delete Deadline')).toBeTruthy();
       
       fireEvent.press(screen.getByText('🗑️ Delete Deadline'));
-      expect(Alert.alert).toHaveBeenCalled();
+      expect(mockAlert).toHaveBeenCalled();
     });
   });
 });
