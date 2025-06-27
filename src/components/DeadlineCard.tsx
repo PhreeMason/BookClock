@@ -12,6 +12,13 @@ const urgencyBorderColorMap = {
   'approaching': '#FB923C',
 }
 
+const backgroundImageUrl = {
+    default: 'https://images.unsplash.com/photo-1750712406219-549c4ba27210?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    desert: 'https://images.unsplash.com/photo-1750712406219-549c4ba27210?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    cherry: 'https://images.unsplash.com/photo-1750625991979-a008c832e04c?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+}
+
+
 interface DeadlineCardProps {
   deadline: ReadingDeadlineWithProgress;
   disableNavigation?: boolean;
@@ -92,7 +99,7 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
       <View style={[styles.card, { borderColor }]}>
         {true ? (
           <ImageBackground
-            source={{ uri: 'https://images.unsplash.com/photo-1750625991979-a008c832e04c?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }}
+            source={{ uri: backgroundImageUrl['default'] }}
             style={styles.backgroundImage}
             blurRadius={50}
           >

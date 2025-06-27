@@ -1,9 +1,10 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
-import Toast from 'react-native-toast-message';
-import { ThemedButton } from './themed';
-import { ThemedView } from './themed';
+import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, StyleSheet } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { ThemedButton, ThemedView } from './themed';
 
 interface DeadlineActionButtonsProps {
   deadline: ReadingDeadlineWithProgress;
@@ -18,6 +19,8 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
   onSetAside,
   onDelete,
 }) => {
+  const { deleteDeadline } = useDeadlines();
+  const [isDeleting, setIsDeleting] = useState(false);
   const handleComplete = () => {
     if (onComplete) {
       onComplete();
@@ -51,16 +54,57 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
   const handleDelete = () => {
     if (onDelete) {
       onDelete();
-    } else {
-      Toast.show({
-        type: 'info',
-        text1: 'Delete Book',
-        text2: 'This feature is coming soon!',
-        autoHide: true,
-        visibilityTime: 2000,
-        position: 'top',
-      });
+      return;
     }
+
+    // Show confirmation dialog
+    Alert.alert(
+      'Delete Deadline',
+      `Are you sure you want to delete "${deadline.book_title}"? This action cannot be undone.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            setIsDeleting(true);
+            deleteDeadline(
+              deadline.id,
+              // Success callback
+              () => {
+                setIsDeleting(false);
+                Toast.show({
+                  type: 'success',
+                  text1: 'Deadline deleted',
+                  text2: `"${deadline.book_title}" has been removed`,
+                  autoHide: true,
+                  visibilityTime: 2000,
+                  position: 'top',
+                  onHide: () => {
+                    router.replace('/');
+                  }
+                });
+              },
+              // Error callback
+              (error) => {
+                setIsDeleting(false);
+                Toast.show({
+                  type: 'error',
+                  text1: 'Failed to delete deadline',
+                  text2: error.message || 'Please try again',
+                  autoHide: true,
+                  visibilityTime: 3000,
+                  position: 'top'
+                });
+              }
+            );
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -78,10 +122,11 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
         onPress={handleSetAside}
       />
       <ThemedButton
-        title="🗑️ Delete Book"
+        title={isDeleting ? "Deleting..." : "🗑️ Delete Deadline"}
         variant="dangerOutline"
         style={styles.deleteBtn}
         onPress={handleDelete}
+        disabled={isDeleting}
       />
     </ThemedView>
   );
