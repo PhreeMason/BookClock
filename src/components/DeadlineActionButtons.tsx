@@ -79,7 +79,7 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
       />
       <ThemedButton
         title="🗑️ Delete Book"
-        variant="danger"
+        variant="dangerOutline"
         style={styles.deleteBtn}
         onPress={handleDelete}
       />
