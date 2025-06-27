@@ -4,6 +4,8 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { DeadlineProvider, useDeadlines } from '../DeadlineProvider';
 
+import { useAddDeadline, useGetDeadlines, useUpdateDeadline, useDeleteDeadline } from '@/hooks/useDeadlines';
+
 // Mock the hooks with simpler types
 jest.mock('@/hooks/useDeadlines', () => ({
   useGetDeadlines: jest.fn(() => ({
@@ -21,8 +23,6 @@ jest.mock('@/hooks/useDeadlines', () => ({
     mutate: jest.fn(),
   })),
 }));
-
-import { useAddDeadline, useGetDeadlines, useUpdateDeadline, useDeleteDeadline } from '@/hooks/useDeadlines';
 
 const mockUseGetDeadlines = useGetDeadlines as jest.MockedFunction<typeof useGetDeadlines>;
 const mockUseAddDeadline = useAddDeadline as jest.MockedFunction<typeof useAddDeadline>;

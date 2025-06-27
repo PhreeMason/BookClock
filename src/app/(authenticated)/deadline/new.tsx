@@ -47,8 +47,7 @@ const NewDeadLine = () => {
         handleSubmit,
         watch,
         setValue,
-        trigger,
-        formState: { errors, isValid, isSubmitting: formIsSubmitting }
+        trigger
     } = useForm<DeadlineFormData>({
         resolver: zodResolver(deadlineFormSchema),
         defaultValues: {

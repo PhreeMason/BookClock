@@ -7,9 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
-import { z } from 'zod'
-import { ThemedButton } from './themed'
-import { ThemedView } from './themed'
+import { ThemedButton , ThemedView } from './themed'
 import ProgressBar from './progress/ProgressBar'
 import ProgressHeader from './progress/ProgressHeader'
 import ProgressInput from './progress/ProgressInput'
@@ -36,7 +34,6 @@ const ReadingProgress = ({
     const progressSchema = createProgressUpdateSchema(totalQuantity, deadline.format);
     const updateProgressMutation = useUpdateDeadlineProgress();
 
-    type FormData = z.infer<typeof progressSchema>;
     
     const {
         control,

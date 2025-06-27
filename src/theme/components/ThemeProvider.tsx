@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useColorScheme } from 'react-native';
-import { Theme, ThemeContextValue, ThemeMode } from '../types';
+import { ThemeContextValue, ThemeMode } from '../types';
 import { themes } from '../themes';
 import { createTheme } from '../utils/themeUtils';
 

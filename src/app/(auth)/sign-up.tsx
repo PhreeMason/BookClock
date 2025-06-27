@@ -33,7 +33,8 @@ const mapClerkErrorToFormField = (error: any) => {
 export default function SignUpScreen() {
     const { isLoaded, signUp, setActive } = useSignUp();
     const router = useRouter();
-    const { signOut } = useClerk()
+    const { signOut } = useClerk();
+    const { theme } = useTheme();
 
     const [pendingVerification, setPendingVerification] = React.useState(false);
     const [code, setCode] = React.useState('');
@@ -98,7 +99,6 @@ export default function SignUpScreen() {
     };
 
     if (pendingVerification) {
-        const { theme } = useTheme();
         const textMutedColor = theme.textMuted;
         
         return (

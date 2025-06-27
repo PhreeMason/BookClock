@@ -1,4 +1,10 @@
 // Mock Toast first
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import dayjs from 'dayjs';
+import React from 'react';
+import { Alert } from 'react-native';
+import NewDeadLine from '../new';
+
 jest.mock('react-native-toast-message', () => {
   const mockShow = jest.fn();
   return {
@@ -10,12 +16,6 @@ jest.mock('react-native-toast-message', () => {
     mockShow,
   };
 });
-
-import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
-import dayjs from 'dayjs';
-import React from 'react';
-import { Alert } from 'react-native';
-import NewDeadLine from '../new';
 
 // Get the mock function for use in tests
 const mockToastShow = jest.mocked(require('react-native-toast-message')).mockShow;

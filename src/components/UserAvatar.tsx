@@ -1,5 +1,4 @@
-import { ThemedText } from '@/components/themed';
-import { ThemedView } from '@/components/themed';
+import { ThemedText , ThemedView } from '@/components/themed';
 import { useTheme } from '@/theme';
 import { useUser } from '@clerk/clerk-expo';
 import React from 'react';

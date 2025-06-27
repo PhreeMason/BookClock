@@ -861,7 +861,7 @@ describe('NewDeadLine', () => {
     
     // On step 1, there's no visible back button, but the goBack function should call router.back()
     // We need to trigger the goBack function directly through the FormHeader
-    const formHeader = getByTestId('form-header');
+    getByTestId('form-header');
     
     // Since the FormHeader mock shows the back button when showBack is true,
     // but on step 1 showBack should be false, we need to test the goBack function differently

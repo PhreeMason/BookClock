@@ -32,7 +32,7 @@ const mapClerkErrorToFormField = (error: any) => {
 export default function Page() {
     const { signIn, setActive, isLoaded } = useSignIn();
     const router = useRouter();
-    const { signOut } = useClerk()
+    const { signOut } = useClerk();
 
     const {
         control,
@@ -112,7 +112,7 @@ export default function Page() {
             </ThemedView>
 
             <ThemedView backgroundColor="card" style={styles.footer}>
-                <ThemedText>Don't have an account? </ThemedText>
+                <ThemedText>Don&apos;t have an account? </ThemedText>
                 <Link href="/(auth)/sign-up">
                     <ThemedText type="link">Sign up</ThemedText>
                 </Link>
