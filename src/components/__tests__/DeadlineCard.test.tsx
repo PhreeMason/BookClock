@@ -60,6 +60,7 @@ describe('DeadlineCard', () => {
       isLoading: false,
       error: null,
       addDeadline: jest.fn(),
+      updateDeadline: jest.fn(),
       calculateUnitsPerDay: jest.fn(),
       getUrgencyLevel: jest.fn(),
       getUrgencyColor: jest.fn(),

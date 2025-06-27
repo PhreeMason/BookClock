@@ -14,12 +14,16 @@ jest.mock('@/hooks/useDeadlines', () => ({
   useAddDeadline: jest.fn(() => ({
     mutate: jest.fn(),
   })),
+  useUpdateDeadline: jest.fn(() => ({
+    mutate: jest.fn(),
+  })),
 }));
 
-import { useAddDeadline, useGetDeadlines } from '@/hooks/useDeadlines';
+import { useAddDeadline, useGetDeadlines, useUpdateDeadline } from '@/hooks/useDeadlines';
 
 const mockUseGetDeadlines = useGetDeadlines as jest.MockedFunction<typeof useGetDeadlines>;
 const mockUseAddDeadline = useAddDeadline as jest.MockedFunction<typeof useAddDeadline>;
+const mockUseUpdateDeadline = useUpdateDeadline as jest.MockedFunction<typeof useUpdateDeadline>;
 
 // Mock data for testing
 const createMockDeadline = (
@@ -69,11 +73,15 @@ const TestComponent = () => {
 
 describe('DeadlineProvider', () => {
   const mockMutate = jest.fn();
+  const mockUpdateMutate = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseAddDeadline.mockReturnValue({
       mutate: mockMutate,
+    } as any);
+    mockUseUpdateDeadline.mockReturnValue({
+      mutate: mockUpdateMutate,
     } as any);
   });
 

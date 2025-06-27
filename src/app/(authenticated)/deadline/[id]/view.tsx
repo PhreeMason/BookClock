@@ -17,7 +17,7 @@ const DeadlineView = () => {
     const router = useRouter();
     const { deadlines } = useDeadlines();
     const { theme } = useTheme();
-    const backgroundColor = theme.background;
+    const backgroundColor = theme.surfaceHover;
 
     const deadline = deadlines.find(d => d.id === id);
 
@@ -30,14 +30,7 @@ const DeadlineView = () => {
     }
 
     const handleEdit = () => {
-        Toast.show({
-            type: 'info',
-            text1: 'Edit Deadline',
-            text2: 'This feature is coming soon!',
-            autoHide: true,
-            visibilityTime: 2000,
-            position: 'top',
-        });
+        router.push(`/deadline/${id}/edit`);
     };
 
     return (

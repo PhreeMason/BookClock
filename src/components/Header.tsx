@@ -3,8 +3,7 @@ import dayjs from 'dayjs';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { ThemedText } from './themed';
-import { ThemedView } from './themed';
+import { ThemedText, ThemedView } from './themed';
 import { IconSymbol } from './ui/IconSymbol';
 
 type HeaderProps = {
@@ -24,8 +23,8 @@ const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderP
     };
 
     return (
-        <ThemedView backgroundColor="background" borderColor="border" style={styles.container}>
-            <ThemedView backgroundColor="background" style={styles.dateRow}>
+        <ThemedView backgroundColor="surfaceHover" borderColor="border" style={styles.container}>
+            <ThemedView backgroundColor="surfaceHover" style={styles.dateRow}>
                 <ThemedText style={styles.dateText}>{formattedDate}</ThemedText>
                 <ThemedText color="textMuted" style={styles.statusSummary}>
                     {activeCount} active • {attentionCount} needs attention

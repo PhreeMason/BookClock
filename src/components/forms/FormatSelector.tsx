@@ -6,9 +6,10 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 interface FormatSelectorProps {
     selectedFormat: string;
     onSelectFormat: (format: 'physical' | 'ebook' | 'audio') => void;
+    disabled?: boolean;
 }
 
-export const FormatSelector = ({ selectedFormat, onSelectFormat }: FormatSelectorProps) => {
+export const FormatSelector = ({ selectedFormat, onSelectFormat, disabled = false }: FormatSelectorProps) => {
     const { theme } = useTheme();
     const primaryColor = theme.primary;
     const cardColor = theme.surface;
@@ -31,9 +32,11 @@ export const FormatSelector = ({ selectedFormat, onSelectFormat }: FormatSelecto
                             styles.formatChip,
                             { 
                                 backgroundColor: isSelected ? `${primaryColor}20` : cardColor, // primary with opacity or card
+                                opacity: disabled ? 0.5 : 1
                             }
                         ]}
-                        onPress={() => onSelectFormat(format.key as 'physical' | 'ebook' | 'audio')}
+                        onPress={disabled ? undefined : () => onSelectFormat(format.key as 'physical' | 'ebook' | 'audio')}
+                        disabled={disabled}
                     >
                         <ThemedText 
                             color={isSelected ? 'primary' : 'textMuted'}
