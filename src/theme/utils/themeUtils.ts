@@ -1,6 +1,6 @@
 import { SimpleTheme, Theme, ComputedColors } from '../types';
 import { designTokens } from '../tokens';
-import { opacity, mix, lighten, darken, adjustHue } from './colorUtils';
+import { opacity, mix, lighten, darken } from './colorUtils';
 
 export function computeColors(base: SimpleTheme, isDark: boolean): ComputedColors {
   return {

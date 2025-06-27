@@ -34,7 +34,7 @@ export default function SignInWith({ strategy }: SignInWithProps) {
             // Start the authentication process by calling `startSSOFlow()`
             await signOut()
             
-            const { createdSessionId, setActive, signIn, signUp } =
+            const { createdSessionId, setActive } =
                 await startSSOFlow({
                     strategy,
                     // For web, defaults to current path
@@ -57,7 +57,7 @@ export default function SignInWith({ strategy }: SignInWithProps) {
             // for more info on error handling
             console.error(JSON.stringify(err, null, 2));
         }
-    }, []);
+    }, [signOut, startSSOFlow, strategy]);
 
     return (
         <TouchableOpacity onPress={onPress}>

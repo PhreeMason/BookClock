@@ -3,13 +3,13 @@ import { render, screen } from '@testing-library/react-native';
 import React from 'react';
 import { DeadlineCard } from '../DeadlineCard';
 
+import { useDeadlines } from '@/contexts/DeadlineProvider';
+
 // Mock the deadline provider
 jest.mock('@/contexts/DeadlineProvider', () => ({
   useDeadlines: jest.fn(),
   DeadlineProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-
-import { useDeadlines } from '@/contexts/DeadlineProvider';
 
 const mockUseDeadlines = useDeadlines as jest.MockedFunction<typeof useDeadlines>;
 
@@ -246,7 +246,7 @@ describe('DeadlineCard', () => {
 
       mockFormatUnitsPerDay.mockReturnValue('60 pages/day needed');
 
-      const { getByTestId } = render(<DeadlineCard deadline={deadline} />);
+      render(<DeadlineCard deadline={deadline} />);
       
       // The card should have the overdue border color
       const card = screen.getByText('Test Book').parent?.parent?.parent?.parent;
