@@ -1,5 +1,5 @@
 import { useTheme } from '@/theme';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { ThemedText } from '../themed';
 
@@ -102,11 +102,27 @@ const AudiobookProgressInput: React.FC<AudiobookProgressInputProps> = ({
   const [displayValue, setDisplayValue] = useState('');
   const [isValid, setIsValid] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
+  const displayValueRef = useRef(displayValue);
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    displayValueRef.current = displayValue;
+  }, [displayValue]);
   
   // Update display when value prop changes
   useEffect(() => {
+    const formattedValue = formatAudiobookTime(value);
+    
     if (!isFocused) {
-      setDisplayValue(formatAudiobookTime(value));
+      // When not focused, always update to the formatted value
+      setDisplayValue(formattedValue);
+    } else {
+      // When focused, only update if the current display value doesn't parse to the same value
+      // This allows quick actions to work while preserving user input during typing
+      const currentParsed = parseAudiobookTime(displayValueRef.current);
+      if (currentParsed !== value) {
+        setDisplayValue(formattedValue);
+      }
     }
   }, [value, isFocused]);
   
