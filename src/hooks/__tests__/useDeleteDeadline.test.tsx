@@ -51,6 +51,14 @@ describe('useDeleteDeadline', () => {
     }));
   });
 
+  afterEach(async () => {
+    // Clear query cache to prevent test pollution
+    queryClient.clear();
+    
+    // Wait for any pending async operations
+    await new Promise(resolve => setTimeout(resolve, 0));
+  });
+
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       {children}

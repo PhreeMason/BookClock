@@ -9,6 +9,8 @@ import '../__mocks__/theme';
 // Mock React Native modules that aren't available in test environment
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
 
+// Note: Alert mocking is done per test file to avoid conflicts
+
 // Mock Expo modules
 jest.mock('expo-router', () => ({
   useRouter: () => ({
@@ -41,3 +43,41 @@ jest.mock('@/components/themed', () => ({
 }));
 
 // Legacy mocks removed since those files no longer exist
+
+// Global test cleanup to prevent worker process issues
+afterEach(() => {
+  // Clean up any timers after each test
+  jest.clearAllTimers();
+  
+  // Force garbage collection of any pending async operations
+  jest.clearAllMocks();
+  
+  // Clear any pending setTimeout/setInterval operations
+  if (typeof global.gc === 'function') {
+    global.gc();
+  }
+});
+
+// Global cleanup on exit
+afterAll(async () => {
+  // Ensure everything is cleaned up when tests finish
+  jest.useRealTimers();
+  jest.clearAllTimers();
+  jest.clearAllMocks();
+  jest.restoreAllMocks();
+  
+  // Force cleanup of any remaining handles
+  if (global.gc) {
+    global.gc();
+  }
+  
+  // Clear any remaining timeouts/intervals
+  const maxId = setTimeout(() => {}, 0);
+  for (let i = 1; i <= maxId; i++) {
+    clearTimeout(i);
+    clearInterval(i);
+  }
+  
+  // Give async operations time to complete before exit
+  await new Promise(resolve => setTimeout(resolve, 100));
+});

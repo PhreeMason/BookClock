@@ -78,7 +78,7 @@ export const calculateDaysLeft = (deadlineDate: string): number => {
  * @returns The current progress value, or 0 if no progress entries exist
  */
 export const calculateProgress = (deadline: ReadingDeadlineWithProgress): number => {
-    if (deadline.progress.length === 0) return 0;
+    if (!deadline.progress || deadline.progress.length === 0) return 0;
     
     const latestProgress = deadline.progress.reduce((latest, current) => {
         return new Date(current.updated_at || current.created_at || '') > 
