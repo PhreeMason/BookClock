@@ -13,6 +13,11 @@ The app uses a modular form architecture for complex multi-step forms.
 - **`DeadlineFormStep1`** - First step: book details and format
 - **`DeadlineFormStep2`** - Second step: deadline, progress, and flexibility settings
 
+## Specialized Input Components (`src/components/progress/`)
+
+- **`ProgressInput`** - Router component for format-specific progress inputs
+- **`AudiobookProgressInput`** - Specialized time input for audiobook formats with comprehensive parsing
+
 ## Form Utilities (`src/lib/`)
 
 - **`deadlineFormSchema.ts`** - Zod schema and TypeScript types for form validation

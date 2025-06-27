@@ -90,29 +90,34 @@ The `ReadingProgress` component orchestrates all sub-components:
 ## Smart Input System
 
 ### AudioBook Time Input
-The `ProgressInput` component handles audiobook time formatting:
+The `AudiobookProgressInput` component provides comprehensive audiobook time parsing:
 
 ```typescript
-// Conversion utilities
-const convertMinutesToTimeString = (minutes: number): string => {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  if (hours === 0) return `${mins}m`;
-  if (mins === 0) return `${hours}h`;
-  return `${hours}h ${mins}m`;
-};
+// Supported formats (all converted to minutes internally):
+parseAudiobookTime('3h 2m')      // => 182
+parseAudiobookTime('3H 2M')      // => 182 (case insensitive)
+parseAudiobookTime('3h2m')       // => 182 (no spaces)
+parseAudiobookTime('03h 02m')    // => 182 (leading zeros)
+parseAudiobookTime('3:02')       // => 182 (colon format)
+parseAudiobookTime('3:02:30')    // => 182 (ignores seconds)
+parseAudiobookTime('2.5h')       // => 150 (decimal hours)
+parseAudiobookTime('2,5h')       // => 150 (European format)
+parseAudiobookTime('45m')        // => 45  (minutes only)
+parseAudiobookTime('182')        // => 182 (plain number as minutes)
+parseAudiobookTime('3 hours 2 minutes') // => 182 (full words)
 
-const convertTimeStringToMinutes = (timeString: string): number => {
-  // Handles: "2h 30m", "2h", "30m", "120"
-  const hourMatch = timeString.match(/(\d+)h/);
-  const minuteMatch = timeString.match(/(\d+)m/);
-  
-  const hours = hourMatch ? parseInt(hourMatch[1]) : 0;
-  const minutes = minuteMatch ? parseInt(minuteMatch[1]) : 0;
-  
-  return hours * 60 + minutes;
-};
+// Formatting for display:
+formatAudiobookTime(182)         // => "3h 2m"
+formatAudiobookTime(180)         // => "3h"
+formatAudiobookTime(45)          // => "45m"
 ```
+
+**Key Features:**
+- **Real-time validation** with visual feedback
+- **Auto-formatting** on blur for consistency  
+- **Error recovery** - restores last valid value for invalid input
+- **Always stores as minutes** for database consistency
+- **Comprehensive format support** - handles virtually any reasonable time input
 
 ### Mixed Value Support
 The `CustomInput` component handles both string and number values:
