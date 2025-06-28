@@ -21,9 +21,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
   return (
     <View style={styles.progressBarContainer}>
-      <ThemedView backgroundColor="accent" style={styles.progressBar}>
+      <ThemedView backgroundColor="primary" style={styles.progressBar}>
         <ThemedView
-          backgroundColor="primary"
+          backgroundColor="accent"
           style={[styles.progressFill, { width: `${progressPercentage}%` }]}
         />
       </ThemedView>
