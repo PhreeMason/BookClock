@@ -23,10 +23,20 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     const loadTheme = async () => {
       try {
         const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+        const isSystemDark = systemColorScheme === 'dark';
+        
         if (savedTheme && savedTheme in themes) {
-          setThemeMode(savedTheme as ThemeMode);
-        } else if (systemColorScheme === 'dark') {
-          setThemeMode('dark');
+          const savedThemeData = themes[savedTheme as ThemeMode];
+          // Check if saved theme matches system dark/light mode
+          if (savedThemeData.isDark === isSystemDark) {
+            setThemeMode(savedTheme as ThemeMode);
+          } else {
+            // Switch to appropriate default theme for system mode
+            setThemeMode(isSystemDark ? 'dark' : 'light');
+          }
+        } else {
+          // No saved theme, use system default
+          setThemeMode(isSystemDark ? 'dark' : 'light');
         }
       } catch (error) {
         console.error('Error loading theme:', error);
@@ -54,11 +64,22 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     return createTheme(baseTheme, isDark);
   }, [themeMode]);
 
+  // Filter available themes based on system color scheme
+  const availableThemes = useMemo(() => {
+    const allThemes = Object.keys(themes) as ThemeMode[];
+    const isSystemDark = systemColorScheme === 'dark';
+    
+    return allThemes.filter(themeName => {
+      const themeData = themes[themeName];
+      return themeData.isDark === isSystemDark;
+    });
+  }, [systemColorScheme]);
+
   const value: ThemeContextValue = {
     theme,
     themeMode,
     setThemeMode: handleSetThemeMode,
-    availableThemes: Object.keys(themes) as ThemeMode[],
+    availableThemes,
   };
 
   if (isLoading) {
