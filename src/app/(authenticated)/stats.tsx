@@ -6,6 +6,13 @@ import { useTheme } from '@/theme';
 import { router } from 'expo-router';
 import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import FormatDistributionChart from '@/components/FormatDistributionChart';
+import TotalProgressRingChart from '@/components/TotalProgressRingChart';
+import WeeklyReadingHeatmap from '@/components/WeeklyReadingHeatmap';
+import ReadingStatsCards from '@/components/ReadingStatsCards';
+import ReadingVelocityChart from '@/components/ReadingVelocityChart';
+import DailyPagesChart from '@/components/DailyPagesChart';
+import AchievementsCard from '@/components/AchievementsCard';
 
 export default function StatsScreen() {
     const { theme } = useTheme();
@@ -48,7 +55,28 @@ export default function StatsScreen() {
             </View>
 
             <ThemedScrollView backgroundColor="background" style={styles.content}>
-                {/* Reading Pace Section */}
+                {/* 1. Overall Progress Overview */}
+                <TotalProgressRingChart />
+
+                {/* 2. Achievements - Motivational and goal-oriented */}
+                <AchievementsCard />
+
+                {/* 3. Key Stats Cards - Quick overview metrics */}
+                <ReadingStatsCards />
+
+                {/* 4. Daily Progress Tracking */}
+                <DailyPagesChart />
+
+                {/* 5. Reading Velocity - Performance over time */}
+                <ReadingVelocityChart />
+
+                {/* 6. Activity Patterns */}
+                <WeeklyReadingHeatmap />
+
+                {/* 7. Format Distribution - Reading habits */}
+                <FormatDistributionChart />
+
+                {/* 8. Reading Pace Analysis */}
                 <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <IconSymbol name="speedometer" size={24} color={iconColor} />
@@ -83,7 +111,7 @@ export default function StatsScreen() {
                     </View>
                 </ThemedView>
 
-                {/* How Pace is Calculated Section */}
+                {/* 9. How Pace is Calculated - Educational info */}
                 <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <IconSymbol name="info.circle.fill" size={24} color={iconColor} />

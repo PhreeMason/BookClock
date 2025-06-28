@@ -9,6 +9,95 @@ export type Json =
 export type Database = {
     public: {
         Tables: {
+            achievement_progress: {
+                Row: {
+                    achievement_id: string
+                    created_at: string | null
+                    current_value: number
+                    id: string
+                    last_updated: string | null
+                    max_value: number | null
+                    metadata: Json | null
+                    updated_at: string | null
+                    user_id: string
+                }
+                Insert: {
+                    achievement_id: string
+                    created_at?: string | null
+                    current_value?: number
+                    id?: string
+                    last_updated?: string | null
+                    max_value?: number | null
+                    metadata?: Json | null
+                    updated_at?: string | null
+                    user_id: string
+                }
+                Update: {
+                    achievement_id?: string
+                    created_at?: string | null
+                    current_value?: number
+                    id?: string
+                    last_updated?: string | null
+                    max_value?: number | null
+                    metadata?: Json | null
+                    updated_at?: string | null
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "achievement_progress_achievement_id_fkey"
+                        columns: ["achievement_id"]
+                        isOneToOne: false
+                        referencedRelation: "achievements"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            achievements: {
+                Row: {
+                    category: string
+                    color: string
+                    created_at: string | null
+                    criteria: Json
+                    description: string
+                    icon: string
+                    id: string
+                    is_active: boolean | null
+                    sort_order: number | null
+                    title: string
+                    type: string
+                    updated_at: string | null
+                }
+                Insert: {
+                    category: string
+                    color: string
+                    created_at?: string | null
+                    criteria: Json
+                    description: string
+                    icon: string
+                    id: string
+                    is_active?: boolean | null
+                    sort_order?: number | null
+                    title: string
+                    type: string
+                    updated_at?: string | null
+                }
+                Update: {
+                    category?: string
+                    color?: string
+                    created_at?: string | null
+                    criteria?: Json
+                    description?: string
+                    icon?: string
+                    id?: string
+                    is_active?: boolean | null
+                    sort_order?: number | null
+                    title?: string
+                    type?: string
+                    updated_at?: string | null
+                }
+                Relationships: []
+            }
             arc_book_status_history: {
                 Row: {
                     book_id: string
@@ -509,6 +598,41 @@ export type Database = {
                         columns: ["user_id"]
                         isOneToOne: false
                         referencedRelation: "profiles"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            user_achievements: {
+                Row: {
+                    achievement_id: string
+                    created_at: string | null
+                    id: string
+                    progress_data: Json | null
+                    unlocked_at: string | null
+                    user_id: string
+                }
+                Insert: {
+                    achievement_id: string
+                    created_at?: string | null
+                    id?: string
+                    progress_data?: Json | null
+                    unlocked_at?: string | null
+                    user_id: string
+                }
+                Update: {
+                    achievement_id?: string
+                    created_at?: string | null
+                    id?: string
+                    progress_data?: Json | null
+                    unlocked_at?: string | null
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "user_achievements_achievement_id_fkey"
+                        columns: ["achievement_id"]
+                        isOneToOne: false
+                        referencedRelation: "achievements"
                         referencedColumns: ["id"]
                     },
                 ]

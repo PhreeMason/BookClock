@@ -14,7 +14,7 @@ const ActiveReads = () => {
                 </ThemedView>
             </ThemedScrollView>
         );
-    }
+    }   
 
     if (error) {
         return (
