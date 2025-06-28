@@ -1,8 +1,8 @@
-import React, { createContext, useState, useEffect, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { useColorScheme } from 'react-native';
-import { ThemeContextValue, ThemeMode } from '../types';
 import { themes } from '../themes';
+import { ThemeContextValue, ThemeMode } from '../types';
 import { createTheme } from '../utils/themeUtils';
 
 const THEME_STORAGE_KEY = '@app_theme_mode';
@@ -50,10 +50,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   // Create theme object
   const theme = useMemo(() => {
     const baseTheme = themes[themeMode];
-    const isDark = themeMode === 'dark' || 
-                   (themeMode === 'nature' && false) || // nature is light
-                   (themeMode === 'ocean' && false) ||   // ocean is light
-                   (themeMode === 'sunset' && false);    // sunset is light
+    const isDark = themes[themeMode].isDark
     return createTheme(baseTheme, isDark);
   }, [themeMode]);
 
