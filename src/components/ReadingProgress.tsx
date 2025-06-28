@@ -7,12 +7,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
-import { ThemedButton , ThemedView } from './themed'
 import ProgressBar from './progress/ProgressBar'
 import ProgressHeader from './progress/ProgressHeader'
 import ProgressInput from './progress/ProgressInput'
 import ProgressStats from './progress/ProgressStats'
 import QuickActionButtons from './progress/QuickActionButtons'
+import { ThemedButton, ThemedView } from './themed'
 
 const ReadingProgress = ({
     deadline

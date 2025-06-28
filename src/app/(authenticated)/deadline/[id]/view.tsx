@@ -3,6 +3,7 @@ import DeadlineActionButtons from '@/components/DeadlineActionButtons';
 import DeadlineHeroSection from '@/components/DeadlineHeroSection';
 import DeadlineViewHeader from '@/components/DeadlineViewHeader';
 import ReadingProgress from '@/components/ReadingProgress';
+import SwipeableCharts from '@/components/SwipeableCharts';
 import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { useTheme } from '@/theme';
@@ -40,6 +41,8 @@ const DeadlineView = () => {
 
             <ThemedScrollView style={styles.content}>
                 <DeadlineHeroSection deadline={deadline} />
+
+                <SwipeableCharts deadline={deadline} />
 
                 <ReadingProgress deadline={deadline} />
 
