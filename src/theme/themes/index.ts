@@ -279,6 +279,15 @@ const viralGreenTheme: SimpleTheme = {
     isDark: false,
 };
 
+const blushNavyTheme: SimpleTheme = {
+    text: '#2C2C2C',
+    background: '#F5F1EA',
+    primary: '#2B3D4F',
+    secondary: '#E8C2B9',
+    accent: '#D4A574',
+    isDark: false,
+};
+
 export const themes: Record<ThemeMode, SimpleTheme> = {
     light: lightTheme,
     bae: baeTheme,
@@ -311,6 +320,7 @@ export const themes: Record<ThemeMode, SimpleTheme> = {
     rustPunk: rustPunkTheme,
     quantumFlux: quantumFluxTheme,
     viralGreen: viralGreenTheme,
+    blushNavy: blushNavyTheme,
 };
 
 export const themeNames: Record<ThemeMode, string> = {
@@ -345,4 +355,5 @@ export const themeNames: Record<ThemeMode, string> = {
     rustPunk: 'Rust Punk',
     quantumFlux: 'Quantum Flux',
     viralGreen: 'Viral Green',
+    blushNavy: 'Blush Navy',
 };
