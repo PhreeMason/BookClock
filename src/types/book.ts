@@ -4,9 +4,8 @@ import {
 
 export type StatusEnum = "tbr" | "current" | "completed" | "dnf" | 'pause';
 
-export type BookInsert = TablesInsert<'books'>
 export type UserBookInsert = TablesInsert<'user_books'>
-export type BookAndUserBookInsert = UserBookInsert & BookInsert &
+export type BookAndUserBookInsert = UserBookInsert &
 {
     status: StatusEnum;
     currentHours: number;
