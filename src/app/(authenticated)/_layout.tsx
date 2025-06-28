@@ -20,6 +20,7 @@ export default function ProtectedLayout() {
         <Stack.Screen name='index' options={{ headerShown: false }} />
         <Stack.Screen name='deadline/new' options={{ headerShown: false }} />
         <Stack.Screen name='deadline/[id]/view' options={{ headerShown: false }} />
+        <Stack.Screen name='deadline/[id]/edit' options={{ headerShown: false }} />
         <Stack.Screen name='settings' options={{ headerShown: false }} />
       </Stack>
     </DeadlineProvider>

@@ -20,108 +20,56 @@ export interface PaceBasedStatus {
 }
 
 /**
- * Extracts daily reading progress from progress history entries from the last 7 days.
- * Calculates the difference between consecutive progress entries to determine daily reading amounts.
- * Converts everything to "page equivalents" for consistent pace calculation.
- */
-export const extractReadingDays = (deadline: ReadingDeadlineWithProgress): ReadingDay[] => {
-  if (!deadline.progress || deadline.progress.length === 0) {
-    return [];
-  }
-
-  // Get cutoff date for last 7 days
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - 7);
-
-  // Sort progress entries by date and filter to last 7 days
-  const recentProgress = deadline.progress
-    .filter(entry => {
-      const entryDate = new Date(entry.created_at || entry.updated_at || '');
-      return entryDate >= cutoffDate;
-    })
-    .sort((a, b) => 
-      new Date(a.created_at || a.updated_at || '').getTime() - 
-      new Date(b.created_at || b.updated_at || '').getTime()
-    );
-
-  if (recentProgress.length === 0) {
-    return [];
-  }
-
-  const readingDays: ReadingDay[] = [];
-  let previousProgress = 0;
-
-  // Find the baseline progress (what progress was 7 days ago)
-  // We need to get the progress value from just before our 7-day window
-  const allProgress = [...deadline.progress].sort((a, b) => 
-    new Date(a.created_at || a.updated_at || '').getTime() - 
-    new Date(b.created_at || b.updated_at || '').getTime()
-  );
-
-  // Find the last progress entry before our 7-day window
-  const baselineProgress = allProgress.find(entry => {
-    const entryDate = new Date(entry.created_at || entry.updated_at || '');
-    return entryDate < cutoffDate;
-  });
-
-  if (baselineProgress) {
-    previousProgress = baselineProgress.current_progress || 0;
-  }
-
-  recentProgress.forEach((entry) => {
-    const currentProgress = entry.current_progress || 0;
-    const dailyProgress = currentProgress - previousProgress;
-    
-    if (dailyProgress > 0) {
-      // Convert to page equivalents for consistent calculation
-      let pageEquivalent = dailyProgress;
-      if (deadline.format === 'audio') {
-        // Convert audio minutes to page equivalents (1.5 minutes = 1 page)
-        pageEquivalent = dailyProgress / 1.5;
-      }
-      
-      readingDays.push({
-        date: new Date(entry.created_at || entry.updated_at || '').toISOString().split('T')[0],
-        pagesRead: pageEquivalent,
-        format: deadline.format
-      });
-    }
-    
-    previousProgress = currentProgress;
-  });
-
-  return readingDays;
-};
-
-/**
  * Gets reading days from the last 7 days across all deadlines for a user.
  * Already filters and converts to page equivalents in extractReadingDays.
  */
 export const getRecentReadingDays = (
   deadlines: ReadingDeadlineWithProgress[]
 ): ReadingDay[] => {
-  const allReadingDays: ReadingDay[] = [];
-  
-  // Extract reading days from all deadlines (already filtered to last 7 days)
-  deadlines.forEach(deadline => {
-    const readingDays = extractReadingDays(deadline);
-    allReadingDays.push(...readingDays);
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const AUDIO_MINUTES_PER_PAGE = 1.5;
+  let dailyProgress: { [date: string]: number } = {};
+
+  deadlines.forEach(book => {
+    // Sort progress updates by date
+    let progress = book.progress.slice().sort(
+      (a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
+    );
+
+    for (let i = 1; i < progress.length; i++) {
+      let prev = progress[i - 1];
+      let curr = progress[i];
+
+      let startDate = new Date(prev.created_at).getTime();
+      let endDate = new Date(curr.created_at).getTime();
+      let days = Math.max(1, Math.round((endDate - startDate) / MS_PER_DAY));
+
+      let progressDiff = curr.current_progress - prev.current_progress;
+
+      // For audio books, convert minutes to pages
+      if (book.format === "audio") {
+        progressDiff = progressDiff / AUDIO_MINUTES_PER_PAGE;
+      }
+
+      // Distribute progress evenly across days
+      for (let d = 0; d < days; d++) {
+        let date = new Date(startDate + d * MS_PER_DAY)
+          .toISOString()
+          .slice(0, 10); // YYYY-MM-DD
+
+        dailyProgress[date] = (dailyProgress[date] || 0) + progressDiff / days;
+      }
+    }
   });
 
-  // Group by date and sum page equivalents read per day
-  const dayGroups = new Map<string, number>();
-  allReadingDays.forEach(day => {
-    const existing = dayGroups.get(day.date) || 0;
-    // day.pagesRead is already converted to page equivalents in extractReadingDays
-    dayGroups.set(day.date, existing + day.pagesRead);
-  });
-
-  // Convert back to ReadingDay array
-  return Array.from(dayGroups.entries()).map(([date, pages]) => ({
-    date,
-    pagesRead: pages,
-    format: 'physical' as const // All normalized to page equivalents
-  }));
+  // Convert dictionary to sorted array
+  return Object.entries(dailyProgress)
+    .map(([date, pagesRead]) => ({
+      date,
+      pagesRead: Number(pagesRead.toFixed(2)),
+      format: 'physical' as const
+    }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 };
 
 /**

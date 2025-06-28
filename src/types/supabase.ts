@@ -433,25 +433,25 @@ export type Database = {
             }
             reading_deadline_progress: {
                 Row: {
-                    created_at: string | null
-                    current_progress: number | null // can be minutes for audio or pages for physical and ebooks
+                    created_at: string
+                    current_progress: number
                     id: string
                     reading_deadline_id: string
-                    updated_at: string | null
+                    updated_at: string
                 }
                 Insert: {
-                    created_at?: string | null
-                    current_progress?: number | null // can be minutes for audio or pages for physical and ebooks
+                    created_at?: string
+                    current_progress: number
                     id: string
                     reading_deadline_id: string
-                    updated_at?: string | null
+                    updated_at?: string
                 }
                 Update: {
-                    created_at?: string | null
-                    current_progress?: number | null // can be minutes for audio or pages for physical and ebooks
+                    created_at?: string
+                    current_progress?: number
                     id?: string
                     reading_deadline_id?: string
-                    updated_at?: string | null
+                    updated_at?: string
                 }
                 Relationships: [
                     {
@@ -473,7 +473,7 @@ export type Database = {
                     format: Database["public"]["Enums"]["book_format_enum"]
                     id: string
                     source: string
-                    total_quantity: number // can be minutes for audio or pages for physical and ebooks
+                    total_quantity: number
                     updated_at: string | null
                     user_id: string
                 }
@@ -486,7 +486,7 @@ export type Database = {
                     format: Database["public"]["Enums"]["book_format_enum"]
                     id: string
                     source: string
-                    total_quantity: number // can be minutes for audio or pages for physical and ebooks
+                    total_quantity: number
                     updated_at?: string | null
                     user_id: string
                 }
@@ -499,7 +499,7 @@ export type Database = {
                     format?: Database["public"]["Enums"]["book_format_enum"]
                     id?: string
                     source?: string
-                    total_quantity?: number // can be minutes for audio or pages for physical and ebooks
+                    total_quantity?: number
                     updated_at?: string | null
                     user_id?: string
                 }

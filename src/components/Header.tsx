@@ -1,3 +1,5 @@
+import { usePace } from '@/contexts/PaceProvider';
+import { formatPaceDisplay } from '@/lib/paceCalculations';
 import { useTheme } from '@/theme';
 import dayjs from 'dayjs';
 import { router } from 'expo-router';
@@ -17,10 +19,16 @@ const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderP
     const formattedDate = dayjs(today).format('dddd, MMMM DD')
     const { theme } = useTheme();
     const iconColor = theme.primary;
+    const { userPaceData } = usePace();
 
     const handleSettingsPress = () => {
         router.push('/settings');
     };
+
+    // Format user pace display (default to physical format for mixed reading)
+    const userPaceDisplay = userPaceData.isReliable
+        ? formatPaceDisplay(userPaceData.averagePace, 'physical')
+        : 'No pace data yet';
 
     return (
         <ThemedView backgroundColor="surfaceHover" borderColor="border" style={styles.container}>
@@ -32,9 +40,12 @@ const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderP
                 <ThemedText color="textMuted" style={styles.readingTimeSummary}>
                     {totalReadingTimePerDay}
                 </ThemedText>
+                <ThemedText color="textMuted" style={styles.readingPaceSummary}>
+                    Reading pace: {userPaceDisplay}
+                </ThemedText>
             </ThemedView>
-            <TouchableOpacity 
-                style={styles.settings} 
+            <TouchableOpacity
+                style={styles.settings}
                 onPress={handleSettingsPress}
             >
                 <IconSymbol size={28} name="gearshape.fill" color={iconColor} />
@@ -66,6 +77,9 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     readingTimeSummary: {
+        fontSize: 14,
+    },
+    readingPaceSummary: {
         fontSize: 14,
     },
     settings: {

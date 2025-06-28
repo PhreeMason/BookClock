@@ -4,6 +4,7 @@ export interface SimpleTheme {
   primary: string;
   secondary: string;
   accent: string;
+  isDark: boolean;
 }
 
 export interface DesignTokens {
@@ -72,7 +73,12 @@ export interface Theme extends SimpleTheme, ComputedColors {
   isDark: boolean;
 }
 
-export type ThemeMode = 'light' | 'dark' | 'nature' | 'ocean' | 'sunset' | 'cyberpunk' | 'neon' | 'volcano' | 'galaxy' | 'retro' | 'toxic' | 'midnight' | 'cherry' | 'forest' | 'desert' | 'bae';
+export type ThemeMode = 'light' | 'dark' | 'nature' | 'ocean' 
+| 'sunset' | 'cyberpunk' | 'neon' | 'volcano' | 'galaxy' | 'retro' 
+| 'toxic' | 'midnight' | 'cherry' | 'forest' | 'desert' | 'bae' | 'bookish' 
+| 'twilightRead' | 'cozyLibrary' | 'sunsetPage' | 'dreamyRead' | 'neonTokyo' 
+| 'copperPunk' | 'acidDream' | 'velvetRebellion' | 'holographic' | 'biomechanical' 
+| 'plasmaStorm' | 'rustPunk' | 'quantumFlux' | 'viralGreen';
 
 export interface ThemeContextValue {
   theme: Theme;
