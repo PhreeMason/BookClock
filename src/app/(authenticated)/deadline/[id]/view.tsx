@@ -19,7 +19,6 @@ const DeadlineView = () => {
     const backgroundColor = theme.surfaceHover;
 
     const deadline = deadlines.find(d => d.id === id);
-
     if (!deadline) {
         return (
             <ThemedView style={styles.container}>
@@ -35,7 +34,7 @@ const DeadlineView = () => {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <DeadlineViewHeader
-                onBack={() => router.back()}
+                onBack={() => router.push('/')}
                 onEdit={handleEdit}
             />
 

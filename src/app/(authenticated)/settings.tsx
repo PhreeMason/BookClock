@@ -20,6 +20,10 @@ export default function SettingsScreen() {
         router.back();
     };
 
+    const handleStatsPress = () => {
+        router.push('/stats');
+    };
+
     return (
         <ThemedView backgroundColor="background" style={styles.container}>
             {/* Header */}
@@ -56,6 +60,16 @@ export default function SettingsScreen() {
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="person.fill" size={20} color={iconColor} />
                                 <ThemedText style={styles.settingText}>Edit Profile</ThemedText>
+                            </View>
+                            <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
+                        </TouchableOpacity>
+
+                        <View style={[styles.divider, { backgroundColor: borderColor }]} />
+
+                        <TouchableOpacity style={styles.settingItem} onPress={handleStatsPress}>
+                            <View style={styles.settingLeft}>
+                                <IconSymbol name="chart.bar.fill" size={20} color={iconColor} />
+                                <ThemedText style={styles.settingText}>Reading Stats</ThemedText>
                             </View>
                             <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
                         </TouchableOpacity>

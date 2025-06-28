@@ -593,18 +593,19 @@ describe('DeadlineProvider', () => {
     });
 
     it('should handle audio book pace calculations with proper conversion', () => {
-      // Create audio deadlines with progress in minutes
+      // Create audio deadlines with progress differences showing actual reading activity
       const existingDeadlines = [
         createMockDeadline('audio1', 'Audio Book', 'Author', '2024-02-01T00:00:00Z', 'audio', 600, [
-          createMockProgress(90, daysFromDate('2024-01-15', -6)), // 90 minutes = 60 page equivalents
-          createMockProgress(180, daysFromDate('2024-01-15', -4)), // 90 more minutes = 60 page equivalents
-          createMockProgress(270, daysFromDate('2024-01-15', -2))  // 90 more minutes = 60 page equivalents
-          // Pace: (60 + 60 + 60) / 3 = 60 page equivalents/day = 40 pages/day in mixed calculation
+          createMockProgress(100, daysFromDate('2024-01-15', -6)), // Starting point (large initial progress)
+          createMockProgress(190, daysFromDate('2024-01-15', -4)), // 90 minutes more = 60 page equivalents
+          createMockProgress(280, daysFromDate('2024-01-15', -2)), // 90 minutes more = 60 page equivalents
+          createMockProgress(370, daysFromDate('2024-01-15', -1))  // 90 minutes more = 60 page equivalents
+          // Pace from differences: (60 + 60 + 60) / 3 = 60 page equivalents/day
         ])
       ];
 
       const testAudioDeadline = createMockDeadline('test-audio', 'Test Audio', 'Test Author', '2024-01-25T00:00:00Z', 'audio', 300, [
-        createMockProgress(150, daysFromDate('2024-01-15', -1)) // 150 minutes progress
+        createMockProgress(150, daysFromDate('2024-01-15', -1)) // 150 minutes progress (large initial, ignored)
       ]);
 
       mockUseGetDeadlines.mockReturnValue({
@@ -632,9 +633,9 @@ describe('DeadlineProvider', () => {
         </DeadlineProvider>
       );
 
-      // User pace: 70 page equivalents/day (actual calculated value)
+      // User pace: 60 page equivalents/day from recent reading differences
       // Required pace: (300-150 minutes) / 1.5 / 10 days = 100 page equivalents / 10 = 10 page equivalents/day
-      expect(screen.getByText('User Pace: 70')).toBeTruthy();
+      expect(screen.getByText('User Pace: 60')).toBeTruthy();
       expect(screen.getByText('Required Pace: 10')).toBeTruthy();
       expect(screen.getByText('Pace Status: green')).toBeTruthy();
     });
