@@ -25,6 +25,19 @@ const MAPPING = {
   'gearshape.fill': 'settings',
   'rectangle.portrait.and.arrow.right': 'logout',
   'chevron.left': 'keyboard-arrow-left',
+  // Stats page icons
+  'chart.bar.fill': 'bar-chart',
+  'speedometer': 'speed',
+  'info.circle.fill': 'info',
+  'checkmark.circle.fill': 'check-circle',
+  'exclamationmark.triangle.fill': 'warning',
+  '1.circle.fill': 'looks-one',
+  '2.circle.fill': 'looks-two',
+  'clock.fill': 'schedule',
+  // Profile icons
+  'person.fill': 'person',
+  'bell.fill': 'notifications',
+  'moon.fill': 'dark-mode',
 } as IconMapping;
 
 /**

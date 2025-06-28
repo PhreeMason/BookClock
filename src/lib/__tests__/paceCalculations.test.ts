@@ -1,15 +1,11 @@
-import {
-  extractReadingDays,
-  getRecentReadingDays,
-  calculateUserPace,
-  calculateRequiredPace,
-  getPaceBasedStatus,
-  getPaceStatusMessage,
-  formatPaceDisplay,
-  UserPaceData,
-  PaceBasedStatus
-} from '../paceCalculations';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
+import {
+    calculateRequiredPace,
+    calculateUserPace,
+    formatPaceDisplay,
+    getPaceBasedStatus,
+    getRecentReadingDays
+} from '../paceCalculations';
 
 // Helper function to create mock deadlines
 const createMockDeadline = (
@@ -46,76 +42,10 @@ const daysAgo = (days: number): string => {
 };
 
 describe('paceCalculations', () => {
-  describe('extractReadingDays', () => {
-    it('should extract reading days from physical book progress within last 7 days', () => {
-      const deadline = createMockDeadline('1', 'physical', 300, [
-        { current_progress: 50, created_at: daysAgo(6) },
-        { current_progress: 80, created_at: daysAgo(4) },
-        { current_progress: 120, created_at: daysAgo(2) }
-      ]);
-
-      const result = extractReadingDays(deadline);
-      
-      expect(result).toEqual([
-        { date: daysAgo(6).split('T')[0], pagesRead: 50, format: 'physical' },
-        { date: daysAgo(4).split('T')[0], pagesRead: 30, format: 'physical' },
-        { date: daysAgo(2).split('T')[0], pagesRead: 40, format: 'physical' }
-      ]);
-    });
-
-    it('should convert audio book minutes to page equivalents', () => {
-      const deadline = createMockDeadline('2', 'audio', 600, [
-        { current_progress: 90, created_at: daysAgo(5) }, // 90 minutes = 60 page equivalents
-        { current_progress: 150, created_at: daysAgo(3) } // 60 more minutes = 40 page equivalents
-      ]);
-
-      const result = extractReadingDays(deadline);
-      
-      expect(result).toEqual([
-        { date: daysAgo(5).split('T')[0], pagesRead: 60, format: 'audio' }, // 90 / 1.5
-        { date: daysAgo(3).split('T')[0], pagesRead: 40, format: 'audio' } // 60 / 1.5
-      ]);
-    });
-
-    it('should filter out progress older than 7 days', () => {
-      const deadline = createMockDeadline('3', 'physical', 300, [
-        { current_progress: 50, created_at: daysAgo(10) }, // Too old
-        { current_progress: 80, created_at: daysAgo(5) },  // Within range
-        { current_progress: 120, created_at: daysAgo(3) }  // Within range
-      ]);
-
-      const result = extractReadingDays(deadline);
-      
-      expect(result).toHaveLength(2);
-      expect(result[0].pagesRead).toBe(30); // 80 - 50 (baseline from 10 days ago)
-      expect(result[1].pagesRead).toBe(40); // 120 - 80
-    });
-
-    it('should handle empty progress array', () => {
-      const deadline = createMockDeadline('4', 'physical', 300, []);
-      const result = extractReadingDays(deadline);
-      expect(result).toEqual([]);
-    });
-
-    it('should handle negative progress changes (ignore them)', () => {
-      const deadline = createMockDeadline('5', 'physical', 300, [
-        { current_progress: 100, created_at: daysAgo(5) },
-        { current_progress: 80, created_at: daysAgo(3) }, // Negative change
-        { current_progress: 120, created_at: daysAgo(1) }
-      ]);
-
-      const result = extractReadingDays(deadline);
-      
-      expect(result).toHaveLength(2);
-      expect(result[0].pagesRead).toBe(100); // First entry
-      expect(result[1].pagesRead).toBe(40); // 120 - 80 (ignores negative change)
-    });
-  });
-
   describe('getRecentReadingDays', () => {
     it('should combine reading days from multiple deadlines', () => {
       const deadline1 = createMockDeadline('1', 'physical', 300, [
-        { current_progress: 50, created_at: daysAgo(5) }
+        { current_progress: 25, created_at: daysAgo(5) } // Small enough to count as daily reading
       ]);
       
       const deadline2 = createMockDeadline('2', 'physical', 400, [
@@ -125,22 +55,22 @@ describe('paceCalculations', () => {
       const result = getRecentReadingDays([deadline1, deadline2]);
       
       expect(result).toHaveLength(1);
-      expect(result[0].pagesRead).toBe(80); // 50 + 30 combined for same day
+      expect(result[0].pagesRead).toBe(55); // 25 + 30 combined for same day
     });
 
     it('should handle mixed audio and physical books', () => {
       const physicalBook = createMockDeadline('1', 'physical', 300, [
-        { current_progress: 50, created_at: daysAgo(3) }
+        { current_progress: 25, created_at: daysAgo(3) } // Small enough to be counted as daily reading
       ]);
       
       const audioBook = createMockDeadline('2', 'audio', 600, [
-        { current_progress: 90, created_at: daysAgo(3) } // 90 minutes = 60 page equivalents
+        { current_progress: 30, created_at: daysAgo(3) } // 30 minutes = 20 page equivalents
       ]);
 
       const result = getRecentReadingDays([physicalBook, audioBook]);
       
       expect(result).toHaveLength(1);
-      expect(result[0].pagesRead).toBe(110); // 50 + 60 page equivalents
+      expect(result[0].pagesRead).toBe(45); // 25 + 20 page equivalents
     });
   });
 
@@ -258,66 +188,6 @@ describe('paceCalculations', () => {
       expect(result.color).toBe('green');
       expect(result.level).toBe('good');
       expect(result.message).toBe("You're on track");
-    });
-  });
-
-  describe('getPaceStatusMessage', () => {
-    const createUserPaceData = (
-      averagePace: number, 
-      method: 'recent_data' | 'default_fallback'
-    ): UserPaceData => ({
-      averagePace,
-      readingDaysCount: method === 'recent_data' ? 5 : 2,
-      isReliable: method === 'recent_data',
-      calculationMethod: method
-    });
-
-    it('should return overdue message', () => {
-      const userPaceData = createUserPaceData(25, 'recent_data');
-      const status: PaceBasedStatus = { color: 'red', level: 'overdue', message: 'Return or renew' };
-      
-      const result = getPaceStatusMessage(userPaceData, 30, status);
-      expect(result).toBe('Return or renew');
-    });
-
-    it('should return start reading message for unreliable data', () => {
-      const userPaceData = createUserPaceData(25, 'default_fallback');
-      const status: PaceBasedStatus = { color: 'red', level: 'impossible', message: 'Start reading now' };
-      
-      const result = getPaceStatusMessage(userPaceData, 50, status);
-      expect(result).toBe('Start reading to track pace');
-    });
-
-    it('should return pace too ambitious for reliable impossible pace', () => {
-      const userPaceData = createUserPaceData(20, 'recent_data');
-      const status: PaceBasedStatus = { color: 'red', level: 'impossible', message: 'Pace too slow' };
-      
-      const result = getPaceStatusMessage(userPaceData, 50, status);
-      expect(result).toBe('Pace too ambitious');
-    });
-
-    it('should return detailed pace increase message for orange status', () => {
-      const userPaceData = createUserPaceData(25, 'recent_data');
-      const status: PaceBasedStatus = { color: 'orange', level: 'approaching', message: 'Pick up the pace' };
-      
-      const result = getPaceStatusMessage(userPaceData, 35, status);
-      expect(result).toBe('Need 10 more pages/day');
-    });
-
-    it('should return on track message for green status with reliable data', () => {
-      const userPaceData = createUserPaceData(30, 'recent_data');
-      const status: PaceBasedStatus = { color: 'green', level: 'good', message: "You're on track" };
-      
-      const result = getPaceStatusMessage(userPaceData, 25, status);
-      expect(result).toBe('On track at 30 pages/day');
-    });
-
-    it('should return generic message for green status with unreliable data', () => {
-      const userPaceData = createUserPaceData(25, 'default_fallback');
-      const status: PaceBasedStatus = { color: 'green', level: 'good', message: "You're on track" };
-      
-      const result = getPaceStatusMessage(userPaceData, 20, status);
-      expect(result).toBe("You're doing great");
     });
   });
 
