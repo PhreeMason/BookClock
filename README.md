@@ -36,6 +36,7 @@ src/
 - **Reading Deadline Tracking** - Create and manage reading deadlines with flexible or strict scheduling
 - **Progress Monitoring** - Track reading progress with format-specific displays (pages, time, etc.)
 - **Multi-format Support** - Physical books, ebooks, and audiobooks with appropriate time formatting
+- **Achievement System** - 9 streak achievements from 25 to 1000+ consecutive reading days
 - **Modular Architecture** - Component-based design with focused responsibilities
 - **Progress History** - Historical progress tracking with database persistence
 - **Smart Input Handling** - Audiobook time formatting with flexible input parsing
@@ -66,6 +67,7 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for detailed guidelines.
 
 ## Documentation
 
+- [Achievement System](docs/ACHIEVEMENTS.md) - Complete achievement system documentation and architecture
 - [Component API Reference](docs/COMPONENTS.md) - Complete component documentation
 - [Form Architecture](docs/FORMS.md) - Form system and best practices
 - [Development Guidelines](docs/DEVELOPMENT.md) - Coding standards and practices
