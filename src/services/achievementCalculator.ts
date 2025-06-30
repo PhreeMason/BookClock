@@ -40,6 +40,33 @@ export class AchievementCalculator {
             case 'consistency_champion':
                 return this.calculateConsistencyChampion(criteria);
             
+            case 'dedicated_reader':
+                return this.calculateDedicatedReader(criteria);
+            
+            case 'reading_habit_master':
+                return this.calculateReadingHabitMaster(criteria);
+            
+            case 'reading_champion':
+                return this.calculateReadingChampion(criteria);
+            
+            case 'century_reader':
+                return this.calculateCenturyReader(criteria);
+            
+            case 'half_year_scholar':
+                return this.calculateHalfYearScholar(criteria);
+            
+            case 'year_long_scholar':
+                return this.calculateYearLongScholar(criteria);
+            
+            case 'reading_hero':
+                return this.calculateReadingHero(criteria);
+            
+            case 'reading_myth':
+                return this.calculateReadingMyth(criteria);
+            
+            case 'reading_legend':
+                return this.calculateReadingLegend(criteria);
+            
             case 'speed_reader':
                 return this.calculateSpeedReader(criteria);
             
@@ -85,9 +112,11 @@ export class AchievementCalculator {
         };
     }
 
-    private calculateConsistencyChampion(criteria: any): AchievementProgress {
-        const target = criteria.target || 7;
-        
+    /**
+     * Calculate current reading streak (consecutive days with reading activity)
+     * Returns the current streak length and maximum achieved streak
+     */
+    private calculateReadingStreak(): { currentStreak: number; maxStreak: number } {
         // Get all unique reading dates from progress data
         const readingDates = new Set<string>();
         this.context.activeDeadlines?.forEach(deadline => {
@@ -99,20 +128,166 @@ export class AchievementCalculator {
             }
         });
 
-        // Calculate current streak (consecutive days from today backwards)
-        let currentStreak = 0;
-        const today = dayjs();
+        // Sort dates for streak calculation
+        const sortedDates = Array.from(readingDates).sort();
         
-        for (let i = 0; i < 30; i++) { // Check last 30 days max
+        let currentStreak = 0;
+        let maxStreak = 0;
+        let tempStreak = 0;
+        
+        // Calculate current streak (from today backwards)
+        const today = dayjs();
+        for (let i = 0; i <= 1095; i++) { // Check up to 3 years back
             const checkDate = today.subtract(i, 'day').format('YYYY-MM-DD');
             if (readingDates.has(checkDate)) {
-                currentStreak++;
+                if (i === 0 || currentStreak > 0) { // Continue streak if today or already started
+                    currentStreak++;
+                }
             } else if (i > 0) { // Don't break on first day (today might not have reading yet)
                 break;
             }
         }
         
+        // Calculate maximum historical streak
+        let previousDate: dayjs.Dayjs | null = null;
+        for (const dateStr of sortedDates) {
+            const currentDate = dayjs(dateStr);
+            
+            if (previousDate && currentDate.diff(previousDate, 'day') === 1) {
+                tempStreak++;
+            } else {
+                maxStreak = Math.max(maxStreak, tempStreak);
+                tempStreak = 1;
+            }
+            
+            previousDate = currentDate;
+        }
+        maxStreak = Math.max(maxStreak, tempStreak);
+        
+        return { currentStreak, maxStreak };
+    }
+
+    private calculateConsistencyChampion(criteria: any): AchievementProgress {
+        const target = criteria.target || 7;
+        const { currentStreak } = this.calculateReadingStreak();
         const current = Math.min(currentStreak, target);
+        
+        return {
+            current,
+            max: target,
+            percentage: Math.min((current / target) * 100, 100),
+            achieved: current >= target
+        };
+    }
+
+    private calculateDedicatedReader(criteria: any): AchievementProgress {
+        const target = criteria.target || 25;
+        const { maxStreak } = this.calculateReadingStreak();
+        const current = Math.min(maxStreak, target);
+        
+        return {
+            current,
+            max: target,
+            percentage: Math.min((current / target) * 100, 100),
+            achieved: current >= target
+        };
+    }
+
+    private calculateReadingHabitMaster(criteria: any): AchievementProgress {
+        const target = criteria.target || 50;
+        const { maxStreak } = this.calculateReadingStreak();
+        const current = Math.min(maxStreak, target);
+        
+        return {
+            current,
+            max: target,
+            percentage: Math.min((current / target) * 100, 100),
+            achieved: current >= target
+        };
+    }
+
+    private calculateCenturyReader(criteria: any): AchievementProgress {
+        const target = criteria.target || 100;
+        const { maxStreak } = this.calculateReadingStreak();
+        const current = Math.min(maxStreak, target);
+        
+        return {
+            current,
+            max: target,
+            percentage: Math.min((current / target) * 100, 100),
+            achieved: current >= target
+        };
+    }
+
+    private calculateYearLongScholar(criteria: any): AchievementProgress {
+        const target = criteria.target || 365;
+        const { maxStreak } = this.calculateReadingStreak();
+        const current = Math.min(maxStreak, target);
+        
+        return {
+            current,
+            max: target,
+            percentage: Math.min((current / target) * 100, 100),
+            achieved: current >= target
+        };
+    }
+
+    private calculateReadingChampion(criteria: any): AchievementProgress {
+        const target = criteria.target || 75;
+        const { maxStreak } = this.calculateReadingStreak();
+        const current = Math.min(maxStreak, target);
+        
+        return {
+            current,
+            max: target,
+            percentage: Math.min((current / target) * 100, 100),
+            achieved: current >= target
+        };
+    }
+
+    private calculateHalfYearScholar(criteria: any): AchievementProgress {
+        const target = criteria.target || 180;
+        const { maxStreak } = this.calculateReadingStreak();
+        const current = Math.min(maxStreak, target);
+        
+        return {
+            current,
+            max: target,
+            percentage: Math.min((current / target) * 100, 100),
+            achieved: current >= target
+        };
+    }
+
+    private calculateReadingHero(criteria: any): AchievementProgress {
+        const target = criteria.target || 500;
+        const { maxStreak } = this.calculateReadingStreak();
+        const current = Math.min(maxStreak, target);
+        
+        return {
+            current,
+            max: target,
+            percentage: Math.min((current / target) * 100, 100),
+            achieved: current >= target
+        };
+    }
+
+    private calculateReadingMyth(criteria: any): AchievementProgress {
+        const target = criteria.target || 750;
+        const { maxStreak } = this.calculateReadingStreak();
+        const current = Math.min(maxStreak, target);
+        
+        return {
+            current,
+            max: target,
+            percentage: Math.min((current / target) * 100, 100),
+            achieved: current >= target
+        };
+    }
+
+    private calculateReadingLegend(criteria: any): AchievementProgress {
+        const target = criteria.target || 1000;
+        const { maxStreak } = this.calculateReadingStreak();
+        const current = Math.min(maxStreak, target);
         
         return {
             current,
