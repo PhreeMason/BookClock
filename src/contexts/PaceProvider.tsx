@@ -2,11 +2,13 @@ import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { 
   calculateUserPace, 
+  calculateUserListeningPace,
   calculateRequiredPace,
   getPaceBasedStatus,
   getPaceStatusMessage,
   formatPaceDisplay,
   UserPaceData,
+  UserListeningPaceData,
   PaceBasedStatus
 } from '@/lib/paceCalculations';
 import { calculateProgress, calculateDaysLeft, calculateProgressPercentage } from '@/lib/deadlineUtils';
@@ -15,6 +17,7 @@ import { calculateTotalQuantity } from '@/lib/deadlineCalculations';
 interface PaceContextType {
   // User's overall pace data
   userPaceData: UserPaceData;
+  userListeningPaceData: UserListeningPaceData;
   
   // Calculate pace-based status for a specific deadline
   getDeadlinePaceStatus: (deadline: ReadingDeadlineWithProgress) => {
@@ -32,6 +35,8 @@ interface PaceContextType {
   formatPaceForFormat: (pace: number, format: 'physical' | 'ebook' | 'audio') => string;
   getUserPaceReliability: () => boolean;
   getUserPaceMethod: () => 'recent_data' | 'default_fallback';
+  getUserListeningPaceReliability: () => boolean;
+  getUserListeningPaceMethod: () => 'recent_data' | 'default_fallback';
 }
 
 const PaceContext = createContext<PaceContextType | undefined>(undefined);
@@ -45,6 +50,11 @@ export const PaceProvider: React.FC<PaceProviderProps> = ({ children, deadlines 
   // Calculate user's overall pace from all deadlines
   const userPaceData = useMemo(() => {
     return calculateUserPace(deadlines);
+  }, [deadlines]);
+
+  // Calculate user's listening pace from audio deadlines
+  const userListeningPaceData = useMemo(() => {
+    return calculateUserListeningPace(deadlines);
   }, [deadlines]);
 
   // Calculate pace-based status for a specific deadline
@@ -104,12 +114,25 @@ export const PaceProvider: React.FC<PaceProviderProps> = ({ children, deadlines 
     return userPaceData.calculationMethod;
   };
 
+  // Get reliability of user listening pace calculation
+  const getUserListeningPaceReliability = (): boolean => {
+    return userListeningPaceData.isReliable;
+  };
+
+  // Get listening pace calculation method used
+  const getUserListeningPaceMethod = (): 'recent_data' | 'default_fallback' => {
+    return userListeningPaceData.calculationMethod;
+  };
+
   const value: PaceContextType = {
     userPaceData,
+    userListeningPaceData,
     getDeadlinePaceStatus,
     formatPaceForFormat,
     getUserPaceReliability,
-    getUserPaceMethod
+    getUserPaceMethod,
+    getUserListeningPaceReliability,
+    getUserListeningPaceMethod
   };
 
   return (

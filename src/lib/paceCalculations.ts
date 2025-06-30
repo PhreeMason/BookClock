@@ -6,9 +6,22 @@ export interface ReadingDay {
   format: 'physical' | 'ebook' | 'audio';
 }
 
+export interface ListeningDay {
+  date: string;
+  minutesListened: number;
+  format: 'audio';
+}
+
 export interface UserPaceData {
   averagePace: number;
   readingDaysCount: number;
+  isReliable: boolean;
+  calculationMethod: 'recent_data' | 'default_fallback';
+}
+
+export interface UserListeningPaceData {
+  averagePace: number; // minutes per day
+  listeningDaysCount: number;
   isReliable: boolean;
   calculationMethod: 'recent_data' | 'default_fallback';
 }
@@ -20,13 +33,12 @@ export interface PaceBasedStatus {
 }
 
 /**
- * Gets reading days from the last 7 days across all deadlines for a user.
- * Already filters and converts to page equivalents in extractReadingDays.
+ * Gets reading days from the last 7 days for physical and ebook deadlines only.
+ * No format mixing - only page-based reading data (physical + ebook).
  */
 export const getRecentReadingDays = (
   deadlines: ReadingDeadlineWithProgress[]
 ): ReadingDay[] => {
-  const AUDIO_MINUTES_PER_PAGE = 1.5;
   const DAYS_TO_CONSIDER = 7;
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER);
@@ -34,7 +46,10 @@ export const getRecentReadingDays = (
   
   let dailyProgress: { [date: string]: number } = {};
 
-  deadlines.forEach(book => {
+  // Filter to only physical and ebook deadlines (no audio mixing)
+  const readingDeadlines = deadlines.filter(d => d.format === 'physical' || d.format === 'ebook');
+
+  readingDeadlines.forEach(book => {
     // Sort progress updates by date
     if (!book.progress || !Array.isArray(book.progress)) return;
     
@@ -48,18 +63,14 @@ export const getRecentReadingDays = (
     // Large initial progress values represent "I'm already X pages into this book" not "I read X pages today"
     const firstProgress = progress[0];
     const firstDate = new Date(firstProgress.created_at);
-    const INITIAL_PROGRESS_THRESHOLD = 50; // Only count if less than 50 pages/minutes
+    const INITIAL_PROGRESS_THRESHOLD = 50; // Only count if less than 50 pages
     
     if (firstDate.getTime() >= cutoffTime && 
         firstProgress.current_progress > 0 && 
         firstProgress.current_progress <= INITIAL_PROGRESS_THRESHOLD) {
       const dateStr = firstDate.toISOString().slice(0, 10);
-      let pagesRead = firstProgress.current_progress;
-      
-      // For audio books, convert minutes to pages
-      if (book.format === "audio") {
-        pagesRead = pagesRead / AUDIO_MINUTES_PER_PAGE;
-      }
+      // Both physical and ebook are already in pages
+      const pagesRead = firstProgress.current_progress;
       
       dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + pagesRead;
     }
@@ -76,10 +87,7 @@ export const getRecentReadingDays = (
       
       let progressDiff = curr.current_progress - prev.current_progress;
 
-      // For audio books, convert minutes to pages
-      if (book.format === "audio") {
-        progressDiff = progressDiff / AUDIO_MINUTES_PER_PAGE;
-      }
+      // Both physical and ebook are already in pages (no conversion needed)
 
       // Only assign the progress to the end date (when progress was recorded)
       let endDateObj = new Date(endDate);
@@ -278,4 +286,123 @@ export const formatCombinedPaceDisplay = (pace: number): string => {
   }
   
   return `${pages} pages/day ~${minutes}m/day`;
+};
+
+/**
+ * Gets listening days from the last 7 days for audio deadlines only.
+ * Returns minutes listened per day.
+ */
+export const getRecentListeningDays = (
+  deadlines: ReadingDeadlineWithProgress[]
+): ListeningDay[] => {
+  const DAYS_TO_CONSIDER = 7;
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER);
+  const cutoffTime = cutoffDate.getTime();
+  
+  let dailyProgress: { [date: string]: number } = {};
+
+  // Filter to only audio deadlines
+  const audioDeadlines = deadlines.filter(d => d.format === 'audio');
+
+  audioDeadlines.forEach(book => {
+    // Sort progress updates by date
+    if (!book.progress || !Array.isArray(book.progress)) return;
+    
+    let progress = book.progress.slice().sort(
+      (a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
+    );
+
+    if (progress.length === 0) return;
+
+    // Only count first progress if it's reasonable for a single day
+    const firstProgress = progress[0];
+    const firstDate = new Date(firstProgress.created_at);
+    const INITIAL_LISTENING_THRESHOLD = 300; // 5 hours max for initial listening
+    
+    if (firstDate.getTime() >= cutoffTime && 
+        firstProgress.current_progress > 0 && 
+        firstProgress.current_progress <= INITIAL_LISTENING_THRESHOLD) {
+      const dateStr = firstDate.toISOString().slice(0, 10);
+      const minutesListened = firstProgress.current_progress;
+      
+      dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + minutesListened;
+    }
+
+    // Calculate differences between consecutive progress entries
+    for (let i = 1; i < progress.length; i++) {
+      let prev = progress[i - 1];
+      let curr = progress[i];
+
+      let endDate = new Date(curr.created_at).getTime();
+      
+      // Skip if the end date is before the cutoff
+      if (endDate < cutoffTime) continue;
+      
+      let progressDiff = curr.current_progress - prev.current_progress;
+
+      // Only positive progress (minutes listened)
+      if (progressDiff > 0) {
+        let endDateObj = new Date(endDate);
+        if (endDateObj.getTime() >= cutoffTime) {
+          let dateStr = endDateObj.toISOString().slice(0, 10);
+          dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + progressDiff;
+        }
+      }
+    }
+  });
+
+  // Convert dictionary to sorted array
+  return Object.entries(dailyProgress)
+    .map(([date, minutesListened]) => ({
+      date,
+      minutesListened: Number(minutesListened.toFixed(2)),
+      format: 'audio' as const
+    }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+};
+
+/**
+ * Calculates user's listening pace based on recent audio book activity.
+ * Tier 1: ≥3 listening days in past 7 days - use rolling 7-day average
+ * Tier 2: <3 listening days - use 30 minutes/day default
+ */
+export const calculateUserListeningPace = (deadlines: ReadingDeadlineWithProgress[]): UserListeningPaceData => {
+  const recentDays = getRecentListeningDays(deadlines);
+  const listeningDaysCount = recentDays.length;
+
+  if (listeningDaysCount >= 3) {
+    // Tier 1: Recent data available
+    const totalMinutes = recentDays.reduce((sum, day) => sum + day.minutesListened, 0);
+    const averagePace = totalMinutes / listeningDaysCount;
+    
+    return {
+      averagePace,
+      listeningDaysCount,
+      isReliable: true,
+      calculationMethod: 'recent_data'
+    };
+  }
+
+  // Tier 2: Insufficient recent data - use default (30 minutes/day)
+  return {
+    averagePace: 30,
+    listeningDaysCount,
+    isReliable: false,
+    calculationMethod: 'default_fallback'
+  };
+};
+
+/**
+ * Formats listening pace for display.
+ */
+export const formatListeningPaceDisplay = (pace: number): string => {
+  const minutes = Math.round(pace);
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  
+  if (hours > 0) {
+    return `${hours}h ${remainingMinutes}m/day`;
+  }
+  return `${minutes}m/day`;
 };

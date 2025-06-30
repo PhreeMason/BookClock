@@ -38,6 +38,9 @@ const MAPPING = {
   'person.fill': 'person',
   'bell.fill': 'notifications',
   'moon.fill': 'dark-mode',
+  'slider.horizontal.3': 'tune',
+  'book.fill': 'menu-book',
+  'headphones': 'headphones',
 } as IconMapping;
 
 /**

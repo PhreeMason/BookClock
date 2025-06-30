@@ -7,19 +7,22 @@ import React, { useMemo } from 'react';
 import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 
-interface DailyReading {
+interface DailyListeningData {
     date: string;
-    totalPagesRead: number;
+    minutesListened: number;
     sessionCount: number;
 }
 
-const DailyPagesChart: React.FC = () => {
+const DailyListeningProgressChart: React.FC = () => {
     const { theme } = useTheme();
     const { activeDeadlines, isLoading } = useDeadlines();
     const screenWidth = Dimensions.get('window').width;
 
-    const dailyData = useMemo(() => {
-        if (!activeDeadlines?.length) {
+    const dailyData = useMemo(() => {        
+        // Filter to only audio deadlines
+        const audioDeadlines = activeDeadlines?.filter(d => d.format === 'audio') || [];
+        
+        if (!audioDeadlines.length) {
             return null;
         }
 
@@ -27,7 +30,7 @@ const DailyPagesChart: React.FC = () => {
         const dailyProgress: Record<string, number> = {};
         const dailySessions: Record<string, number> = {};
 
-        activeDeadlines.forEach(deadline => {
+        audioDeadlines.forEach(deadline => {
             if (!deadline.progress || deadline.progress.length === 0) return;
 
             // Sort progress entries by date
@@ -65,28 +68,20 @@ const DailyPagesChart: React.FC = () => {
                     previousDayProgress = maxProgressThatDay;
                 }
 
-                // Convert to page equivalents
-                let pagesRead = 0;
-                if (deadline.format === 'physical' || deadline.format === 'ebook') {
-                    // Both physical and ebook are measured in pages
-                    pagesRead = progressDelta;
-                } else if (deadline.format === 'audio') {
-                    // Convert minutes to page equivalent (1.5 minutes per page)
-                    pagesRead = progressDelta / 1.5;
-                }
+                // Keep minutes as minutes (NO conversion to page equivalents)
+                const minutesListened = progressDelta;
 
                 // Only count positive progress (avoid negative deltas from corrections)
-                if (pagesRead > 0) {
-                    dailyProgress[date] = (dailyProgress[date] || 0) + pagesRead;
+                if (minutesListened > 0) {
+                    dailyProgress[date] = (dailyProgress[date] || 0) + minutesListened;
                     dailySessions[date] = (dailySessions[date] || 0) + 1;
                 }
             });
         });
 
-        // Create daily reading data starting from earliest progress date
-        // Find the earliest progress date
+        // Create daily listening data starting from earliest progress date
         const allProgressDates: string[] = [];
-        activeDeadlines.forEach(deadline => {
+        audioDeadlines.forEach(deadline => {
             if (deadline.progress?.length) {
                 deadline.progress.forEach(entry => {
                     allProgressDates.push(dayjs(entry.created_at).format('YYYY-MM-DD'));
@@ -105,28 +100,29 @@ const DailyPagesChart: React.FC = () => {
             // Default to 7 days ago if no progress
             startDate = endDate.subtract(6, 'day');
         }
-        const dailyReadingData: DailyReading[] = [];
+        
+        const dailyListeningData: DailyListeningData[] = [];
 
         let currentDate = startDate;
         while (currentDate.isBefore(endDate) || currentDate.isSame(endDate, 'day')) {
             const dateStr = currentDate.format('YYYY-MM-DD');
-            const pagesRead = dailyProgress[dateStr] || 0;
+            const minutesListened = dailyProgress[dateStr] || 0;
             const sessions = dailySessions[dateStr] || 0;
 
-            dailyReadingData.push({
+            dailyListeningData.push({
                 date: dateStr,
-                totalPagesRead: Math.round(pagesRead * 10) / 10, // Round to 1 decimal
+                minutesListened: Math.round(minutesListened * 10) / 10, // Round to 1 decimal
                 sessionCount: sessions
             });
 
             currentDate = currentDate.add(1, 'day');
         }
 
-        // Check if we have any reading data
-        const daysWithReading = dailyReadingData.filter(d => d.totalPagesRead > 0).length;
+        // Check if we have any listening data
+        const daysWithListening = dailyListeningData.filter(d => d.minutesListened > 0).length;
         
-        if (daysWithReading >= 1) {
-            return dailyReadingData;
+        if (daysWithListening >= 1) {
+            return dailyListeningData;
         } else {
             return null;
         }
@@ -136,9 +132,9 @@ const DailyPagesChart: React.FC = () => {
         return (
             <ThemedView backgroundColor="card" borderColor="border" style={styles.container}>
                 <View style={styles.header}>
-                    <IconSymbol name="chart.bar.fill" size={24} color={theme.primary} />
+                    <IconSymbol name="headphones" size={24} color={theme.accent} />
                     <ThemedText type="semiBold" style={styles.title}>
-                        Daily Combined Progress
+                        Daily Listening Progress
                     </ThemedText>
                 </View>
                 <ThemedText color="textMuted" style={styles.loadingText}>
@@ -152,17 +148,17 @@ const DailyPagesChart: React.FC = () => {
         return (
             <ThemedView backgroundColor="card" borderColor="border" style={styles.container}>
                 <View style={styles.header}>
-                    <IconSymbol name="chart.bar.fill" size={24} color={theme.primary} />
+                    <IconSymbol name="headphones" size={24} color={theme.accent} />
                     <ThemedText type="semiBold" style={styles.title}>
-                        Daily Combined Progress
+                        Daily Listening Progress
                     </ThemedText>
                 </View>
                 <View style={styles.emptyContent}>
                     <ThemedText color="textMuted" style={styles.emptyText}>
-                        No reading or listening activity found
+                        No listening activity found
                     </ThemedText>
                     <ThemedText color="textMuted" style={styles.emptySubtext}>
-                        Start logging your reading or listening progress to see daily charts
+                        Start listening to audiobooks to see daily progress
                     </ThemedText>
                 </View>
             </ThemedView>
@@ -170,10 +166,20 @@ const DailyPagesChart: React.FC = () => {
     }
 
     // Calculate stats
-    const totalPages = dailyData.reduce((sum, day) => sum + day.totalPagesRead, 0);
-    const daysWithReading = dailyData.filter(d => d.totalPagesRead > 0).length;
-    const averagePages = daysWithReading > 0 ? totalPages / daysWithReading : 0;
-    const maxPages = Math.max(...dailyData.map(d => d.totalPagesRead));
+    const totalMinutes = dailyData.reduce((sum, day) => sum + day.minutesListened, 0);
+    const daysWithListening = dailyData.filter(d => d.minutesListened > 0).length;
+    const averageMinutes = daysWithListening > 0 ? totalMinutes / daysWithListening : 0;
+    const maxMinutes = Math.max(...dailyData.map(d => d.minutesListened));
+
+    // Format time helpers
+    const formatTime = (minutes: number): string => {
+        const hours = Math.floor(minutes / 60);
+        const mins = Math.round(minutes % 60);
+        if (hours > 0) {
+            return `${hours}h ${mins}m`;
+        }
+        return `${mins}m`;
+    };
 
     // Calculate optimal chart width for scrollable view
     const barWidth = 20;
@@ -188,9 +194,9 @@ const DailyPagesChart: React.FC = () => {
         const shouldShowLabel = index % 3 === 0 || index === dailyData.length - 1;
         
         return {
-            value: day.totalPagesRead,
+            value: day.minutesListened,
             label: shouldShowLabel ? dayjs(day.date).format('M/D') : '',
-            frontColor: day.totalPagesRead > 0 ? theme.primary : theme.surface,
+            frontColor: day.minutesListened > 0 ? theme.accent : theme.surface,
             labelTextStyle: { color: theme.textMuted, fontSize: 11 },
         };
     });
@@ -198,9 +204,9 @@ const DailyPagesChart: React.FC = () => {
     return (
         <ThemedView backgroundColor="card" borderColor="border" style={styles.container}>
             <View style={styles.header}>
-                <IconSymbol name="chart.bar.fill" size={24} color={theme.primary} />
+                <IconSymbol name="headphones" size={24} color={theme.accent} />
                 <ThemedText type="semiBold" style={styles.title}>
-                    Daily Reading Progress
+                    Daily Listening Progress
                 </ThemedText>
             </View>
 
@@ -208,15 +214,15 @@ const DailyPagesChart: React.FC = () => {
             <View style={styles.statsRow}>
                 <View style={styles.statBox}>
                     <ThemedText style={styles.statNumber}>
-                        {Math.round(totalPages)}
+                        {formatTime(totalMinutes)}
                     </ThemedText>
                     <ThemedText color="textMuted" style={styles.statLabel}>
-                        Total combined
+                        Total listened
                     </ThemedText>
                 </View>
                 <View style={[styles.statBox, styles.statBoxCenter]}>
                     <ThemedText style={styles.statNumber}>
-                        {Math.round(averagePages * 10) / 10}
+                        {formatTime(averageMinutes)}
                     </ThemedText>
                     <ThemedText color="textMuted" style={styles.statLabel}>
                         Avg per day
@@ -224,7 +230,7 @@ const DailyPagesChart: React.FC = () => {
                 </View>
                 <View style={styles.statBox}>
                     <ThemedText style={styles.statNumber}>
-                        {daysWithReading}
+                        {daysWithListening}
                     </ThemedText>
                     <ThemedText color="textMuted" style={styles.statLabel}>
                         Active days (30d)
@@ -242,7 +248,7 @@ const DailyPagesChart: React.FC = () => {
                     <BarChart
                         data={chartData}
                         width={scrollableChartWidth}
-                        height={180} // Reduced from 200 to 180
+                        height={200}
                         barWidth={barWidth}
                         spacing={spacing}
                         initialSpacing={20}
@@ -254,11 +260,12 @@ const DailyPagesChart: React.FC = () => {
                         yAxisTextStyle={{ color: theme.textMuted, fontSize: 11 }}
                         xAxisLabelTextStyle={{ color: theme.textMuted, fontSize: 11 }}
                         noOfSections={4}
-                        maxValue={Math.ceil(maxPages * 1.1) || 10}
+                        maxValue={Math.ceil(maxMinutes * 1.1) || 10}
                         rulesType="solid"
                         rulesColor={theme.border + '40'}
                         showGradient
                         gradientColor={theme.surface}
+                        yAxisLabelSuffix=" min"
                     />
                 </ScrollView>
             </View>
@@ -266,9 +273,9 @@ const DailyPagesChart: React.FC = () => {
             {/* Legend */}
             <View style={styles.legend}>
                 <View style={styles.legendItem}>
-                    <View style={[styles.legendBar, { backgroundColor: theme.primary }]} />
+                    <View style={[styles.legendBar, { backgroundColor: theme.accent }]} />
                     <ThemedText color="textMuted" style={styles.legendText}>
-                        Combined reading & listening activity • Scroll to see all data
+                        Minutes listened • Scroll to see all data
                     </ThemedText>
                 </View>
             </View>
@@ -323,10 +330,10 @@ const styles = StyleSheet.create({
         marginLeft: -5,
         marginRight: -5,
         marginBottom: 16,
-        height: 220, // Explicit height for chart + padding
+        height: 240, // Increased height for better visibility
     },
     scrollView: {
-        height: 220, // Match container height
+        height: 240, // Match container height
     },
     scrollContent: {
         paddingHorizontal: 0,
@@ -368,4 +375,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default DailyPagesChart;
+export default DailyListeningProgressChart;
