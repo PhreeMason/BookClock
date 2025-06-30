@@ -1,22 +1,25 @@
 import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { usePace } from '@/contexts/PaceProvider';
-import { formatCombinedPaceDisplay } from '@/lib/paceCalculations';
+import { formatPaceDisplay, formatListeningPaceDisplay } from '@/lib/paceCalculations';
 import { useTheme } from '@/theme';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import FormatDistributionChart from '@/components/FormatDistributionChart';
 import TotalProgressRingChart from '@/components/TotalProgressRingChart';
 import WeeklyReadingHeatmap from '@/components/WeeklyReadingHeatmap';
 import ReadingStatsCards from '@/components/ReadingStatsCards';
-import ReadingVelocityChart from '@/components/ReadingVelocityChart';
 import DailyPagesChart from '@/components/DailyPagesChart';
+import DailyReadingProgressChart from '@/components/DailyReadingProgressChart';
+import DailyListeningProgressChart from '@/components/DailyListeningProgressChart';
+import ReadingListeningToggle, { FormatCategory } from '@/components/ReadingListeningToggle';
 import AchievementsCard from '@/components/AchievementsCard';
 
 export default function StatsScreen() {
     const { theme } = useTheme();
-    const { userPaceData } = usePace();
+    const { userPaceData, userListeningPaceData } = usePace();
+    const [selectedCategory, setSelectedCategory] = useState<FormatCategory>('reading');
     const borderColor = theme.border;
     const iconColor = theme.primary;
     const successColor = theme.success;
@@ -26,9 +29,9 @@ export default function StatsScreen() {
         router.back();
     };
 
-    // Format reading pace display
+    // Format reading pace display (pages only, no time equivalents)
     const paceDisplay = userPaceData.isReliable
-        ? formatCombinedPaceDisplay(userPaceData.averagePace)
+        ? formatPaceDisplay(userPaceData.averagePace, 'physical')
         : 'No pace data yet';
 
     const paceMethod = userPaceData.calculationMethod === 'recent_data' 
@@ -40,6 +43,21 @@ export default function StatsScreen() {
         : 'Estimate (insufficient data)';
 
     const reliabilityColor = userPaceData.isReliable ? successColor : warningColor;
+
+    // Format listening pace display
+    const listeningPaceDisplay = userListeningPaceData.isReliable
+        ? formatListeningPaceDisplay(userListeningPaceData.averagePace)
+        : 'No listening data yet';
+
+    const listeningPaceMethod = userListeningPaceData.calculationMethod === 'recent_data' 
+        ? 'Based on recent listening activity' 
+        : 'Default estimate';
+
+    const listeningReliabilityText = userListeningPaceData.isReliable 
+        ? 'Reliable (≥3 listening days)' 
+        : 'Estimate (insufficient data)';
+
+    const listeningReliabilityColor = userListeningPaceData.isReliable ? successColor : warningColor;
 
     return (
         <ThemedView backgroundColor="background" style={styles.container}>
@@ -61,14 +79,20 @@ export default function StatsScreen() {
                 {/* 2. Achievements - Motivational and goal-oriented */}
                 <AchievementsCard />
 
-                {/* 3. Key Stats Cards - Quick overview metrics */}
+                {/* 3. Category Selection */}
+                <ReadingListeningToggle 
+                    selectedCategory={selectedCategory}
+                    onCategoryChange={setSelectedCategory}
+                    showCombined={true}
+                />
+
+                {/* 4. Key Stats Cards - Quick overview metrics */}
                 <ReadingStatsCards />
 
-                {/* 4. Daily Progress Tracking */}
-                <DailyPagesChart />
-
-                {/* 5. Reading Velocity - Performance over time */}
-                <ReadingVelocityChart />
+                {/* 5. Daily Progress Tracking - Format Specific */}
+                {selectedCategory === 'reading' && <DailyReadingProgressChart />}
+                {selectedCategory === 'listening' && <DailyListeningProgressChart />}
+                {selectedCategory === 'combined' && <DailyPagesChart />}
 
                 {/* 6. Activity Patterns */}
                 <WeeklyReadingHeatmap />
@@ -76,38 +100,77 @@ export default function StatsScreen() {
                 {/* 7. Format Distribution - Reading habits */}
                 <FormatDistributionChart />
 
-                {/* 8. Reading Pace Analysis */}
+                {/* 8. Reading & Listening Pace Analysis */}
                 <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <IconSymbol name="speedometer" size={24} color={iconColor} />
                         <ThemedText type="semiBold" style={styles.sectionTitle}>
-                            Reading Pace
+                            Reading & Listening Pace
                         </ThemedText>
                     </View>
                     
-                    <View style={styles.statContainer}>
-                        <ThemedText style={styles.statValue}>
-                            {paceDisplay}
-                        </ThemedText>
-                        <ThemedText color="textMuted" style={styles.statDescription}>
-                            {paceMethod}
-                        </ThemedText>
-                        <View style={styles.reliabilityContainer}>
-                            <IconSymbol 
-                                name={userPaceData.isReliable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"} 
-                                size={16} 
-                                color={reliabilityColor} 
-                            />
-                            <ThemedText style={[styles.reliabilityText, { color: reliabilityColor }]}>
-                                {reliabilityText}
+                    <View style={styles.paceRow}>
+                        {/* Reading Pace */}
+                        <View style={styles.paceColumn}>
+                            <View style={styles.paceHeader}>
+                                <IconSymbol name="book.fill" size={20} color={theme.primary} />
+                                <ThemedText type="semiBold" style={styles.paceColumnTitle}>
+                                    Reading
+                                </ThemedText>
+                            </View>
+                            <ThemedText style={styles.paceValue}>
+                                {paceDisplay}
                             </ThemedText>
+                            <ThemedText color="textMuted" style={styles.paceDescription}>
+                                {paceMethod}
+                            </ThemedText>
+                            <View style={styles.reliabilityContainer}>
+                                <IconSymbol 
+                                    name={userPaceData.isReliable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"} 
+                                    size={14} 
+                                    color={reliabilityColor} 
+                                />
+                                <ThemedText style={[styles.reliabilityTextSmall, { color: reliabilityColor }]}>
+                                    {reliabilityText}
+                                </ThemedText>
+                            </View>
+                            {userPaceData.isReliable && (
+                                <ThemedText color="textMuted" style={styles.dataPointsTextSmall}>
+                                    {userPaceData.readingDaysCount} reading days
+                                </ThemedText>
+                            )}
                         </View>
-                        
-                        {userPaceData.isReliable && (
-                            <ThemedText color="textMuted" style={styles.dataPointsText}>
-                                Based on {userPaceData.readingDaysCount} reading days
+
+                        {/* Listening Pace */}
+                        <View style={[styles.paceColumn, styles.paceColumnRight]}>
+                            <View style={styles.paceHeader}>
+                                <IconSymbol name="headphones" size={20} color={theme.accent} />
+                                <ThemedText type="semiBold" style={styles.paceColumnTitle}>
+                                    Listening
+                                </ThemedText>
+                            </View>
+                            <ThemedText style={styles.paceValue}>
+                                {listeningPaceDisplay}
                             </ThemedText>
-                        )}
+                            <ThemedText color="textMuted" style={styles.paceDescription}>
+                                {listeningPaceMethod}
+                            </ThemedText>
+                            <View style={styles.reliabilityContainer}>
+                                <IconSymbol 
+                                    name={userListeningPaceData.isReliable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"} 
+                                    size={14} 
+                                    color={listeningReliabilityColor} 
+                                />
+                                <ThemedText style={[styles.reliabilityTextSmall, { color: listeningReliabilityColor }]}>
+                                    {listeningReliabilityText}
+                                </ThemedText>
+                            </View>
+                            {userListeningPaceData.isReliable && (
+                                <ThemedText color="textMuted" style={styles.dataPointsTextSmall}>
+                                    {userListeningPaceData.listeningDaysCount} listening days
+                                </ThemedText>
+                            )}
+                        </View>
                     </View>
                 </ThemedView>
 
@@ -146,7 +209,7 @@ export default function StatsScreen() {
                         </View>
                         
                         <ThemedText color="textMuted" style={styles.infoNote}>
-                            Time equivalents are calculated using 1.5 minutes per page, which matches audiobook conversion rates.
+                            Reading pace is based only on physical books and ebooks (measured in pages). Audiobook listening pace is tracked separately.
                         </ThemedText>
                     </View>
                 </ThemedView>
@@ -243,6 +306,7 @@ const styles = StyleSheet.create({
     reliabilityContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: 8,
     },
     reliabilityText: {
@@ -253,6 +317,57 @@ const styles = StyleSheet.create({
     dataPointsText: {
         fontSize: 12,
         textAlign: 'center',
+    },
+    paceRow: {
+        flexDirection: 'row',
+        gap: 16,
+        paddingHorizontal: 4,
+    },
+    paceColumn: {
+        flex: 1,
+        alignItems: 'center',
+        paddingVertical: 8,
+    },
+    paceColumnRight: {
+        borderLeftWidth: 1,
+        borderColor: '#E0E0E0',
+        paddingLeft: 16,
+        marginLeft: 4,
+    },
+    paceHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    paceColumnTitle: {
+        fontSize: 15,
+        marginLeft: 8,
+        fontWeight: '600',
+    },
+    paceValue: {
+        fontSize: 22,
+        fontWeight: '700',
+        textAlign: 'center',
+        marginBottom: 8,
+        lineHeight: 28,
+    },
+    paceDescription: {
+        fontSize: 13,
+        textAlign: 'center',
+        marginBottom: 12,
+        lineHeight: 18,
+    },
+    reliabilityTextSmall: {
+        fontSize: 13,
+        fontWeight: '500',
+        marginLeft: 6,
+        textAlign: 'center',
+    },
+    dataPointsTextSmall: {
+        fontSize: 12,
+        textAlign: 'center',
+        marginTop: 8,
+        lineHeight: 16,
     },
     infoContainer: {
         gap: 12,

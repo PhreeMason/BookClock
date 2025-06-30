@@ -47,12 +47,8 @@ const TotalProgressRingChart: React.FC = () => {
                 // Convert minutes to page equivalent (1.5 minutes per page)
                 progressInPages = calculations.currentProgress / 1.5;
                 targetInPages = calculations.totalQuantity / 1.5;
-            } else if (deadline.format === 'ebook') {
-                // Convert percentage to page equivalent (assume 300 pages average)
-                progressInPages = (calculations.currentProgress / 100) * 300;
-                targetInPages = (calculations.totalQuantity / 100) * 300;
             }
-            // physical books are already in pages
+            // physical books and ebooks are already in pages
             
             totalProgress += progressInPages;
             totalTarget += targetInPages;
@@ -144,7 +140,7 @@ const TotalProgressRingChart: React.FC = () => {
                     <View style={styles.legendItem}>
                         <View style={[styles.legendDot, { backgroundColor: theme.primary }]} />
                         <ThemedText style={styles.legendLabel}>
-                            Page equivalents read
+                            Progress completed
                         </ThemedText>
                         <ThemedText style={styles.legendValue}>
                             {Math.round(totalProgress)}
@@ -153,7 +149,7 @@ const TotalProgressRingChart: React.FC = () => {
                     <View style={styles.legendItem}>
                         <View style={[styles.legendDot, { backgroundColor: theme.textMuted }]} />
                         <ThemedText style={styles.legendLabel}>
-                            Page equivalents remaining
+                            Progress remaining
                         </ThemedText>
                         <ThemedText style={styles.legendValue}>
                             {Math.round(totalTarget - totalProgress)}

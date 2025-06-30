@@ -29,11 +29,9 @@ const ReadingStatsCards: React.FC = () => {
                 const latestProgress = deadline.progress[deadline.progress.length - 1];
                 
                 // Convert to pages for standardization
-                if (deadline.format === 'physical') {
+                if (deadline.format === 'physical' || deadline.format === 'ebook') {
+                    // Both physical and ebook are measured in pages
                     totalPagesRead += latestProgress.current_progress;
-                } else if (deadline.format === 'ebook') {
-                    // Assume average book is 300 pages
-                    totalPagesRead += Math.round((latestProgress.current_progress / 100) * 300);
                 } else if (deadline.format === 'audio') {
                     // For audio books, current_progress is total minutes listened so far
                     totalMinutesRead += latestProgress.current_progress;

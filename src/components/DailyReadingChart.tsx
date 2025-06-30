@@ -89,7 +89,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   const getUnitLabel = (format: string) => {
     switch (format) {
       case 'audio': return 'min';
-      case 'ebook': return '%';
+      case 'ebook': return 'pg';
       case 'physical': return 'pg';
       default: return 'pg';
     }
@@ -107,7 +107,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   const getSubtitle = (format: string) => {
     switch (format) {
       case 'audio': return 'Minutes listened per day';
-      case 'ebook': return 'Percentage read per day';
+      case 'ebook': return 'Pages read per day';
       case 'physical': return 'Pages read per day';
       default: return 'Progress per day';
     }
