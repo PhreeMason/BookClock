@@ -130,17 +130,20 @@ describe('DailyReadingChart', () => {
       expect(getByText('Percentage read per day')).toBeTruthy();
     });
 
-    it('should not render when no progress data exists', () => {
+    it('should render empty state when no progress data exists', () => {
       const bookWithoutProgress = {
         ...mockPhysicalBook,
         progress: []
       };
 
-      const { queryByTestId } = render(
+      const { queryByTestId, getByText } = render(
         <DailyReadingChart deadline={bookWithoutProgress} />
       );
 
       expect(queryByTestId('bar-chart')).toBeNull();
+      expect(getByText('Daily Reading Progress')).toBeTruthy();
+      expect(getByText('No reading activity in the last 7 days')).toBeTruthy();
+      expect(getByText('Start reading to see your daily progress')).toBeTruthy();
     });
   });
 
@@ -234,7 +237,7 @@ describe('DailyReadingChart', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should handle book with very old progress data', () => {
+    it('should show empty state for book with very old progress data', () => {
       const bookWithOldProgress = {
         ...mockPhysicalBook,
         progress: [
@@ -248,12 +251,13 @@ describe('DailyReadingChart', () => {
         ]
       };
 
-      const { queryByTestId } = render(
+      const { queryByTestId, getByText } = render(
         <DailyReadingChart deadline={bookWithOldProgress} />
       );
 
-      // Should not render since no recent progress
+      // Should show empty state since no recent progress
       expect(queryByTestId('bar-chart')).toBeNull();
+      expect(getByText('No reading activity in the last 7 days')).toBeTruthy();
     });
 
     it('should handle large initial progress values correctly', () => {
