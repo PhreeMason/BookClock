@@ -100,7 +100,7 @@ export default function Page() {
                 />
 
                 {errors.root && (
-                    <ThemedText color="error" style={styles.errorText}>{errors.root.message}</ThemedText>
+                    <ThemedText type="error" style={styles.errorText}>{errors.root.message}</ThemedText>
                 )}
 
                 <ThemedButton
