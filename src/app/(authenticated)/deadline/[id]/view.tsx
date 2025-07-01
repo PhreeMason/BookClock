@@ -41,10 +41,11 @@ const DeadlineView = () => {
 
             <ThemedScrollView style={styles.content}>
                 <DeadlineHeroSection deadline={deadline} />
+                
+                <ReadingProgress deadline={deadline} />
 
                 <SwipeableCharts deadline={deadline} />
 
-                <ReadingProgress deadline={deadline} />
 
                 <BookDetailsSection deadline={deadline} />
 

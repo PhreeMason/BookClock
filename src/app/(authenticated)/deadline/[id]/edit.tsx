@@ -24,6 +24,8 @@ import {
     getPaceEstimate
 } from '@/lib/deadlineCalculations';
 
+import { convertMinutesToHoursAndMinutes } from '@/lib/audiobookTimeUtils';
+
 import { DeadlineFormData, deadlineFormSchema } from '@/lib/deadlineFormSchema';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -89,8 +91,16 @@ const EditDeadline = () => {
 
             // Set quantity/time based on format
             if (deadline.format === 'audio') {
-                setValue('totalMinutes', deadline.total_quantity);
-                setValue('currentMinutes', latestProgress?.current_progress || 0);
+                // Convert total minutes to hours and minutes for form display
+                const { hours, minutes } = convertMinutesToHoursAndMinutes(deadline.total_quantity);
+                setValue('totalQuantity', hours);
+                setValue('totalMinutes', minutes);
+                
+                // Convert current progress minutes to hours and minutes for form display
+                const currentProgressMinutes = latestProgress?.current_progress || 0;
+                const { hours: currentHours, minutes: currentMins } = convertMinutesToHoursAndMinutes(currentProgressMinutes);
+                setValue('currentProgress', currentHours);
+                setValue('currentMinutes', currentMins);
             } else {
                 setValue('totalQuantity', deadline.total_quantity);
                 setValue('currentProgress', latestProgress?.current_progress || 0);
