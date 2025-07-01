@@ -25,12 +25,14 @@ const getCumulativeProgress = (deadline: ReadingDeadlineWithProgress): ProgressP
 
   if (progress.length === 0) return [];
 
-  // Convert to cumulative progress points
-  return progress.map(entry => ({
-    date: new Date(entry.created_at).toISOString().slice(0, 10),
-    totalProgress: entry.current_progress,
-    timestamp: new Date(entry.created_at).getTime()
-  }));
+  // Convert to cumulative progress points with validation
+  return progress
+    .filter(entry => entry.created_at && typeof entry.current_progress === 'number')
+    .map(entry => ({
+      date: new Date(entry.created_at).toISOString().slice(0, 10),
+      totalProgress: Math.max(0, entry.current_progress), // Ensure non-negative values
+      timestamp: new Date(entry.created_at).getTime()
+    }));
 };
 
 const ProgressAreaChart: React.FC<ProgressAreaChartProps> = ({ deadline }) => {
@@ -84,16 +86,12 @@ const ProgressAreaChart: React.FC<ProgressAreaChartProps> = ({ deadline }) => {
         month: 'short', 
         day: 'numeric' 
       }) : '',
-    labelTextStyle: {
-      color: theme.textMuted,
-      fontSize: 10,
-    },
   }));
 
   // Add goal line if we have a target
-  const goalValue = deadline.total_quantity;
-  const maxProgress = Math.max(...chartData.map(d => d.value));
-  const yAxisMax = Math.max(goalValue, maxProgress) * 1.1; // Add 10% padding
+  const goalValue = deadline.total_quantity || 0;
+  const maxProgress = chartData.length > 0 ? Math.max(...chartData.map(d => d.value)) : 0;
+  const yAxisMax = Math.max(goalValue, maxProgress, 1) * 1.1; // Add 10% padding, minimum 1
 
   return (
     <ThemedView style={styles.container}>
@@ -128,7 +126,7 @@ const ProgressAreaChart: React.FC<ProgressAreaChartProps> = ({ deadline }) => {
           }}
           xAxisLabelTextStyle={{
             color: theme.textMuted,
-            fontSize: 9,
+            fontSize: 10,
           }}
           noOfSections={4}
           maxValue={yAxisMax}

@@ -364,11 +364,78 @@ describe('ProgressAreaChart', () => {
         ]
       };
 
-      const { getByTestId } = render(
+      const { queryByTestId } = render(
         <ProgressAreaChart deadline={bookWithMalformedProgress} />
       );
 
-      // Should handle gracefully and still render chart
+      // Should filter out malformed data and not render chart
+      expect(queryByTestId('line-chart')).toBeNull();
+    });
+
+    it('should handle missing created_at timestamps', () => {
+      const bookWithMissingTimestamps = {
+        ...mockPhysicalBook,
+        progress: [
+          {
+            id: 'missing-timestamp',
+            created_at: null as any, // Missing timestamp
+            updated_at: '2025-06-26T00:00:00Z',
+            current_progress: 50,
+            reading_deadline_id: 'test-book-1'
+          }
+        ]
+      };
+
+      const { queryByTestId } = render(
+        <ProgressAreaChart deadline={bookWithMissingTimestamps} />
+      );
+
+      // Should filter out entries with missing timestamps and not render chart
+      expect(queryByTestId('line-chart')).toBeNull();
+    });
+
+    it('should handle negative progress values', () => {
+      const bookWithNegativeProgress = {
+        ...mockPhysicalBook,
+        progress: [
+          {
+            id: 'negative-progress',
+            created_at: '2025-06-26T00:00:00Z',
+            updated_at: '2025-06-26T00:00:00Z',
+            current_progress: -10, // Negative progress
+            reading_deadline_id: 'test-book-1'
+          }
+        ]
+      };
+
+      const { getByTestId } = render(
+        <ProgressAreaChart deadline={bookWithNegativeProgress} />
+      );
+
+      // Should handle negative values by converting to 0
+      expect(getByTestId('line-chart')).toBeTruthy();
+    });
+
+    it('should handle missing total_quantity', () => {
+      const bookWithMissingGoal = {
+        ...mockPhysicalBook,
+        total_quantity: null as any, // Missing goal
+        progress: [
+          {
+            id: 'valid-progress',
+            created_at: '2025-06-26T00:00:00Z',
+            updated_at: '2025-06-26T00:00:00Z',
+            current_progress: 50,
+            reading_deadline_id: 'test-book-1'
+          }
+        ]
+      };
+
+      const { getByTestId } = render(
+        <ProgressAreaChart deadline={bookWithMissingGoal} />
+      );
+
+      // Should handle missing goal gracefully
       expect(getByTestId('line-chart')).toBeTruthy();
     });
   });
