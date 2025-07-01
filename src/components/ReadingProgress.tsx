@@ -2,6 +2,7 @@ import { useDeadlines } from '@/contexts/DeadlineProvider'
 import { useUpdateDeadlineProgress } from '@/hooks/useDeadlines'
 import { formatProgressDisplay } from '@/lib/deadlineUtils'
 import { createProgressUpdateSchema } from '@/lib/progressUpdateSchema'
+import { useTheme } from '@/theme'
 import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -19,6 +20,7 @@ const ReadingProgress = ({
 }: {
     deadline: ReadingDeadlineWithProgress;
 }) => {
+    const {theme} = useTheme();
     const { getDeadlineCalculations } = useDeadlines();
     const calculations = getDeadlineCalculations(deadline);
     const {
@@ -32,7 +34,7 @@ const ReadingProgress = ({
 
     const progressSchema = createProgressUpdateSchema(totalQuantity, deadline.format);
     const updateProgressMutation = useUpdateDeadlineProgress();
-
+    const borderColor = theme.border;
     
     const {
         control,
@@ -90,7 +92,7 @@ const ReadingProgress = ({
     };
 
     return (
-        <ThemedView backgroundColor="card" style={styles.section}>
+        <ThemedView backgroundColor="card" style={[styles.section, { borderColor }]}>
             <ProgressHeader />
             
             <ProgressStats
@@ -136,6 +138,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 12,
         marginBottom: 16,
+        borderWidth: 1,
     },
     updateSection: {
         marginTop: 8,
