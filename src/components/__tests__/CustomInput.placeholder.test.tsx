@@ -116,14 +116,6 @@ describe('New Deadline Form Default Values Issue', () => {
             currentProgress: 0,   // ❌ This causes "0" to show instead of placeholder
         };
 
-        // Expected defaultValues for proper placeholder behavior:
-        const expectedDefaults = {
-            totalQuantity: undefined,     // ✅ This would show placeholder
-            totalMinutes: undefined,      // ✅ This would show placeholder
-            currentMinutes: undefined,    // ✅ This would show placeholder
-            currentProgress: undefined,   // ✅ This would show placeholder
-        };
-
         // Demonstrate current behavior
         render(<TestFormWrapper defaultValues={currentDefaults} />);
         expect(screen.getByTestId('input-totalQuantity').props.value).toBe('0');
