@@ -1,85 +1,63 @@
 import { ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTheme } from '@/theme';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useAchievements } from '@/services/achievementService';
+import { useAchievementsQuery } from '@/hooks/useAchievementsQuery';
+import { AchievementsSkeleton } from '@/components/AchievementsSkeleton';
 
-interface AchievementWithStatus {
-    id: string;
-    title: string;
-    description: string;
-    icon: string;
-    color: string;
-    isUnlocked: boolean;
-    progress?: number;
-    maxProgress?: number;
-    percentage?: number;
-    unlockedAt?: string;
-}
 
 const AchievementsCard: React.FC = () => {
     const { theme } = useTheme();
-    const { getAchievements, checkAndUnlock, updateProgress, isReady } = useAchievements();
-    const [achievements, setAchievements] = useState<AchievementWithStatus[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { 
+        achievements, 
+        totalUnlocked, 
+        totalAchievements, 
+        isLoading,
+        isError
+    } = useAchievementsQuery();
 
-    useEffect(() => {
-        if (!isReady) {
-            setIsLoading(false);
-            return;
-        }
+    // Memoize sorted achievements
+    const sortedAchievements = useMemo(() => {
+        return [...achievements].sort((a, b) => {
+            // Sort by unlocked status first (unlocked first), then by progress
+            if (a.isUnlocked !== b.isUnlocked) {
+                return a.isUnlocked ? -1 : 1;
+            }
+            // Then by progress percentage
+            return (b.progress ?? 0) - (a.progress ?? 0);
+        });
+    }, [achievements]);
 
-        let isCancelled = false;
-
-        const loadAchievements = async () => {
-            try {
-                setIsLoading(true);
-                
-                // Update progress first
-                await updateProgress?.();
-                
-                // Check for new unlocks
-                await checkAndUnlock?.();
-                
-                // Get updated achievements
-                const achievementsData = await getAchievements?.();
-                
-                if (!isCancelled) {
-                    if (achievementsData) {
-                        setAchievements(achievementsData);
-                    }
-                }
-            } catch (error) {
-                if (!isCancelled) {
-                    console.error('Failed to load achievements:', error);
-                }
-            } finally {
-                if (!isCancelled) {
-                    setIsLoading(false);
-                }
+    // Helper function to get theme color - memoized
+    const getThemeColor = useMemo(() => {
+        return (colorName: string): string => {
+            switch (colorName) {
+                case 'primary': return theme.primary;
+                case 'accent': return theme.accent;
+                case 'success': return theme.success;
+                case 'warning': return theme.warning;
+                case 'info': return theme.info;
+                default: return theme.primary;
             }
         };
-
-        loadAchievements();
-
-        return () => {
-            isCancelled = true;
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isReady]); // Only depend on isReady to prevent infinite loop
+    }, [theme]);
 
     if (isLoading) {
+        return <AchievementsSkeleton />;
+    }
+
+    if (isError) {
         return (
             <ThemedView backgroundColor="card" borderColor="border" style={styles.container}>
                 <View style={styles.header}>
-                    <IconSymbol name="checkmark.circle.fill" size={24} color={theme.primary} />
+                    <IconSymbol name="exclamationmark.triangle" size={24} color={theme.warning} />
                     <ThemedText type="semiBold" style={styles.title}>
                         Achievements
                     </ThemedText>
                 </View>
-                <ThemedText color="textMuted" style={styles.loadingText}>
-                    Loading achievements...
+                <ThemedText color="textMuted" style={styles.errorText}>
+                    Failed to load achievements. Please try again later.
                 </ThemedText>
             </ThemedView>
         );
@@ -101,17 +79,6 @@ const AchievementsCard: React.FC = () => {
         );
     }
 
-    // Helper function to get theme color
-    const getThemeColor = (colorName: string): string => {
-        switch (colorName) {
-            case 'primary': return theme.primary;
-            case 'accent': return theme.accent;
-            case 'success': return theme.success;
-            case 'warning': return theme.warning;
-            case 'info': return theme.info;
-            default: return theme.primary;
-        }
-    };
 
     return (
         <ThemedView backgroundColor="card" borderColor="border" style={styles.container}>
@@ -122,16 +89,14 @@ const AchievementsCard: React.FC = () => {
                 </ThemedText>
             </View>
 
+            <View style={styles.progressHeader}>
+                <ThemedText color="textMuted" style={styles.progressText}>
+                    {totalUnlocked} of {totalAchievements} unlocked
+                </ThemedText>
+            </View>
+
             <View style={styles.achievementsList}>
-                {achievements
-                    .sort((a, b) => {
-                        // Sort by unlocked status first (unlocked first), then by title
-                        if (a.isUnlocked !== b.isUnlocked) {
-                            return a.isUnlocked ? -1 : 1;
-                        }
-                        return a.title.localeCompare(b.title);
-                    })
-                    .map((achievement) => (
+                {sortedAchievements.map((achievement) => (
                     <View key={achievement.id} style={styles.achievementItem}>
                         <View style={[
                             styles.iconContainer,
@@ -167,14 +132,14 @@ const AchievementsCard: React.FC = () => {
                                 {achievement.description}
                             </ThemedText>
                             
-                            {achievement.progress !== undefined && achievement.maxProgress && (
+                            {achievement.progress !== undefined && achievement.progress < 100 && (
                                 <View style={styles.progressContainer}>
                                     <View style={styles.progressBar}>
                                         <View 
                                             style={[
                                                 styles.progressFill,
                                                 { 
-                                                    width: `${(achievement.progress / achievement.maxProgress) * 100}%`,
+                                                    width: `${achievement.progress}%`,
                                                     backgroundColor: achievement.isUnlocked 
                                                         ? getThemeColor(achievement.color) 
                                                         : theme.textMuted
@@ -182,8 +147,8 @@ const AchievementsCard: React.FC = () => {
                                             ]}
                                         />
                                     </View>
-                                    <ThemedText color="textMuted" style={styles.progressText}>
-                                        {achievement.progress}/{achievement.maxProgress}
+                                    <ThemedText color="textMuted" style={styles.progressPercent}>
+                                        {Math.round(achievement.progress)}%
                                     </ThemedText>
                                 </View>
                             )}
@@ -269,16 +234,26 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         minWidth: 30,
     },
-    loadingText: {
-        fontSize: 14,
-        textAlign: 'center',
-        padding: 20,
-    },
     emptyText: {
         fontSize: 14,
         textAlign: 'center',
         padding: 20,
         lineHeight: 20,
+    },
+    errorText: {
+        fontSize: 14,
+        textAlign: 'center',
+        padding: 20,
+        lineHeight: 20,
+    },
+    progressHeader: {
+        marginBottom: 16,
+    },
+    progressPercent: {
+        fontSize: 12,
+        fontWeight: '600',
+        minWidth: 40,
+        textAlign: 'right',
     },
 });
 
