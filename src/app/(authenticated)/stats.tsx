@@ -1,20 +1,21 @@
+import AchievementsCard from '@/components/AchievementsCard';
+import DailyListeningProgressChart from '@/components/DailyListeningProgressChart';
+import DailyPagesChart from '@/components/DailyPagesChart';
+import DailyReadingProgressChart from '@/components/DailyReadingProgressChart';
+import FormatDistributionChart from '@/components/FormatDistributionChart';
+import ReadingCalendar from '@/components/ReadingCalendar';
+import ReadingListeningToggle, { FormatCategory } from '@/components/ReadingListeningToggle';
+import ReadingStatsCards from '@/components/ReadingStatsCards';
 import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
+import TotalProgressRingChart from '@/components/TotalProgressRingChart';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import WeeklyReadingHeatmap from '@/components/WeeklyReadingHeatmap';
 import { usePace } from '@/contexts/PaceProvider';
-import { formatPaceDisplay, formatListeningPaceDisplay } from '@/lib/paceCalculations';
+import { formatListeningPaceDisplay, formatPaceDisplay } from '@/lib/paceCalculations';
 import { useTheme } from '@/theme';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
-import FormatDistributionChart from '@/components/FormatDistributionChart';
-import TotalProgressRingChart from '@/components/TotalProgressRingChart';
-import WeeklyReadingHeatmap from '@/components/WeeklyReadingHeatmap';
-import ReadingStatsCards from '@/components/ReadingStatsCards';
-import DailyPagesChart from '@/components/DailyPagesChart';
-import DailyReadingProgressChart from '@/components/DailyReadingProgressChart';
-import DailyListeningProgressChart from '@/components/DailyListeningProgressChart';
-import ReadingListeningToggle, { FormatCategory } from '@/components/ReadingListeningToggle';
-import AchievementsCard from '@/components/AchievementsCard';
 
 export default function StatsScreen() {
     const { theme } = useTheme();
@@ -97,10 +98,13 @@ export default function StatsScreen() {
                 {/* 6. Activity Patterns */}
                 <WeeklyReadingHeatmap />
 
-                {/* 7. Format Distribution - Reading habits */}
+                {/* 7. Reading Calendar - Daily reading history */}
+                <ReadingCalendar selectedCategory={selectedCategory} dateRange="90d" />
+
+                {/* 8. Format Distribution - Reading habits */}
                 <FormatDistributionChart />
 
-                {/* 8. Reading & Listening Pace Analysis */}
+                {/* 9. Reading & Listening Pace Analysis */}
                 <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <IconSymbol name="speedometer" size={24} color={iconColor} />
@@ -174,7 +178,7 @@ export default function StatsScreen() {
                     </View>
                 </ThemedView>
 
-                {/* 9. How Pace is Calculated - Educational info */}
+                {/* 10. How Pace is Calculated - Educational info */}
                 <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <IconSymbol name="info.circle.fill" size={24} color={iconColor} />
@@ -210,34 +214,6 @@ export default function StatsScreen() {
                         
                         <ThemedText color="textMuted" style={styles.infoNote}>
                             Reading pace is based only on physical books and ebooks (measured in pages). Audiobook listening pace is tracked separately.
-                        </ThemedText>
-                    </View>
-                </ThemedView>
-
-                {/* Coming Soon Section */}
-                <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <IconSymbol name="clock.fill" size={24} color={iconColor} />
-                        <ThemedText type="semiBold" style={styles.sectionTitle}>
-                            Coming Soon
-                        </ThemedText>
-                    </View>
-                    
-                    <View style={styles.comingSoonContainer}>
-                        <ThemedText color="textMuted" style={styles.comingSoonText}>
-                            More stats coming soon:
-                        </ThemedText>
-                        <ThemedText color="textMuted" style={styles.comingSoonItem}>
-                            • Reading streaks and consistency
-                        </ThemedText>
-                        <ThemedText color="textMuted" style={styles.comingSoonItem}>
-                            • Books completed over time
-                        </ThemedText>
-                        <ThemedText color="textMuted" style={styles.comingSoonItem}>
-                            • Average reading speed by format
-                        </ThemedText>
-                        <ThemedText color="textMuted" style={styles.comingSoonItem}>
-                            • Progress towards reading goals
                         </ThemedText>
                     </View>
                 </ThemedView>
