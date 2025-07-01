@@ -56,10 +56,6 @@ const NewDeadLine = () => {
             format: 'physical',
             source: 'arc',
             deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-            totalQuantity: 0,
-            totalMinutes: 0,
-            currentMinutes: 0,
-            currentProgress: 0,
             flexibility: 'flexible'
         }
     });

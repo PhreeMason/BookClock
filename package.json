@@ -7,7 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint",
+    "lint": "expo lint src",
     "typecheck": "npx tsc --noEmit",
     "build:local": "npx eas build --platform android --profile preview --local",
     "supabase:genTypes": "npx supabase gen types --lang=typescript --project-id \"azghfvgabktnvdfjtxhl\" --schema public > src/types/supabase.ts",
@@ -50,6 +50,7 @@
     "react-dom": "19.0.0",
     "react-hook-form": "^7.56.4",
     "react-native": "0.79.4",
+    "react-native-calendars": "^1.1313.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-gifted-charts": "^1.4.61",
     "react-native-pager-view": "^6.7.1",
@@ -88,6 +89,10 @@
     "testPathIgnorePatterns": [
       "<rootDir>/src/__tests__/setup.ts",
       "<rootDir>/src/__tests__/teardown.ts"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|isows|@supabase/.*)",
+      "/node_modules/react-native-reanimated/plugin/"
     ],
     "clearMocks": true,
     "restoreMocks": true,
