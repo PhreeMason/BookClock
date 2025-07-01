@@ -39,22 +39,35 @@ jest.mock('react-native-safe-area-context', () => ({
 jest.mock('@/components/forms', () => ({
     DeadlineFormStep1: ({ control, selectedFormat }: any) => {
         const { useWatch } = require('react-hook-form');
+        const { Text, View } = require('react-native');
         const totalQuantity = useWatch({ control, name: 'totalQuantity' });
         const totalMinutes = useWatch({ control, name: 'totalMinutes' });
         
         return (
-            <div>
-                <div testID="mock-form-step1">DeadlineFormStep1</div>
-                <div testID="selected-format">{selectedFormat}</div>
-                <div testID="total-quantity">{totalQuantity}</div>
-                <div testID="total-minutes">{totalMinutes}</div>
-            </div>
+            <View>
+                <Text testID="mock-form-step1">DeadlineFormStep1</Text>
+                <Text testID="selected-format">{selectedFormat}</Text>
+                <Text testID="total-quantity">{totalQuantity}</Text>
+                <Text testID="total-minutes">{totalMinutes}</Text>
+            </View>
         );
     },
-    DeadlineFormStep2: () => <div testID="mock-form-step2">DeadlineFormStep2</div>,
-    FormHeader: () => <div>FormHeader</div>,
-    FormProgressBar: () => <div>FormProgressBar</div>,
-    StepIndicators: () => <div>StepIndicators</div>,
+    DeadlineFormStep2: () => {
+        const { Text } = require('react-native');
+        return <Text testID="mock-form-step2">DeadlineFormStep2</Text>;
+    },
+    FormHeader: () => {
+        const { Text } = require('react-native');
+        return <Text>FormHeader</Text>;
+    },
+    FormProgressBar: () => {
+        const { Text } = require('react-native');
+        return <Text>FormProgressBar</Text>;
+    },
+    StepIndicators: () => {
+        const { Text } = require('react-native');
+        return <Text>StepIndicators</Text>;
+    },
 }));
 
 const mockDeadline = {

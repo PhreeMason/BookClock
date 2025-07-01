@@ -2,7 +2,6 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReadingCalendar from '../ReadingCalendar';
-import ReadingDayDetails from '../ReadingDayDetails';
 import { useDeadlineHistory } from '@/hooks/useReadingHistory';
 
 // Mock the hooks and components
@@ -17,18 +16,19 @@ jest.mock('@clerk/clerk-expo', () => ({
 }));
 jest.mock('../ReadingDayDetails', () => {
   return jest.fn(({ dayData, isVisible }) => {
+    const { View, Text } = require('react-native');
     if (!isVisible) return null;
     return (
-      <div testID="reading-day-details">
-        <div testID="selected-date">{dayData.date}</div>
-        <div testID="total-progress">{dayData.totalProgressMade}</div>
-        <div testID="deadlines-count">{dayData.deadlines.length}</div>
+      <View testID="reading-day-details">
+        <Text testID="selected-date">{dayData.date}</Text>
+        <Text testID="total-progress">{dayData.totalProgressMade}</Text>
+        <Text testID="deadlines-count">{dayData.deadlines.length}</Text>
         {dayData.deadlines.map((deadline: any, index: number) => (
-          <div key={index} testID={`deadline-${index}`}>
+          <Text key={index} testID={`deadline-${index}`}>
             {deadline.book_title}
-          </div>
+          </Text>
         ))}
-      </div>
+      </View>
     );
   });
 });
@@ -36,42 +36,43 @@ jest.mock('../ReadingDayDetails', () => {
 // Mock the Calendar component to capture onDayPress
 jest.mock('react-native-calendars', () => ({
   Calendar: ({ onDayPress, markedDates, ...props }: any) => {
+    const { View, TouchableOpacity, Text } = require('react-native');
     return (
-      <div testID="calendar" {...props}>
-        <div testID="calendar-grid">
+      <View testID="calendar" {...props}>
+        <View testID="calendar-grid">
           {/* Simulate calendar dates that can be pressed */}
-          <button
+          <TouchableOpacity
             testID="date-2025-06-21"
             onPress={() => onDayPress({ dateString: '2025-06-21' })}
           >
-            21
-          </button>
-          <button
+            <Text>21</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             testID="date-2025-06-22"
             onPress={() => onDayPress({ dateString: '2025-06-22' })}
           >
-            22
-          </button>
-          <button
+            <Text>22</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             testID="date-2025-06-23"
             onPress={() => onDayPress({ dateString: '2025-06-23' })}
           >
-            23
-          </button>
-          <button
+            <Text>23</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             testID="date-2025-06-24"
             onPress={() => onDayPress({ dateString: '2025-06-24' })}
           >
-            24
-          </button>
-          <button
+            <Text>24</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             testID="date-2025-06-25"
             onPress={() => onDayPress({ dateString: '2025-06-25' })}
           >
-            25
-          </button>
-        </div>
-      </div>
+            <Text>25</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   },
 }));

@@ -43,48 +43,64 @@ jest.mock('react-native-safe-area-context', () => ({
 jest.mock('@/components/forms', () => ({
     DeadlineFormStep1: ({ control, selectedFormat }: any) => {
         const { useWatch } = require('react-hook-form');
+        const { Text, View, TextInput } = require('react-native');
         const totalQuantity = useWatch({ control, name: 'totalQuantity' });
         const totalMinutes = useWatch({ control, name: 'totalMinutes' });
         
         return (
-            <div>
-                <div testID="form-step1">DeadlineFormStep1</div>
-                <div testID="selected-format">{selectedFormat}</div>
-                <div testID="total-quantity-value">{totalQuantity}</div>
-                <div testID="total-minutes-value">{totalMinutes}</div>
+            <View>
+                <Text testID="form-step1">DeadlineFormStep1</Text>
+                <Text testID="selected-format">{selectedFormat}</Text>
+                <Text testID="total-quantity-value">{totalQuantity}</Text>
+                <Text testID="total-minutes-value">{totalMinutes}</Text>
                 {/* Simulate the actual input fields */}
-                <input 
+                <TextInput 
                     testID="input-totalQuantity" 
                     value={totalQuantity === 0 ? '0' : totalQuantity} 
                     placeholder="How many pages total?"
                 />
-                <input 
+                <TextInput 
                     testID="input-totalMinutes" 
                     value={totalMinutes === 0 ? '0' : totalMinutes} 
                     placeholder="Minutes (optional)"
-                    style={{ display: selectedFormat === 'audio' ? 'block' : 'none' }}
+                    style={{ display: selectedFormat === 'audio' ? 'flex' : 'none' }}
                 />
-            </div>
+            </View>
         );
     },
-    DeadlineFormStep2: () => <div testID="form-step2">DeadlineFormStep2</div>,
-    FormHeader: () => <div>FormHeader</div>,
-    FormProgressBar: () => <div>FormProgressBar</div>,
-    StepIndicators: () => <div>StepIndicators</div>,
+    DeadlineFormStep2: () => {
+        const { Text } = require('react-native');
+        return <Text testID="form-step2">DeadlineFormStep2</Text>;
+    },
+    FormHeader: () => {
+        const { Text } = require('react-native');
+        return <Text>FormHeader</Text>;
+    },
+    FormProgressBar: () => {
+        const { Text } = require('react-native');
+        return <Text>FormProgressBar</Text>;
+    },
+    StepIndicators: () => {
+        const { Text } = require('react-native');
+        return <Text>StepIndicators</Text>;
+    },
 }));
 
 // Mock the format selector to allow format changes
 jest.mock('@/components/forms/FormatSelector', () => ({
-    FormatSelector: ({ selectedFormat, onSelectFormat }: any) => (
-        <div>
-            <button testID="format-physical" onClick={() => onSelectFormat('physical')}>
-                Physical {selectedFormat === 'physical' && '(selected)'}
-            </button>
-            <button testID="format-audio" onClick={() => onSelectFormat('audio')}>
-                Audio {selectedFormat === 'audio' && '(selected)'}
-            </button>
-        </div>
-    ),
+    FormatSelector: ({ selectedFormat, onSelectFormat }: any) => {
+        const { View, TouchableOpacity, Text } = require('react-native');
+        return (
+            <View>
+                <TouchableOpacity testID="format-physical" onPress={() => onSelectFormat('physical')}>
+                    <Text>Physical {selectedFormat === 'physical' && '(selected)'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity testID="format-audio" onPress={() => onSelectFormat('audio')}>
+                    <Text>Audio {selectedFormat === 'audio' && '(selected)'}</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    },
 }));
 
 describe('NewDeadline - Placeholder Value Bugs', () => {
