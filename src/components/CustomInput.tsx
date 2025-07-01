@@ -47,7 +47,13 @@ export default function CustomInput<T extends FieldValues>({
                 <View style={styles.container}>
                     <TextInput
                         {...props}
-                        value={typeof value === 'number' ? value.toString() : (value ?? '')}
+                        value={
+                            // For numeric inputs, show empty string (placeholder) when value is undefined
+                            // This allows placeholders to show for new forms
+                            inputType === 'integer' || inputType === 'number'
+                                ? (value === undefined ? '' : value.toString())
+                                : (typeof value === 'number' ? value.toString() : (value ?? ''))
+                        }
                         onChangeText={(text) => {
                             // Always pass the raw text to the form - let the schema handle validation and conversion
                             onChange(text);

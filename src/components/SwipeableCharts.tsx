@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import PagerView from 'react-native-pager-view';
-import { ThemedView, ThemedText } from '@/components/themed';
+import { ThemedText, ThemedView } from '@/components/themed';
 import { useTheme } from '@/theme';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
-import ProgressAreaChart from './ProgressAreaChart';
+import React, { useRef, useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import PagerView from 'react-native-pager-view';
 import DailyReadingChart from './DailyReadingChart';
+import ProgressAreaChart from './ProgressAreaChart';
 
 interface SwipeableChartsProps {
   deadline: ReadingDeadlineWithProgress;
@@ -15,7 +15,7 @@ const SwipeableCharts: React.FC<SwipeableChartsProps> = ({ deadline }) => {
   const { theme } = useTheme();
   const [currentPage, setCurrentPage] = useState(0);
   const pagerRef = useRef<PagerView>(null);
-
+  const borderColor = theme.border;
   const onPageSelected = (e: any) => {
     setCurrentPage(e.nativeEvent.position);
   };
@@ -28,7 +28,7 @@ const SwipeableCharts: React.FC<SwipeableChartsProps> = ({ deadline }) => {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { borderColor }]}>
       <PagerView
         ref={pagerRef}
         style={styles.pagerView}
@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderRadius: 12,
     overflow: 'hidden',
+    borderWidth: 1,
   },
   pagerView: {
     height: 380,

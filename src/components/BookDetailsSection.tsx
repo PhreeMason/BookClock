@@ -1,5 +1,5 @@
-import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import { useTheme } from '@/theme'
+import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import dayjs from 'dayjs'
 import React from 'react'
 import { StyleSheet } from 'react-native'
@@ -13,8 +13,9 @@ const BookDetailsSection = (
     { deadline }: { deadline: ReadingDeadlineWithProgress }
 ) => {
     const { theme } = useTheme();
+    const borderColor = theme.border;
     return (
-        <ThemedView backgroundColor="card" style={styles.section}>
+        <ThemedView borderColor={borderColor} backgroundColor="card" style={styles.section}>
             <ThemedView style={styles.sectionTitle}>
                 <ThemedText style={styles.sectionIcon}>📚</ThemedText>
                 <ThemedText type="subtitle">Book Details</ThemedText>
@@ -55,6 +56,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 20,
         marginBottom: 16,
+        borderWidth: 1,
     },
     sectionTitle: {
         flexDirection: 'row',
