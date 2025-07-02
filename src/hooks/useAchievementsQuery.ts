@@ -142,7 +142,7 @@ export function useAchievementsQuery() {
           return a.isUnlocked ? -1 : 1;
         }
         // Then by progress percentage
-        return (b.progress ?? 0) - (a.progress ?? 0);
+        return (b.percentage ?? 0) - (a.percentage ?? 0);
       });
     });
 

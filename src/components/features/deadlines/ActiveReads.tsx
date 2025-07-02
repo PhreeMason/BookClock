@@ -5,7 +5,8 @@ import { Link } from 'expo-router'
 import { StyleSheet } from 'react-native'
 
 const ActiveReads = () => {
-    const { activeDeadlines, isLoading, error } = useDeadlines()
+    const { activeDeadlines, isLoading, error } = useDeadlines();
+    console.log(JSON.stringify(activeDeadlines, null, 2)); // Debugging output
     if (isLoading) {
         return (
             <ThemedScrollView>
