@@ -84,7 +84,8 @@ export const PaceProvider: React.FC<PaceProviderProps> = ({ children, deadlines 
     const statusMessage = getPaceStatusMessage(
       userPaceData,
       requiredPace,
-      status
+      status,
+      deadline.format
     );
     
     return {
