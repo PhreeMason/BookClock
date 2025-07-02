@@ -11,17 +11,21 @@ export type FormatCategory = 'reading' | 'listening' | 'combined';
 interface ReadingListeningToggleProps {
     selectedCategory: FormatCategory;
     onCategoryChange: (category: FormatCategory) => void;
-    showCombined?: boolean; // Whether to show the combined option
 }
 
 const ReadingListeningToggle: React.FC<ReadingListeningToggleProps> = ({
     selectedCategory,
     onCategoryChange,
-    showCombined = true
 }) => {
     const { theme } = useTheme();
 
     const categories = [
+        {
+            key: 'combined' as const,
+            label: 'Combined',
+            icon: 'chart.bar.fill' as IconSymbolName,
+            description: 'All formats together'
+        },
         {
             key: 'reading' as const,
             label: 'Reading',
@@ -33,13 +37,7 @@ const ReadingListeningToggle: React.FC<ReadingListeningToggleProps> = ({
             label: 'Listening',
             icon: 'headphones' as IconSymbolName,
             description: 'Audiobooks'
-        },
-        ...(showCombined ? [{
-            key: 'combined' as const,
-            label: 'Combined',
-            icon: 'chart.bar.fill' as IconSymbolName,
-            description: 'All formats together'
-        }] : [])
+        }
     ];
 
     return (

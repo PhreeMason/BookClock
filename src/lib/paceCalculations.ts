@@ -221,7 +221,8 @@ export const getPaceBasedStatus = (
 export const getPaceStatusMessage = (
   userPaceData: UserPaceData,
   requiredPace: number,
-  status: PaceBasedStatus
+  status: PaceBasedStatus,
+  format?: 'physical' | 'ebook' | 'audio'
 ): string => {
   if (status.level === 'overdue') {
     return 'Return or renew';
@@ -234,19 +235,19 @@ export const getPaceStatusMessage = (
     return 'Pace too ambitious';
   }
 
-  if (status.color === 'green') {
-    if (userPaceData.isReliable) {
-      return `On track at ${Math.round(userPaceData.averagePace)} pages/day`;
-    }
+  if (status.level === 'urgent') {
+    return 'Tough timeline';
+  }
+
+  if (status.level === 'good' || status.color === 'green') {
     return "You're doing great";
   }
 
-  if (status.color === 'orange') {
-    const paceIncrease = Math.round(requiredPace - userPaceData.averagePace);
-    return `Need ${paceIncrease} more pages/day`;
+  if (status.level === 'approaching' || status.color === 'orange') {
+    return 'A bit more daily';
   }
 
-  return status.message;
+  return 'Good';
 };
 
 /**
