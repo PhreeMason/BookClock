@@ -77,8 +77,8 @@ export default function StatsScreen() {
                 {/* 1. Overall Progress Overview */}
                 <TotalProgressRingChart />
 
-                {/* 2. Achievements - Motivational and goal-oriented */}
-                <AchievementsCard />
+                {/* 2. Key Stats Cards - Quick overview metrics */}
+                <ReadingStatsCards />
 
                 {/* 3. Category Selection */}
                 <ReadingListeningToggle 
@@ -87,22 +87,22 @@ export default function StatsScreen() {
                     showCombined={true}
                 />
 
-                {/* 4. Key Stats Cards - Quick overview metrics */}
-                <ReadingStatsCards />
-
-                {/* 5. Daily Progress Tracking - Format Specific */}
+                {/* 4. Daily Progress Tracking - Format Specific */}
                 {selectedCategory === 'reading' && <DailyReadingProgressChart />}
                 {selectedCategory === 'listening' && <DailyListeningProgressChart />}
                 {selectedCategory === 'combined' && <DailyPagesChart />}
 
-                {/* 6. Activity Patterns */}
+                {/* 5. Activity Patterns */}
                 <WeeklyReadingHeatmap />
 
-                {/* 7. Reading Calendar - Daily reading history */}
+                {/* 6. Reading Calendar - Daily reading history */}
                 <ReadingCalendar selectedCategory={selectedCategory} dateRange="90d" />
 
-                {/* 8. Format Distribution - Reading habits */}
+                {/* 7. Format Distribution - Reading habits */}
                 <FormatDistributionChart />
+
+                {/* 8. Achievements - Motivational and goal-oriented */}
+                <AchievementsCard />
 
                 {/* 9. Reading & Listening Pace Analysis */}
                 <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
