@@ -4,7 +4,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useAchievementsQuery } from '@/hooks/useAchievementsQuery';
 import { useTheme } from '@/theme';
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 
 const AchievementsCard: React.FC = () => {
@@ -25,7 +25,7 @@ const AchievementsCard: React.FC = () => {
                 return a.isUnlocked ? -1 : 1;
             }
             // Then by progress percentage
-            return (b.progress ?? 0) - (a.progress ?? 0);
+            return (b.percentage ?? 0) - (a.percentage ?? 0);
         });
     }, [achievements]);
 
@@ -95,10 +95,8 @@ const AchievementsCard: React.FC = () => {
                 </ThemedText>
             </View>
 
-            <ScrollView 
-                style={styles.achievementsScrollView}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.achievementsList}
+            <View 
+                style={styles.achievementsList}
             >
                 {sortedAchievements.map((achievement) => (
                     <View key={achievement.id} style={styles.achievementItem}>
@@ -136,14 +134,14 @@ const AchievementsCard: React.FC = () => {
                                 {achievement.description}
                             </ThemedText>
                             
-                            {achievement.progress !== undefined && achievement.progress < 100 && (
+                            {achievement.percentage !== undefined && achievement.percentage < 100 && (
                                 <View style={styles.progressContainer}>
                                     <View style={styles.progressBar}>
                                         <View 
                                             style={[
                                                 styles.progressFill,
                                                 { 
-                                                    width: `${achievement.progress}%`,
+                                                    width: `${achievement.percentage}%`,
                                                     backgroundColor: achievement.isUnlocked 
                                                         ? getThemeColor(achievement.color) 
                                                         : theme.textMuted
@@ -152,14 +150,14 @@ const AchievementsCard: React.FC = () => {
                                         />
                                     </View>
                                     <ThemedText color="textMuted" style={styles.progressPercent}>
-                                        {Math.round(achievement.progress)}%
+                                        {Math.round(achievement.percentage)}%
                                     </ThemedText>
                                 </View>
                             )}
                         </View>
                     </View>
                 ))}
-            </ScrollView>
+            </View>
         </ThemedView>
     );
 };
@@ -179,9 +177,6 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         marginLeft: 12,
-    },
-    achievementsScrollView: {
-        maxHeight: 320,
     },
     achievementsList: {
         gap: 12,
