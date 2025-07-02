@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import React from 'react';
-import ReadingProgress from '../ReadingProgress';
+import ReadingProgress from '../shared/ReadingProgress';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 // Mock the hooks

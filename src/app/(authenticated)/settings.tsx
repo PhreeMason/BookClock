@@ -1,8 +1,8 @@
-import { SignOutButton } from '@/components/SignOutButton';
+import { SignOutButton } from '@/components/auth/SignOutButton';
 import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
-import { ThemeSwitcher } from '@/components/ThemeSwitcher';
+import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { UserAvatar } from '@/components/UserAvatar';
+import { UserAvatar } from '@/components/shared/UserAvatar';
 import { useTheme } from '@/theme';
 import { useUser } from '@clerk/clerk-expo';
 import { router } from 'expo-router';

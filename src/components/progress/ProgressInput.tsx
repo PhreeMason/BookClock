@@ -1,6 +1,6 @@
 import React from 'react';
 import { Control, Controller } from 'react-hook-form';
-import CustomInput from '../CustomInput';
+import CustomInput from '@/components/shared/CustomInput';
 import AudiobookProgressInput from './AudiobookProgressInput';
 
 interface ProgressInputProps {

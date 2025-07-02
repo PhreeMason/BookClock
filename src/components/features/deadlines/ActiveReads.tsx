@@ -1,4 +1,4 @@
-import { DeadlineCard } from '@/components/DeadlineCard'
+import { DeadlineCard } from '@/components/features/deadlines/DeadlineCard'
 import { ThemedButton, ThemedScrollView, ThemedText, ThemedView } from '@/components/themed'
 import { useDeadlines } from '@/contexts/DeadlineProvider'
 import { Link } from 'expo-router'

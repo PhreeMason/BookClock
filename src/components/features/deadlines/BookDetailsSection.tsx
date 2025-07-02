@@ -3,7 +3,7 @@ import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import dayjs from 'dayjs'
 import React from 'react'
 import { StyleSheet } from 'react-native'
-import { ThemedText, ThemedView } from './themed'
+import { ThemedText, ThemedView } from '@/components/themed'
 
 const makeUpperCaseFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);

@@ -4,7 +4,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Text, View } from 'react-native';
 import { z } from 'zod';
-import CustomInput from '../CustomInput';
+import CustomInput from '../shared/CustomInput';
 
 // Mock the theme hook
 // Test schema similar to the actual deadline form

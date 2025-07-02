@@ -4,8 +4,8 @@ import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import React, { useRef, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
-import DailyReadingChart from './DailyReadingChart';
-import ProgressAreaChart from './ProgressAreaChart';
+import DailyReadingChart from '@/components/charts/DailyReadingChart';
+import ProgressAreaChart from '@/components/charts/ProgressAreaChart';
 
 interface SwipeableChartsProps {
   deadline: ReadingDeadlineWithProgress;

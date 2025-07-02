@@ -1,9 +1,9 @@
-import BookDetailsSection from '@/components/BookDetailsSection';
-import DeadlineActionButtons from '@/components/DeadlineActionButtons';
-import DeadlineHeroSection from '@/components/DeadlineHeroSection';
-import DeadlineViewHeader from '@/components/DeadlineViewHeader';
-import ReadingProgress from '@/components/ReadingProgress';
-import SwipeableCharts from '@/components/SwipeableCharts';
+import BookDetailsSection from '@/components/features/deadlines/BookDetailsSection';
+import DeadlineActionButtons from '@/components/features/deadlines/DeadlineActionButtons';
+import DeadlineHeroSection from '@/components/features/deadlines/DeadlineHeroSection';
+import DeadlineViewHeader from '@/components/features/deadlines/DeadlineViewHeader';
+import ReadingProgress from '@/components/shared/ReadingProgress';
+import SwipeableCharts from '@/components/features/stats/SwipeableCharts';
 import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { useTheme } from '@/theme';

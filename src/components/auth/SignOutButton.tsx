@@ -3,8 +3,8 @@ import { useTheme } from '@/theme';
 import { useClerk } from '@clerk/clerk-expo';
 import * as Linking from 'expo-linking';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { ThemedText } from './themed';
-import { IconSymbol } from './ui/IconSymbol';
+import { ThemedText } from '@/components/themed';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 export const SignOutButton = () => {
   const { signOut } = useClerk()

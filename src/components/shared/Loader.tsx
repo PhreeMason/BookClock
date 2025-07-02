@@ -1,8 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 
+import { ThemedText, ThemedView } from '@/components/themed';
 import { useTheme } from '@/theme';
-import { ThemedText, ThemedView } from './themed';
 
 type ColorValue = string;
 

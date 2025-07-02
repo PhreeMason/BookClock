@@ -1,3 +1,4 @@
+import { ThemedText } from '@/components/themed';
 import { useTheme } from '@/theme';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import {
@@ -6,7 +7,6 @@ import {
     TextInputProps,
     View
 } from 'react-native';
-import { ThemedText } from './themed';
 
 type CustomInputProps<T extends FieldValues> = {
     control: Control<T>; // custom fields

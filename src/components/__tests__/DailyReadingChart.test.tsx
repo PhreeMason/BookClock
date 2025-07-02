@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react-native';
 import React from 'react';
-import DailyReadingChart from '../DailyReadingChart';
+import DailyReadingChart from '../charts/DailyReadingChart';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 // Mock the gifted charts

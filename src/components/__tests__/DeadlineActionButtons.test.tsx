@@ -3,7 +3,7 @@ import React from 'react';
 import { Alert } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { router } from 'expo-router';
-import DeadlineActionButtons from '../DeadlineActionButtons';
+import DeadlineActionButtons from '../features/deadlines/DeadlineActionButtons';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 // Mock dependencies

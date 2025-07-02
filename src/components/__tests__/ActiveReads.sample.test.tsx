@@ -1,6 +1,6 @@
 import { render, waitFor } from '@testing-library/react-native';
 import React from 'react';
-import ActiveReads from '../ActiveReads';
+import ActiveReads from '../features/deadlines/ActiveReads';
 import { mockUseGetDeadlines } from '@/__mocks__/useDeadlinesMock';
 
 // Mock the deadline hooks

@@ -1,5 +1,5 @@
-import CustomInput from '@/components/CustomInput';
-import SignInWith from '@/components/SignInWith';
+import CustomInput from '@/components/shared/CustomInput';
+import SignInWith from '@/components/auth/SignInWith';
 import { ThemedButton, ThemedText, ThemedView, ThemedKeyboardAvoidingView } from '@/components/themed';
 import { useTheme } from '@/theme';
 import { isClerkAPIResponseError, useClerk, useSignUp } from '@clerk/clerk-expo';
