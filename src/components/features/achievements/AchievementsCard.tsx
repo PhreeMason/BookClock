@@ -4,7 +4,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useAchievementsQuery } from '@/hooks/useAchievementsQuery';
 import { useTheme } from '@/theme';
 import React, { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 
 const AchievementsCard: React.FC = () => {
@@ -95,7 +95,11 @@ const AchievementsCard: React.FC = () => {
                 </ThemedText>
             </View>
 
-            <View style={styles.achievementsList}>
+            <ScrollView 
+                style={styles.achievementsScrollView}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.achievementsList}
+            >
                 {sortedAchievements.map((achievement) => (
                     <View key={achievement.id} style={styles.achievementItem}>
                         <View style={[
@@ -108,7 +112,7 @@ const AchievementsCard: React.FC = () => {
                         ]}>
                             <IconSymbol 
                                 name={achievement.icon as any} 
-                                size={20} 
+                                size={18} 
                                 color={achievement.isUnlocked ? getThemeColor(achievement.color) : theme.textMuted} 
                             />
                         </View>
@@ -123,7 +127,7 @@ const AchievementsCard: React.FC = () => {
                                 </ThemedText>
                                 {achievement.isUnlocked && (
                                     <View style={styles.unlockedBadge}>
-                                        <IconSymbol name="checkmark.circle.fill" size={16} color={theme.success} />
+                                        <IconSymbol name="checkmark.circle.fill" size={14} color={theme.success} />
                                     </View>
                                 )}
                             </View>
@@ -155,7 +159,7 @@ const AchievementsCard: React.FC = () => {
                         </View>
                     </View>
                 ))}
-            </View>
+            </ScrollView>
         </ThemedView>
     );
 };
@@ -164,32 +168,35 @@ const styles = StyleSheet.create({
     container: {
         borderRadius: 12,
         borderWidth: 1,
-        padding: 20,
+        padding: 16,
         marginBottom: 20,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 12,
     },
     title: {
         fontSize: 18,
         marginLeft: 12,
     },
+    achievementsScrollView: {
+        maxHeight: 320,
+    },
     achievementsList: {
-        gap: 16,
+        gap: 12,
     },
     achievementItem: {
         flexDirection: 'row',
         alignItems: 'flex-start',
     },
     iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: 12,
+        marginRight: 10,
     },
     achievementContent: {
         flex: 1,
@@ -201,17 +208,17 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     achievementTitle: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '600',
         flex: 1,
     },
     unlockedBadge: {
-        marginLeft: 8,
+        marginLeft: 6,
     },
     achievementDescription: {
-        fontSize: 14,
-        marginBottom: 8,
-        lineHeight: 20,
+        fontSize: 13,
+        marginBottom: 6,
+        lineHeight: 18,
     },
     progressContainer: {
         flexDirection: 'row',
@@ -247,7 +254,7 @@ const styles = StyleSheet.create({
         lineHeight: 20,
     },
     progressHeader: {
-        marginBottom: 16,
+        marginBottom: 12,
     },
     progressPercent: {
         fontSize: 12,
