@@ -20,7 +20,7 @@ import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 export default function StatsScreen() {
     const { theme } = useTheme();
     const { userPaceData, userListeningPaceData } = usePace();
-    const [selectedCategory, setSelectedCategory] = useState<FormatCategory>('reading');
+    const [selectedCategory, setSelectedCategory] = useState<FormatCategory>('combined');
     const borderColor = theme.border;
     const iconColor = theme.primary;
     const successColor = theme.success;
@@ -84,7 +84,6 @@ export default function StatsScreen() {
                 <ReadingListeningToggle 
                     selectedCategory={selectedCategory}
                     onCategoryChange={setSelectedCategory}
-                    showCombined={true}
                 />
 
                 {/* 4. Daily Progress Tracking - Format Specific */}
