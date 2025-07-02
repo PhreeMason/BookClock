@@ -25,14 +25,29 @@ const getCumulativeProgress = (deadline: ReadingDeadlineWithProgress): ProgressP
 
   if (progress.length === 0) return [];
 
-  // Convert to cumulative progress points with validation
-  return progress
+  // Filter valid entries and group by date
+  const progressByDate = new Map<string, ProgressPoint>();
+  
+  progress
     .filter(entry => entry.created_at && typeof entry.current_progress === 'number')
-    .map(entry => ({
-      date: new Date(entry.created_at).toISOString().slice(0, 10),
-      totalProgress: Math.max(0, entry.current_progress), // Ensure non-negative values
-      timestamp: new Date(entry.created_at).getTime()
-    }));
+    .forEach(entry => {
+      const date = new Date(entry.created_at).toISOString().slice(0, 10);
+      const timestamp = new Date(entry.created_at).getTime();
+      const totalProgress = Math.max(0, entry.current_progress); // Ensure non-negative values
+      
+      // If we already have an entry for this date, keep the one with the latest timestamp
+      const existing = progressByDate.get(date);
+      if (!existing || timestamp > existing.timestamp) {
+        progressByDate.set(date, {
+          date,
+          totalProgress,
+          timestamp
+        });
+      }
+    });
+  
+  // Convert map to array and sort by date
+  return Array.from(progressByDate.values()).sort((a, b) => a.timestamp - b.timestamp);
 };
 
 const ProgressAreaChart: React.FC<ProgressAreaChartProps> = ({ deadline }) => {
