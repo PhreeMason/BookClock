@@ -3,7 +3,7 @@ import React from 'react';
 import { Alert } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { router } from 'expo-router';
-import DeadlineActionButtons from '../DeadlineActionButtons';
+import DeadlineActionButtons from '../features/deadlines/DeadlineActionButtons';
 import { DeadlineProvider } from '@/contexts/DeadlineProvider';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

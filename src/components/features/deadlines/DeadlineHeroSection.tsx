@@ -1,8 +1,8 @@
+import { ThemedView } from '@/components/themed';
+import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { ThemedView } from './themed';
 import { DeadlineCard } from './DeadlineCard';
-import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 interface DeadlineHeroSectionProps {
   deadline: ReadingDeadlineWithProgress;

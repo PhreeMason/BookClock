@@ -1,10 +1,10 @@
+import { ThemedText, ThemedView } from '@/components/themed';
 import { useTheme } from '@/theme';
 import dayjs from 'dayjs';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { ThemedText, ThemedView } from './themed';
-import { IconSymbol } from './ui/IconSymbol';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 type HeaderProps = {
     activeCount: number;

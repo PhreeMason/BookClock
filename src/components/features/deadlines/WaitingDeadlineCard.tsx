@@ -1,7 +1,7 @@
+import { ThemedText, ThemedView } from '@/components/themed';
 import { useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { ThemedText , ThemedView } from './themed';
 
 const WaitingDeadlineCard = () => {
     const { theme } = useTheme();

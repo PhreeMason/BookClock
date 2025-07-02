@@ -1,4 +1,4 @@
-import { Loader } from '@/components/Loader';
+import { Loader } from '@/components/shared/Loader';
 import { DeadlineProvider } from '@/contexts/DeadlineProvider';
 import { useAuth } from '@clerk/clerk-expo';
 import { Redirect, Stack } from 'expo-router';

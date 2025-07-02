@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react-native';
 import React from 'react';
-import ProgressAreaChart from '../ProgressAreaChart';
+import ProgressAreaChart from '../charts/ProgressAreaChart';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 // Mock the gifted charts

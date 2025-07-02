@@ -1,7 +1,7 @@
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { render, screen } from '@testing-library/react-native';
 import React from 'react';
-import { DeadlineCard } from '../DeadlineCard';
+import { DeadlineCard } from '../features/deadlines/DeadlineCard';
 
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 

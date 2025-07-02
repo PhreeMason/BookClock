@@ -1,4 +1,4 @@
-import CustomInput from '@/components/CustomInput';
+import CustomInput from '@/components/shared/CustomInput';
 import { ThemedText } from '@/components/themed';
 import { DeadlineFormData } from '@/lib/deadlineFormSchema';
 import React from 'react';

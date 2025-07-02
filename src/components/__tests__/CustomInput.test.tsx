@@ -2,7 +2,7 @@ import { render, fireEvent } from '@testing-library/react-native';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
-import CustomInput from '../CustomInput';
+import CustomInput from '../shared/CustomInput';
 
 // Mock the theme hook
 // Mock ThemedText

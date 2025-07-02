@@ -1,3 +1,4 @@
+import { ThemedButton, ThemedView } from '@/components/themed'
 import { useDeadlines } from '@/contexts/DeadlineProvider'
 import { useUpdateDeadlineProgress } from '@/hooks/useDeadlines'
 import { formatProgressDisplay } from '@/lib/deadlineUtils'
@@ -8,12 +9,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
-import ProgressBar from './progress/ProgressBar'
-import ProgressHeader from './progress/ProgressHeader'
-import ProgressInput from './progress/ProgressInput'
-import ProgressStats from './progress/ProgressStats'
-import QuickActionButtons from './progress/QuickActionButtons'
-import { ThemedButton, ThemedView } from './themed'
+import ProgressBar from '@/components/progress/ProgressBar'
+import ProgressHeader from '@/components/progress/ProgressHeader'
+import ProgressInput from '@/components/progress/ProgressInput'
+import ProgressStats from '@/components/progress/ProgressStats'
+import QuickActionButtons from '@/components/progress/QuickActionButtons'
 
 const ReadingProgress = ({
     deadline

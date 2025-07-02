@@ -1,6 +1,6 @@
-import ActiveReads from '@/components/ActiveReads';
-import Header from '@/components/Header';
-import OverdueReads from '@/components/OverdueReads';
+import ActiveReads from '@/components/features/deadlines/ActiveReads';
+import Header from '@/components/navigation/Header';
+import OverdueReads from '@/components/features/deadlines/OverdueReads';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { useTheme } from '@/theme';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';

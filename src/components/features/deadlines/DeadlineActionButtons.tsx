@@ -1,10 +1,10 @@
+import { ThemedButton, ThemedView } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { ThemedButton, ThemedView } from './themed';
 
 interface DeadlineActionButtonsProps {
   deadline: ReadingDeadlineWithProgress;

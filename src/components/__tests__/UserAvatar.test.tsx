@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react-native';
 import React from 'react';
-import { UserAvatar } from '../UserAvatar';
+import { UserAvatar } from '../shared/UserAvatar';
 
 // Mock the useUser hook from @clerk/clerk-expo
 jest.mock('@clerk/clerk-expo', () => ({

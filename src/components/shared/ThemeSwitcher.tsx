@@ -1,9 +1,9 @@
+import { ThemedText, ThemedView } from '@/components/themed';
 import { ThemeMode, themeNames, useTheme } from '@/theme';
 import { themes } from '@/theme/themes';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ThemedText, ThemedView } from './themed';
-import { IconSymbol } from './ui/IconSymbol';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 export function ThemeSwitcher() {
     const { theme, themeMode, setThemeMode, availableThemes } = useTheme();

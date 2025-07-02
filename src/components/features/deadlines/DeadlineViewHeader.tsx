@@ -1,6 +1,6 @@
+import { ThemedButton, ThemedText, ThemedView } from '@/components/themed';
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { ThemedButton, ThemedText, ThemedView } from './themed';
 
 interface DeadlineViewHeaderProps {
   title?: string;

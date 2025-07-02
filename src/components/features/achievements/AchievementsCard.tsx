@@ -1,10 +1,10 @@
+import { AchievementsSkeleton } from '@/components/features/achievements/AchievementsSkeleton';
 import { ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useAchievementsQuery } from '@/hooks/useAchievementsQuery';
 import { useTheme } from '@/theme';
 import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useAchievementsQuery } from '@/hooks/useAchievementsQuery';
-import { AchievementsSkeleton } from '@/components/AchievementsSkeleton';
 
 
 const AchievementsCard: React.FC = () => {

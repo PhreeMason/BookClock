@@ -1,10 +1,10 @@
 import { render, fireEvent } from '@testing-library/react-native';
 import React from 'react';
-import SwipeableCharts from '../SwipeableCharts';
+import SwipeableCharts from '../features/stats/SwipeableCharts';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 // Mock the child components
-jest.mock('../ProgressAreaChart', () => {
+jest.mock('../charts/ProgressAreaChart', () => {
   return jest.fn(({ deadline, testID }: any) => {
     const React = require('react');
     const { View, Text } = require('react-native');
@@ -16,7 +16,7 @@ jest.mock('../ProgressAreaChart', () => {
   });
 });
 
-jest.mock('../DailyReadingChart', () => {
+jest.mock('../charts/DailyReadingChart', () => {
   return jest.fn(({ deadline, testID }: any) => {
     const React = require('react');
     const { View, Text } = require('react-native');

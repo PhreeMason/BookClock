@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import ReadingDayDetails from '../ReadingDayDetails';
+import ReadingDayDetails from '../features/calendar/ReadingDayDetails';
 import { useTheme } from '@/theme';
 import { DailyDeadlineEntry } from '@/hooks/useReadingHistory';
 import { getSampleDeadlines } from '@/__tests__/fixtures/sampleDeadlines';

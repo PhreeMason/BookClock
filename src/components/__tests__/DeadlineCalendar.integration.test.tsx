@@ -2,7 +2,7 @@ import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import ReadingCalendar from '../ReadingCalendar';
+import ReadingCalendar from '../features/calendar/ReadingCalendar';
 import { useSupabase } from '@/lib/supabase';
 import { useTheme } from '@/theme';
 import { getSampleDeadlines } from '@/__tests__/fixtures/sampleDeadlines';
