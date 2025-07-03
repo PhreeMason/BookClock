@@ -1,4 +1,4 @@
-import { useAddDeadline, useGetDeadlines, useUpdateDeadline, useDeleteDeadline } from '@/hooks/useDeadlines';
+import { useAddDeadline, useGetDeadlines, useUpdateDeadline, useDeleteDeadline, useCompleteDeadline, useSetAsideDeadline } from '@/hooks/useDeadlines';
 import {
     calculateCurrentProgress,
     calculateRemaining,
@@ -29,6 +29,8 @@ interface DeadlineContextType {
     progressDetails: ReadingDeadlineProgressInsert;
   }, onSuccess?: () => void, onError?: (error: Error) => void) => void;
   deleteDeadline: (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => void;
+  completeDeadline: (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => void;
+  setAsideDeadline: (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => void;
   
   // Calculations for individual deadlines (updated with pace-based logic)
   getDeadlineCalculations: (deadline: ReadingDeadlineWithProgress) => {
@@ -78,6 +80,8 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
   const { mutate: addDeadlineMutation } = useAddDeadline();
   const { mutate: updateDeadlineMutation } = useUpdateDeadline();
   const { mutate: deleteDeadlineMutation } = useDeleteDeadline();
+  const { mutate: completeDeadlineMutation } = useCompleteDeadline();
+  const { mutate: setAsideDeadlineMutation } = useSetAsideDeadline();
   
   // Access pace calculations
   const { getDeadlinePaceStatus } = usePace();
@@ -243,6 +247,30 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     });
   };
 
+  const completeDeadline = (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => {
+    completeDeadlineMutation(deadlineId, {
+      onSuccess: () => {
+        onSuccess?.();
+      },
+      onError: (error) => {
+        console.error("Error completing deadline:", error);
+        onError?.(error);
+      }
+    });
+  };
+
+  const setAsideDeadline = (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => {
+    setAsideDeadlineMutation(deadlineId, {
+      onSuccess: () => {
+        onSuccess?.();
+      },
+      onError: (error) => {
+        console.error("Error setting aside deadline:", error);
+        onError?.(error);
+      }
+    });
+  };
+
   const value: DeadlineContextType = {
     // Data
     deadlines,
@@ -255,6 +283,8 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     addDeadline,
     updateDeadline,
     deleteDeadline,
+    completeDeadline,
+    setAsideDeadline,
     
     // Calculations
     getDeadlineCalculations,

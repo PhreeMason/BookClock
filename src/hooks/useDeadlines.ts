@@ -57,11 +57,30 @@ export const useAddDeadline = () => {
                 .select()
                 .single();
 
-            if (progressError) {
+                        if (progressError) {
                 console.error('Error inserting progress:', progressError);
                 throw new Error(progressError.message);
             }
-            
+
+            // create deadline status entry
+            const { data: statusData, error: statusError } = await supabase.from('reading_deadline_status')
+                .insert({
+                    reading_deadline_id: finalDeadlineId,
+                    status: 'reading',
+                    created_at: new Date().toISOString()
+                })
+                .select()
+                .single();
+
+            if (statusError) {
+                console.error('Error inserting initial status:', statusError);
+                throw new Error(statusError.message);
+            }
+
+            data.status = [statusData];
+            data.id = finalDeadlineId;
+            data.user_id = userId;
+    
             data.progress = progressData;
             return data;
         },
@@ -273,29 +292,127 @@ export const useUpdateDeadlineProgress = () => {
     })
 }
 
-export const useGetDeadlines = () => {
+export const useGetDeadlines = (options?: { includeNonActive?: boolean }) => {
     const supabase = useSupabase();
     const user = useUser();
     const userId = user?.user?.id;
+    const includeNonActive = options?.includeNonActive ?? false;
 
     return useQuery<ReadingDeadlineWithProgress[]>({
-        queryKey: ['deadlines', userId],
+        queryKey: ['deadlines', userId, includeNonActive],
         queryFn: async () => {
             if (!userId) throw new Error("User not authenticated");
             const { data, error } = await supabase
                 .from('reading_deadlines')
                 .select(`
                     *,
-                    progress:reading_deadline_progress(*)
+                    progress:reading_deadline_progress(*),
+                    status:reading_deadline_status(*)
                 `)
                 .eq('user_id', userId)
                 .order('created_at', { ascending: false });
 
             if (error) throw new Error(error.message);
-            return data as ReadingDeadlineWithProgress[];
+            
+            // Filter based on includeNonActive option
+            const filteredData = includeNonActive 
+                ? (data || [])
+                : (data?.filter(deadline => {
+                    const latestStatus = deadline.status?.[deadline.status.length - 1]?.status;
+                    return !latestStatus || latestStatus === 'reading';
+                }) || []);
+            
+            return filteredData as ReadingDeadlineWithProgress[];
         },
         enabled: !!userId,
         refetchOnWindowFocus: false,
         // staleTime: 1000 * 60 * 60 * 5, // 5 hours
+    })
+}
+
+const useUpdateDeadlineStatus = (status: 'complete' | 'set_aside') => {
+    const supabase = useSupabase();
+    const user = useUser();
+    const userId = user?.user?.id;
+    const queryClient = useQueryClient();
+    
+    const actionName = status === 'complete' ? 'completing' : 'setting aside';
+    const mutationKey = status === 'complete' ? 'completeDeadline' : 'setAsideDeadline';
+    
+    return useMutation({
+        mutationKey: [mutationKey],
+        mutationFn: async (deadlineId: string) => {
+            if (!userId) {
+                throw new Error("User not authenticated");
+            }
+            
+            const { data, error } = await supabase
+                .from('reading_deadline_status')
+                .insert({
+                    reading_deadline_id: deadlineId,
+                    status,
+                    created_at: new Date().toISOString()
+                })
+                .select()
+                .single();
+
+            if (error) {
+                console.error(`Error ${actionName} deadline:`, error);
+                throw new Error(error.message);
+            }
+            
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['deadlines', userId] });
+        },
+        onError: (error) => {
+            console.error(`Error ${actionName} deadline:`, error);
+        },
+    })
+}
+
+export const useCompleteDeadline = () => useUpdateDeadlineStatus('complete');
+
+export const useSetAsideDeadline = () => useUpdateDeadlineStatus('set_aside');
+
+export const useGetCompletedDeadlines = () => {
+    const supabase = useSupabase();
+    const user = useUser();
+    const userId = user?.user?.id;
+
+    return useQuery<ReadingDeadlineWithProgress[]>({
+        queryKey: ['completedDeadlines', userId],
+        queryFn: async () => {
+            if (!userId) throw new Error("User not authenticated");
+            const { data, error } = await supabase
+                .from('reading_deadlines')
+                .select(`
+                    *,
+                    progress:reading_deadline_progress(*),
+                    status:reading_deadline_status(*)
+                `)
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false });
+
+            if (error) throw new Error(error.message);
+            
+            // Filter for completed and set_aside deadlines only
+            const filteredData = data?.filter(deadline => {
+                const latestStatus = deadline.status?.[deadline.status.length - 1]?.status;
+                return latestStatus === 'complete' || latestStatus === 'set_aside';
+            }) || [];
+            
+            // Sort by completion date (most recent status entry)
+            filteredData.sort((a, b) => {
+                const aDate = a.status?.[a.status.length - 1]?.created_at || a.created_at;
+                const bDate = b.status?.[b.status.length - 1]?.created_at || b.created_at;
+                return new Date(bDate).getTime() - new Date(aDate).getTime();
+            });
+            
+            return filteredData as ReadingDeadlineWithProgress[];
+        },
+        enabled: !!userId,
+        refetchOnWindowFocus: false,
     })
 }

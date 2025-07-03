@@ -19,20 +19,45 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
   onSetAside,
   onDelete,
 }) => {
-  const { deleteDeadline } = useDeadlines();
+  const { deleteDeadline, completeDeadline, setAsideDeadline } = useDeadlines();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [isSettingAside, setIsSettingAside] = useState(false);
   const handleComplete = () => {
     if (onComplete) {
       onComplete();
     } else {
-      Toast.show({
-        type: 'info',
-        text1: 'Mark as Complete',
-        text2: 'This feature is coming soon!',
-        autoHide: true,
-        visibilityTime: 2000,
-        position: 'top',
-      });
+      setIsCompleting(true);
+      completeDeadline(
+        deadline.id,
+        // Success callback
+        () => {
+          setIsCompleting(false);
+          Toast.show({
+            type: 'success',
+            text1: 'Deadline completed!',
+            text2: `Congratulations on finishing "${deadline.book_title}"!`,
+            autoHide: true,
+            visibilityTime: 3000,
+            position: 'top',
+            onHide: () => {
+              router.replace('/');
+            }
+          });
+        },
+        // Error callback
+        (error) => {
+          setIsCompleting(false);
+          Toast.show({
+            type: 'error',
+            text1: 'Failed to complete deadline',
+            text2: error.message || 'Please try again',
+            autoHide: true,
+            visibilityTime: 3000,
+            position: 'top'
+          });
+        }
+      );
     }
   };
 
@@ -40,14 +65,37 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
     if (onSetAside) {
       onSetAside();
     } else {
-      Toast.show({
-        type: 'info',
-        text1: 'Set Aside',
-        text2: 'This feature is coming soon!',
-        autoHide: true,
-        visibilityTime: 2000,
-        position: 'top',
-      });
+      setIsSettingAside(true);
+      setAsideDeadline(
+        deadline.id,
+        // Success callback
+        () => {
+          setIsSettingAside(false);
+          Toast.show({
+            type: 'success',
+            text1: 'Book set aside',
+            text2: `"${deadline.book_title}" has been set aside for later`,
+            autoHide: true,
+            visibilityTime: 2000,
+            position: 'top',
+            onHide: () => {
+              router.replace('/');
+            }
+          });
+        },
+        // Error callback
+        (error) => {
+          setIsSettingAside(false);
+          Toast.show({
+            type: 'error',
+            text1: 'Failed to set aside deadline',
+            text2: error.message || 'Please try again',
+            autoHide: true,
+            visibilityTime: 3000,
+            position: 'top'
+          });
+        }
+      );
     }
   };
 
@@ -110,16 +158,18 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
   return (
     <ThemedView style={styles.actionButtons}>
       <ThemedButton
-        title="✓ Mark as Complete"
+        title={isCompleting ? "Completing..." : "✓ Mark as Complete"}
         variant="success"
         style={styles.completeBtn}
         onPress={handleComplete}
+        disabled={isCompleting}
       />
       <ThemedButton
-        title="📚 Set Aside"
+        title={isSettingAside ? "Setting aside..." : "📚 Set Aside"}
         variant="secondary"
         style={styles.archiveBtn}
         onPress={handleSetAside}
+        disabled={isSettingAside}
       />
       <ThemedButton
         title={isDeleting ? "Deleting..." : "🗑️ Delete Deadline"}

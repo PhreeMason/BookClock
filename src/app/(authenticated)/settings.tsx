@@ -76,6 +76,16 @@ export default function SettingsScreen() {
 
                         <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
+                        <TouchableOpacity style={styles.settingItem} onPress={() => router.push('/completed-deadlines')}>
+                            <View style={styles.settingLeft}>
+                                <IconSymbol name="checkmark.circle.fill" size={20} color={iconColor} />
+                                <ThemedText style={styles.settingText}>Completed Deadlines</ThemedText>
+                            </View>
+                            <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
+                        </TouchableOpacity>
+
+                        <View style={[styles.divider, { backgroundColor: borderColor }]} />
+
                         <TouchableOpacity style={styles.settingItem}>
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="bell.fill" size={20} color={iconColor} />
