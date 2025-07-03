@@ -136,7 +136,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
       const hours = Math.floor(units / 60);
       const minutes = units % 60;
       if (hours > 0) {
-        return `${hours}h ${minutes}m/day needed`;
+        return minutes > 0 ? `${hours}h ${minutes}m/day needed` : `${hours}h/day needed`;
       }
       return `${minutes} minutes/day needed`;
     }
