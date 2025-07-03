@@ -23,6 +23,7 @@ export default function ProtectedLayout() {
         <Stack.Screen name='deadline/[id]/edit' options={{ headerShown: false }} />
         <Stack.Screen name='settings' options={{ headerShown: false }} />
         <Stack.Screen name='stats' options={{ headerShown: false }} />
+        <Stack.Screen name='archive' options={{ headerShown: false }} />
       </Stack>
     </DeadlineProvider>
   );

@@ -1,19 +1,19 @@
 import { DeadlineCard } from '@/components/features/deadlines/DeadlineCard'
 import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed'
-import { useGetCompletedDeadlines } from '@/hooks/useDeadlines'
+import { useGetArchivedDeadlines } from '@/hooks/useDeadlines'
 import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import { StyleSheet, View } from 'react-native'
 
-const CompletedDeadlines = () => {
-    const { data: completedDeadlines = [], isLoading, error } = useGetCompletedDeadlines();
+const ArchivedDeadlines = () => {
+    const { data: ArchivedDeadlines = [], isLoading, error } = useGetArchivedDeadlines();
     
     // Separate completed and set aside deadlines
-    const completed = completedDeadlines.filter(deadline => {
+    const completed = ArchivedDeadlines.filter(deadline => {
         const latestStatus = deadline.status?.[deadline.status.length - 1]?.status;
         return latestStatus === 'complete';
     });
     
-    const setAside = completedDeadlines.filter(deadline => {
+    const setAside = ArchivedDeadlines.filter(deadline => {
         const latestStatus = deadline.status?.[deadline.status.length - 1]?.status;
         return latestStatus === 'set_aside';
     });
@@ -22,7 +22,7 @@ const CompletedDeadlines = () => {
         return (
             <ThemedScrollView>
                 <ThemedView backgroundColor="background" style={styles.container}>
-                    <ThemedText>Loading completed deadlines...</ThemedText>
+                    <ThemedText>Loading archives...</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
         );
@@ -32,7 +32,7 @@ const CompletedDeadlines = () => {
         return (
             <ThemedScrollView>
                 <ThemedView backgroundColor="background" style={styles.container}>
-                    <ThemedText color="error" style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
+                    <ThemedText color="error" style={styles.errorText}>Error loading archives: {error.message}</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
         );
@@ -63,7 +63,7 @@ const CompletedDeadlines = () => {
     return (
         <ThemedScrollView backgroundColor="background">
             <ThemedView backgroundColor="background" style={styles.container}>
-                {completedDeadlines.length > 0 ? (
+                {ArchivedDeadlines.length > 0 ? (
                     <>
                         {renderSection('COMPLETED', completed)}
                         {renderSection('SET ASIDE', setAside)}
@@ -73,7 +73,7 @@ const CompletedDeadlines = () => {
                         style={styles.emptyText}
                         color='textMuted'
                     >
-                        No completed deadlines yet
+                        No deadlines added to archives
                     </ThemedText>
                 )}
             </ThemedView>
@@ -81,7 +81,7 @@ const CompletedDeadlines = () => {
     )
 }
 
-export default CompletedDeadlines
+export default ArchivedDeadlines
 
 const styles = StyleSheet.create({
     container: {
