@@ -98,6 +98,395 @@ export type Database = {
                 }
                 Relationships: []
             }
+            arc_book_status_history: {
+                Row: {
+                    book_id: string
+                    created_at: string | null
+                    id: string
+                    status: Database["public"]["Enums"]["arc_book_status_enum"] | null
+                    user_id: string
+                }
+                Insert: {
+                    book_id: string
+                    created_at?: string | null
+                    id: string
+                    status?: Database["public"]["Enums"]["arc_book_status_enum"] | null
+                    user_id: string
+                }
+                Update: {
+                    book_id?: string
+                    created_at?: string | null
+                    id?: string
+                    status?: Database["public"]["Enums"]["arc_book_status_enum"] | null
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "arc_book_status_history_book_id_fkey"
+                        columns: ["book_id"]
+                        isOneToOne: false
+                        referencedRelation: "books"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "arc_book_status_history_user_id_fkey"
+                        columns: ["user_id"]
+                        isOneToOne: false
+                        referencedRelation: "profiles"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            arc_user_books: {
+                Row: {
+                    book_id: string
+                    completion_date: string | null
+                    genres: string[] | null
+                    notes: string | null
+                    rating: number | null
+                    review_due_date: string | null
+                    source_platform: string
+                    total_pages: number | null
+                    user_id: string
+                }
+                Insert: {
+                    book_id: string
+                    completion_date?: string | null
+                    genres?: string[] | null
+                    notes?: string | null
+                    rating?: number | null
+                    review_due_date?: string | null
+                    source_platform: string
+                    total_pages?: number | null
+                    user_id: string
+                }
+                Update: {
+                    book_id?: string
+                    completion_date?: string | null
+                    genres?: string[] | null
+                    notes?: string | null
+                    rating?: number | null
+                    review_due_date?: string | null
+                    source_platform?: string
+                    total_pages?: number | null
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "arc_user_books_book_id_fkey"
+                        columns: ["book_id"]
+                        isOneToOne: false
+                        referencedRelation: "books"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "arc_user_books_user_id_fkey"
+                        columns: ["user_id"]
+                        isOneToOne: false
+                        referencedRelation: "profiles"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            authors: {
+                Row: {
+                    id: string
+                    name: string
+                }
+                Insert: {
+                    id: string
+                    name: string
+                }
+                Update: {
+                    id?: string
+                    name?: string
+                }
+                Relationships: []
+            }
+            book_authors: {
+                Row: {
+                    author_id: string
+                    book_id: string
+                }
+                Insert: {
+                    author_id: string
+                    book_id: string
+                }
+                Update: {
+                    author_id?: string
+                    book_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "book_authors_author_id_fkey"
+                        columns: ["author_id"]
+                        isOneToOne: false
+                        referencedRelation: "authors"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "book_authors_book_id_fkey"
+                        columns: ["book_id"]
+                        isOneToOne: false
+                        referencedRelation: "books"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            book_notes: {
+                Row: {
+                    book_id: string
+                    created_at: string | null
+                    id: string
+                    note: string | null
+                    updated_at: string | null
+                    user_id: string
+                }
+                Insert: {
+                    book_id: string
+                    created_at?: string | null
+                    id: string
+                    note?: string | null
+                    updated_at?: string | null
+                    user_id: string
+                }
+                Update: {
+                    book_id?: string
+                    created_at?: string | null
+                    id?: string
+                    note?: string | null
+                    updated_at?: string | null
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "book_notes_book_id_fkey"
+                        columns: ["book_id"]
+                        isOneToOne: false
+                        referencedRelation: "books"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            book_reading_logs: {
+                Row: {
+                    audio_end_time: number | null
+                    audio_start_time: number | null
+                    book_id: string
+                    created_at: string | null
+                    current_percentage: number | null
+                    date: string | null
+                    duration: number | null
+                    emotional_state: string[] | null
+                    end_page: number | null
+                    format: Database["public"]["Enums"]["book_format_enum"][] | null
+                    id: string
+                    listening_speed: number | null
+                    note: string | null
+                    pages_read: number | null
+                    rating: number | null
+                    reading_location: string | null
+                    start_page: number | null
+                    updated_at: string | null
+                    user_id: string
+                }
+                Insert: {
+                    audio_end_time?: number | null
+                    audio_start_time?: number | null
+                    book_id: string
+                    created_at?: string | null
+                    current_percentage?: number | null
+                    date?: string | null
+                    duration?: number | null
+                    emotional_state?: string[] | null
+                    end_page?: number | null
+                    format?: Database["public"]["Enums"]["book_format_enum"][] | null
+                    id: string
+                    listening_speed?: number | null
+                    note?: string | null
+                    pages_read?: number | null
+                    rating?: number | null
+                    reading_location?: string | null
+                    start_page?: number | null
+                    updated_at?: string | null
+                    user_id: string
+                }
+                Update: {
+                    audio_end_time?: number | null
+                    audio_start_time?: number | null
+                    book_id?: string
+                    created_at?: string | null
+                    current_percentage?: number | null
+                    date?: string | null
+                    duration?: number | null
+                    emotional_state?: string[] | null
+                    end_page?: number | null
+                    format?: Database["public"]["Enums"]["book_format_enum"][] | null
+                    id?: string
+                    listening_speed?: number | null
+                    note?: string | null
+                    pages_read?: number | null
+                    rating?: number | null
+                    reading_location?: string | null
+                    start_page?: number | null
+                    updated_at?: string | null
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "book_reading_logs_book_id_fkey"
+                        columns: ["book_id"]
+                        isOneToOne: false
+                        referencedRelation: "books"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            book_reviews: {
+                Row: {
+                    book_id: string
+                    created_at: string | null
+                    id: string
+                    rating: number | null
+                    review: string | null
+                    updated_at: string | null
+                    user_id: string
+                }
+                Insert: {
+                    book_id: string
+                    created_at?: string | null
+                    id: string
+                    rating?: number | null
+                    review?: string | null
+                    updated_at?: string | null
+                    user_id: string
+                }
+                Update: {
+                    book_id?: string
+                    created_at?: string | null
+                    id?: string
+                    rating?: number | null
+                    review?: string | null
+                    updated_at?: string | null
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "book_reviews_book_id_fkey"
+                        columns: ["book_id"]
+                        isOneToOne: false
+                        referencedRelation: "books"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            book_status_history: {
+                Row: {
+                    book_id: string
+                    created_at: string | null
+                    id: string
+                    status: Database["public"]["Enums"]["book_status_enum"] | null
+                    updated_at: string | null
+                    user_id: string
+                }
+                Insert: {
+                    book_id: string
+                    created_at?: string | null
+                    id: string
+                    status?: Database["public"]["Enums"]["book_status_enum"] | null
+                    updated_at?: string | null
+                    user_id: string
+                }
+                Update: {
+                    book_id?: string
+                    created_at?: string | null
+                    id?: string
+                    status?: Database["public"]["Enums"]["book_status_enum"] | null
+                    updated_at?: string | null
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "book_status_history_book_id_fkey"
+                        columns: ["book_id"]
+                        isOneToOne: false
+                        referencedRelation: "books"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            books: {
+                Row: {
+                    api_id: string | null
+                    api_source: string | null
+                    cover_image_url: string | null
+                    created_at: string | null
+                    date_added: string | null
+                    description: string | null
+                    edition: Json | null
+                    format: Database["public"]["Enums"]["book_format_enum"] | null
+                    genres: string[] | null
+                    id: string
+                    isbn10: string | null
+                    isbn13: string | null
+                    language: string | null
+                    metadata: Json | null
+                    publication_date: string | null
+                    publisher: string | null
+                    rating: number | null
+                    title: string
+                    total_duration: number | null
+                    total_pages: number | null
+                    updated_at: string | null
+                }
+                Insert: {
+                    api_id?: string | null
+                    api_source?: string | null
+                    cover_image_url?: string | null
+                    created_at?: string | null
+                    date_added?: string | null
+                    description?: string | null
+                    edition?: Json | null
+                    format?: Database["public"]["Enums"]["book_format_enum"] | null
+                    genres?: string[] | null
+                    id: string
+                    isbn10?: string | null
+                    isbn13?: string | null
+                    language?: string | null
+                    metadata?: Json | null
+                    publication_date?: string | null
+                    publisher?: string | null
+                    rating?: number | null
+                    title: string
+                    total_duration?: number | null
+                    total_pages?: number | null
+                    updated_at?: string | null
+                }
+                Update: {
+                    api_id?: string | null
+                    api_source?: string | null
+                    cover_image_url?: string | null
+                    created_at?: string | null
+                    date_added?: string | null
+                    description?: string | null
+                    edition?: Json | null
+                    format?: Database["public"]["Enums"]["book_format_enum"] | null
+                    genres?: string[] | null
+                    id?: string
+                    isbn10?: string | null
+                    isbn13?: string | null
+                    language?: string | null
+                    metadata?: Json | null
+                    publication_date?: string | null
+                    publisher?: string | null
+                    rating?: number | null
+                    title?: string
+                    total_duration?: number | null
+                    total_pages?: number | null
+                    updated_at?: string | null
+                }
+                Relationships: []
+            }
             profiles: {
                 Row: {
                     avatar_url: string | null
@@ -156,6 +545,41 @@ export type Database = {
                 Relationships: [
                     {
                         foreignKeyName: "reading_deadline_progress_reading_deadline_id_fkey"
+                        columns: ["reading_deadline_id"]
+                        isOneToOne: false
+                        referencedRelation: "reading_deadlines"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            reading_deadline_status: {
+                Row: {
+                    created_at: string
+                    id: number
+                    reading_deadline_id: string | null
+                    status:
+                    | Database["public"]["Enums"]["reading_deadline_status_enum"]
+                    | null
+                }
+                Insert: {
+                    created_at?: string
+                    id?: number
+                    reading_deadline_id?: string | null
+                    status?:
+                    | Database["public"]["Enums"]["reading_deadline_status_enum"]
+                    | null
+                }
+                Update: {
+                    created_at?: string
+                    id?: number
+                    reading_deadline_id?: string | null
+                    status?:
+                    | Database["public"]["Enums"]["reading_deadline_status_enum"]
+                    | null
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "reading_deadline_status_reading_deadline_id_fkey"
                         columns: ["reading_deadline_id"]
                         isOneToOne: false
                         referencedRelation: "reading_deadlines"
@@ -389,6 +813,14 @@ export type Database = {
             book_format_enum: "physical" | "ebook" | "audio"
             book_status_enum: "tbr" | "current" | "completed" | "dnf" | "pause"
             deadline_flexibility: "flexible" | "strict"
+            reading_deadline_status_enum:
+            | "requested"
+            | "approved"
+            | "reading"
+            | "rejected"
+            | "withdrew"
+            | "complete"
+            | "set_aside"
         }
         CompositeTypes: {
             [_ in never]: never
@@ -515,6 +947,15 @@ export const Constants = {
             book_format_enum: ["physical", "ebook", "audio"],
             book_status_enum: ["tbr", "current", "completed", "dnf", "pause"],
             deadline_flexibility: ["flexible", "strict"],
+            reading_deadline_status_enum: [
+                "requested",
+                "approved",
+                "reading",
+                "rejected",
+                "withdrew",
+                "complete",
+                "set_aside",
+            ],
         },
     },
 } as const
