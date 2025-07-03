@@ -1,8 +1,8 @@
 import { SignOutButton } from '@/components/auth/SignOutButton';
-import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { UserAvatar } from '@/components/shared/UserAvatar';
+import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTheme } from '@/theme';
 import { useUser } from '@clerk/clerk-expo';
 import { router } from 'expo-router';
@@ -76,10 +76,10 @@ export default function SettingsScreen() {
 
                         <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
-                        <TouchableOpacity style={styles.settingItem} onPress={() => router.push('/completed-deadlines')}>
+                        <TouchableOpacity style={styles.settingItem} onPress={() => router.push('/archive')}>
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="checkmark.circle.fill" size={20} color={iconColor} />
-                                <ThemedText style={styles.settingText}>Completed Deadlines</ThemedText>
+                                <ThemedText style={styles.settingText}>Archives</ThemedText>
                             </View>
                             <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
                         </TouchableOpacity>

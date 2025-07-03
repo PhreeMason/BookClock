@@ -376,13 +376,13 @@ export const useCompleteDeadline = () => useUpdateDeadlineStatus('complete');
 
 export const useSetAsideDeadline = () => useUpdateDeadlineStatus('set_aside');
 
-export const useGetCompletedDeadlines = () => {
+export const useGetArchivedDeadlines = () => {
     const supabase = useSupabase();
     const user = useUser();
     const userId = user?.user?.id;
 
     return useQuery<ReadingDeadlineWithProgress[]>({
-        queryKey: ['completedDeadlines', userId],
+        queryKey: ['ArchivedDeadlines', userId],
         queryFn: async () => {
             if (!userId) throw new Error("User not authenticated");
             const { data, error } = await supabase

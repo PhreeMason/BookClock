@@ -1,9 +1,9 @@
-import { renderHook, waitFor } from '@testing-library/react-native';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
-import { useDeadlineHistory } from '../useReadingHistory';
+import { getSampleDeadlines, getSampleDeadlinesByFormat, sampleDeadlines } from '@/__tests__/fixtures/sampleDeadlines';
 import { useSupabase } from '@/lib/supabase';
-import { sampleDeadlines, getSampleDeadlines, getSampleDeadlinesByFormat } from '@/__tests__/fixtures/sampleDeadlines';
+import { useUser } from '@clerk/clerk-expo';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react-native';
+import { useDeadlineHistory } from '../useReadingHistory';
 
 // Mock dependencies
 jest.mock('@clerk/clerk-expo');
@@ -106,7 +106,7 @@ describe('useDeadlineHistory', () => {
     expect(result.current.data?.entries.length).toBeGreaterThan(0); // Should have some activity days
     expect(result.current.data?.summary.totalDays).toBeGreaterThan(0);
     expect(result.current.data?.summary.activeDeadlines).toBeGreaterThanOrEqual(0);
-    expect(result.current.data?.summary.completedDeadlines).toBeGreaterThanOrEqual(0);
+    expect(result.current.data?.summary.ArchivedDeadlines).toBeGreaterThanOrEqual(0);
   });
 
   it('should handle date range filtering', async () => {
@@ -370,7 +370,7 @@ describe('useDeadlineHistory', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(result.current.data?.summary.completedDeadlines).toBe(1);
+    expect(result.current.data?.summary.ArchivedDeadlines).toBe(1);
     expect(result.current.data?.summary.activeDeadlines).toBe(0);
   });
 });

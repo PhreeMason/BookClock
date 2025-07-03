@@ -1,8 +1,8 @@
-import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import ReadingCalendar from '../features/calendar/ReadingCalendar';
 import { useDeadlineHistory } from '@/hooks/useReadingHistory';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import React from 'react';
+import ReadingCalendar from '../features/calendar/ReadingCalendar';
 
 // Mock the hooks and components
 jest.mock('@/hooks/useReadingHistory');
@@ -185,7 +185,7 @@ describe('ReadingCalendar Date Click Tests', () => {
         totalProgressMade: 3585,
         averageProgressPerDay: 1792.5,
         activeDeadlines: 4,
-        completedDeadlines: 0,
+        ArchivedDeadlines: 0,
       },
     };
 
@@ -330,7 +330,7 @@ describe('ReadingCalendar Date Click Tests', () => {
         totalProgressMade: 1040,
         averageProgressPerDay: 520,
         activeDeadlines: 2,
-        completedDeadlines: 0,
+        ArchivedDeadlines: 0,
       },
     };
 
@@ -424,7 +424,7 @@ describe('ReadingCalendar Date Click Tests', () => {
         totalProgressMade: 0,
         averageProgressPerDay: 0,
         activeDeadlines: 0,
-        completedDeadlines: 0,
+        ArchivedDeadlines: 0,
       },
     };
 

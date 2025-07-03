@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
-import { useMemo } from 'react';
 import { useSupabase } from '@/lib/supabase';
+import { useUser } from '@clerk/clerk-expo';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 export interface DailyDeadlineEntry {
   date: string;
@@ -27,7 +27,7 @@ export interface DeadlineHistoryData {
     totalProgressMade: number;
     averageProgressPerDay: number;
     activeDeadlines: number;
-    completedDeadlines: number;
+    ArchivedDeadlines: number;
   };
 }
 
@@ -254,7 +254,7 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
         return latestProgress.current_progress < d.total_quantity;
       }).length || 0;
       
-      const completedDeadlines = (deadlines?.length || 0) - activeDeadlines;
+      const ArchivedDeadlines = (deadlines?.length || 0) - activeDeadlines;
 
       return {
         entries,
@@ -263,7 +263,7 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
           totalProgressMade,
           averageProgressPerDay: totalDays > 0 ? totalProgressMade / totalDays : 0,
           activeDeadlines,
-          completedDeadlines,
+          ArchivedDeadlines,
         },
       };
     },
