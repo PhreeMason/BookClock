@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { StyleSheet, View, Platform } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { ThemedText, ThemedView } from '@/components/themed';
@@ -25,18 +25,51 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
     formatFilter: selectedCategory,
   });
 
-  // Get all dates with data for navigation
-  const availableDates = data?.entries
-    ? data.entries.map(entry => entry.date).sort()
-    : [];
+
+  // Get all dates in range (including empty ones) for navigation
+  const allDatesInRange = useMemo(() => {
+    const dates: string[] = [];
+    const endDate = new Date();
+    let startDate: Date;
+
+    switch (dateRange) {
+      case '7d':
+        startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case '30d':
+        startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case '90d':
+        startDate = new Date(endDate.getTime() - 90 * 24 * 60 * 60 * 1000);
+        break;
+      case '1y':
+        startDate = new Date(endDate.getTime() - 365 * 24 * 60 * 60 * 1000);
+        break;
+      case 'all':
+      default:
+        // For 'all', use the earliest date from the data
+        const earliestDate = data?.entries?.[0]?.date;
+        startDate = earliestDate ? new Date(earliestDate) : new Date(endDate.getTime() - 90 * 24 * 60 * 60 * 1000);
+    }
+
+    // Generate all dates between start and end
+    const currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      dates.push(`${year}-${month}-${day}`);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates.sort();
+  }, [dateRange, data?.entries]);
+  
 
   const handleDayPress = (day: { dateString: string }) => {
-    if (!data?.entries) return;
-    const dayData = data.entries.find(entry => entry.date === day.dateString);
-    if (dayData) {
-      setSelectedDate(day.dateString);
-      setShowDetails(true);
-    }
+    // Allow clicking on any date, not just ones with data
+    setSelectedDate(day.dateString);
+    setShowDetails(true);
   };
 
   const handleCloseDetails = () => {
@@ -49,12 +82,28 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
   };
 
   const selectedDayData = selectedDate && data?.entries
-    ? data.entries.find(entry => entry.date === selectedDate)
+    ? data.entries.find(entry => entry.date === selectedDate) || {
+        date: selectedDate,
+        deadlines: [],
+        totalProgressMade: 0,
+      }
     : null;
 
   const currentDateIndex = selectedDate
-    ? availableDates.indexOf(selectedDate)
+    ? allDatesInRange.indexOf(selectedDate)
     : 0;
+
+  // Memoize allDayData to prevent unnecessary recalculations
+  const allDayData = useMemo(() => 
+    allDatesInRange.map(date => {
+      const existingEntry = data?.entries?.find(e => e.date === date);
+      return existingEntry || {
+        date,
+        deadlines: [],
+        totalProgressMade: 0,
+      };
+    }), [allDatesInRange, data?.entries]
+  );
 
   if (isLoading) {
     return (
@@ -199,10 +248,10 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
           onClose={handleCloseDetails}
           dayData={selectedDayData}
           selectedCategory={selectedCategory}
-          availableDates={availableDates}
+          availableDates={allDatesInRange}
           currentDateIndex={currentDateIndex}
           onDateChange={handleDateChange}
-          allDayData={data?.entries || []}
+          allDayData={allDayData}
         />
       )}
     </>
