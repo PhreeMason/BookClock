@@ -31,7 +31,7 @@ interface DayContentProps {
 }
 
 // Component for rendering the content of a single day
-const DayContent: React.FC<DayContentProps> = ({ dayData, selectedCategory, theme }) => {
+const DayContent: React.FC<DayContentProps> = React.memo(({ dayData, selectedCategory, theme }) => {
   const formatProgress = (deadline: DailyDeadlineEntry['deadlines'][0]) => {
     if (deadline.format === 'audio') {
       const hours = Math.floor(deadline.progress_made / 60);
@@ -215,7 +215,9 @@ const DayContent: React.FC<DayContentProps> = ({ dayData, selectedCategory, them
       </ThemedView>
     </>
   );
-};
+});
+
+DayContent.displayName = 'DayContent';
 
 const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
   isVisible,
@@ -233,8 +235,11 @@ const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
 
   useEffect(() => {
     if (currentDateIndex !== currentPage && pagerRef.current) {
-      pagerRef.current.setPage(currentDateIndex);
-      setCurrentPage(currentDateIndex);
+      // Use setTimeout to ensure PagerView is fully mounted
+      setTimeout(() => {
+        pagerRef.current?.setPage(currentDateIndex);
+        setCurrentPage(currentDateIndex);
+      }, 0);
     }
   }, [currentDateIndex, currentPage]);
 
@@ -276,6 +281,16 @@ const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
       weekday: 'long',
       year: 'numeric',
       month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const formatShortDate = (dateString: string) => {
+    // Parse YYYY-MM-DD format safely to avoid timezone issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // Month is 0-indexed
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
       day: 'numeric',
     });
   };
@@ -346,18 +361,27 @@ const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
           style={styles.pagerView}
           initialPage={currentDateIndex}
           onPageSelected={handlePageSelected}
+          scrollEnabled={true}
+          overdrag={true}
         >
-          {availableDates.map((date) => {
+          {availableDates.map((date, index) => {
             const currentDayData = allDayData.find((d) => d.date === date) || dayData;
+            // Only render content for current page and adjacent pages for performance
+            const shouldRender = Math.abs(index - currentPage) <= 1;
+            
             return (
               <View key={date} style={styles.pageContainer}>
-                <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                  <DayContent
-                    dayData={currentDayData}
-                    selectedCategory={selectedCategory}
-                    theme={theme}
-                  />
-                </ScrollView>
+                {shouldRender ? (
+                  <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                    <DayContent
+                      dayData={currentDayData}
+                      selectedCategory={selectedCategory}
+                      theme={theme}
+                    />
+                  </ScrollView>
+                ) : (
+                  <View style={styles.content} />
+                )}
               </View>
             );
           })}
@@ -378,7 +402,7 @@ const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
             <ThemedText
               style={[styles.navButtonText, currentPage === 0 && { color: theme.textMuted }]}
             >
-              Previous
+              {currentPage > 0 ? formatShortDate(availableDates[currentPage - 1]) : 'Previous'}
             </ThemedText>
           </TouchableOpacity>
 
@@ -403,7 +427,7 @@ const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
                 currentPage === availableDates.length - 1 && { color: theme.textMuted },
               ]}
             >
-              Next
+              {currentPage < availableDates.length - 1 ? formatShortDate(availableDates[currentPage + 1]) : 'Next'}
             </ThemedText>
             <IconSymbol
               name="chevron.right"

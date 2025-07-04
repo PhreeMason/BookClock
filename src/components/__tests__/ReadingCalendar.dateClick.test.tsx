@@ -14,7 +14,7 @@ jest.mock('@/lib/supabase', () => ({
 jest.mock('@clerk/clerk-expo', () => ({
   useUser: () => ({ user: { id: 'test-user' } }),
 }));
-jest.mock('../ReadingDayDetails', () => {
+jest.mock('../features/calendar/ReadingDayDetails', () => {
   return jest.fn(({ dayData, isVisible }) => {
     const { View, Text } = require('react-native');
     if (!isVisible) return null;
@@ -410,7 +410,7 @@ describe('ReadingCalendar Date Click Tests', () => {
     expect(getByTestId('deadline-1').props.children).toBe('Singing');
   });
 
-  test('clicking empty date should not show details modal', async () => {
+  test('clicking empty date should now show details modal with empty content', async () => {
     const mockData = {
       entries: [
         {
@@ -467,8 +467,18 @@ describe('ReadingCalendar Date Click Tests', () => {
     const june23Button = getByTestId('date-2025-06-23');
     fireEvent.press(june23Button);
 
-    // Details modal should NOT appear
-    const detailsModal = queryByTestId('reading-day-details');
-    expect(detailsModal).toBeFalsy();
+    // Details modal should now appear even for empty dates
+    await waitFor(() => {
+      const detailsModal = queryByTestId('reading-day-details');
+      expect(detailsModal).toBeTruthy();
+    });
+    
+    // Verify it shows the correct date
+    const selectedDate = getByTestId('selected-date');
+    expect(selectedDate.props.children).toBe('2025-06-23');
+    
+    // Verify it shows 0 deadlines
+    const deadlinesCount = getByTestId('deadlines-count');
+    expect(deadlinesCount.props.children).toBe(0);
   });
 });
