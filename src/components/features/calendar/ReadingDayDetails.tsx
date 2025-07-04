@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   Modal,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
+import PagerView from 'react-native-pager-view';
 import { ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTheme } from '@/theme';
@@ -17,38 +18,43 @@ interface ReadingDayDetailsProps {
   onClose: () => void;
   dayData: DailyDeadlineEntry;
   selectedCategory: FormatFilter;
+  availableDates?: string[];
+  currentDateIndex?: number;
+  onDateChange?: (date: string) => void;
+  allDayData?: DailyDeadlineEntry[];
 }
 
-const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
-  isVisible,
-  onClose,
-  dayData,
-  selectedCategory,
-}) => {
-  const { theme } = useTheme();
+interface DayContentProps {
+  dayData: DailyDeadlineEntry;
+  selectedCategory: FormatFilter;
+  theme: any;
+}
 
-  const formatDate = (dateString: string) => {
-    // Parse YYYY-MM-DD format safely to avoid timezone issues
-    const [year, month, day] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day); // Month is 0-indexed
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
+// Component for rendering the content of a single day
+const DayContent: React.FC<DayContentProps> = ({ dayData, selectedCategory, theme }) => {
   const formatProgress = (deadline: DailyDeadlineEntry['deadlines'][0]) => {
     if (deadline.format === 'audio') {
       const hours = Math.floor(deadline.progress_made / 60);
       const minutes = deadline.progress_made % 60;
       if (hours > 0) {
-        return `${hours}h ${minutes}m`;
+        return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
       }
       return `${minutes}m`;
     } else {
       return `${deadline.progress_made} pages`;
+    }
+  };
+
+  const formatQuantity = (quantity: number, format: string) => {
+    if (format === 'audio') {
+      const hours = Math.floor(quantity / 60);
+      const minutes = quantity % 60;
+      if (hours > 0) {
+        return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+      }
+      return `${minutes}m`;
+    } else {
+      return `${quantity} pages`;
     }
   };
 
@@ -87,7 +93,196 @@ const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
     return true; // 'all' or 'combined' category
   });
 
+  // Calculate total progress for filtered deadlines only
+  const filteredTotalProgress = filteredDeadlines.reduce((sum, deadline) => sum + deadline.progress_made, 0);
+  
+  // Format the total based on the selected category
+  const formatTotalProgress = () => {
+    if (selectedCategory === 'listening' && filteredTotalProgress > 0) {
+      const hours = Math.floor(filteredTotalProgress / 60);
+      const minutes = filteredTotalProgress % 60;
+      if (hours > 0) {
+        return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+      }
+      return `${minutes}m`;
+    } else if (selectedCategory === 'reading') {
+      return `${filteredTotalProgress} pages`;
+    }
+    // For 'all' or 'combined', just show the number
+    return Math.round(dayData.totalProgressMade);
+  };
+
   return (
+    <>
+      {/* Summary Stats */}
+      <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <IconSymbol name="chart.bar" size={20} color={theme.primary} />
+          <ThemedText type="semiBold" style={styles.sectionTitle}>
+            Daily Summary
+          </ThemedText>
+        </View>
+        
+        <View style={styles.summaryRow}>
+          <View style={styles.summaryItem}>
+            <IconSymbol name="target" size={20} color={theme.primary} />
+            <ThemedText style={styles.summaryValue}>
+              {formatTotalProgress()}
+            </ThemedText>
+            <ThemedText color="textMuted" style={styles.summaryLabel}>
+              Total Progress
+            </ThemedText>
+          </View>
+          
+          <View style={styles.summaryItem}>
+            <IconSymbol name="calendar.badge.clock" size={20} color={theme.secondary} />
+            <ThemedText style={styles.summaryValue}>
+              {filteredDeadlines.length}
+            </ThemedText>
+            <ThemedText color="textMuted" style={styles.summaryLabel}>
+              Deadlines Worked
+            </ThemedText>
+          </View>
+          
+          <View style={styles.summaryItem}>
+            <IconSymbol name="checkmark.circle" size={20} color={theme.success} />
+            <ThemedText style={styles.summaryValue}>
+              {filteredDeadlines.filter(d => d.total_progress >= d.total_quantity).length}
+            </ThemedText>
+            <ThemedText color="textMuted" style={styles.summaryLabel}>
+              Completed
+            </ThemedText>
+          </View>
+        </View>
+      </ThemedView>
+
+      {/* Deadlines List */}
+      <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <IconSymbol name="list.bullet" size={20} color={theme.primary} />
+          <ThemedText type="semiBold" style={styles.sectionTitle}>
+            Deadlines Worked On
+          </ThemedText>
+        </View>
+
+        {filteredDeadlines.length > 0 ? (
+          <View style={styles.booksList}>
+            {filteredDeadlines.map((deadline, index) => (
+              <View key={`${deadline.id}-${index}`} style={styles.bookItem}>
+                <View style={styles.bookHeader}>
+                  <IconSymbol
+                    name={getFormatIcon(deadline.format)}
+                    size={18}
+                    color={getFormatColor(deadline.format)}
+                  />
+                  <View style={styles.bookInfo}>
+                    <ThemedText type="semiBold" style={styles.bookTitle} numberOfLines={2}>
+                      {deadline.book_title}
+                    </ThemedText>
+                    {deadline.author && (
+                      <ThemedText color="textMuted" style={styles.bookAuthor}>
+                        by {deadline.author}
+                      </ThemedText>
+                    )}
+                    <ThemedText color="textMuted" style={styles.bookAuthor}>
+                      Due: {new Date(deadline.deadline_date).toLocaleDateString()}
+                    </ThemedText>
+                  </View>
+                </View>
+
+                <View style={styles.progressContainer}>
+                  <ThemedText style={styles.progressText}>
+                    Progress: {formatProgress(deadline)}
+                  </ThemedText>
+                  <ThemedText color="textMuted" style={styles.pageRange}>
+                    Total: {formatQuantity(deadline.total_progress, deadline.format)}/{formatQuantity(deadline.total_quantity, deadline.format)} ({Math.round((deadline.total_progress / deadline.total_quantity) * 100)}%)
+                  </ThemedText>
+                  <ThemedText color="textMuted" style={styles.pageRange}>
+                    Source: {deadline.source}
+                  </ThemedText>
+                </View>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.emptyState}>
+            <IconSymbol name="calendar.badge.exclamationmark" size={32} color={theme.textMuted} />
+            <ThemedText color="textMuted" style={styles.emptyText}>
+              No deadline progress recorded for this day
+            </ThemedText>
+          </View>
+        )}
+      </ThemedView>
+    </>
+  );
+};
+
+const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
+  isVisible,
+  onClose,
+  dayData,
+  selectedCategory,
+  availableDates = [],
+  currentDateIndex = 0,
+  onDateChange,
+  allDayData = [],
+}) => {
+  const { theme } = useTheme();
+  const pagerRef = useRef<PagerView>(null);
+  const [currentPage, setCurrentPage] = useState(currentDateIndex);
+
+  useEffect(() => {
+    if (currentDateIndex !== currentPage && pagerRef.current) {
+      pagerRef.current.setPage(currentDateIndex);
+      setCurrentPage(currentDateIndex);
+    }
+  }, [currentDateIndex, currentPage]);
+
+  const handlePageSelected = (e: any) => {
+    const newIndex = e.nativeEvent.position;
+    setCurrentPage(newIndex);
+    if (onDateChange && availableDates[newIndex]) {
+      onDateChange(availableDates[newIndex]);
+    }
+  };
+
+  const navigateToPrevious = () => {
+    if (currentPage > 0) {
+      const newIndex = currentPage - 1;
+      pagerRef.current?.setPage(newIndex);
+      setCurrentPage(newIndex);
+      if (onDateChange && availableDates[newIndex]) {
+        onDateChange(availableDates[newIndex]);
+      }
+    }
+  };
+
+  const navigateToNext = () => {
+    if (currentPage < availableDates.length - 1) {
+      const newIndex = currentPage + 1;
+      pagerRef.current?.setPage(newIndex);
+      setCurrentPage(newIndex);
+      if (onDateChange && availableDates[newIndex]) {
+        onDateChange(availableDates[newIndex]);
+      }
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    // Parse YYYY-MM-DD format safely to avoid timezone issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // Month is 0-indexed
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  // If we don't have navigation data, render the original single-day view
+  if (!availableDates || availableDates.length === 0) {
+    return (
     <Modal
       visible={isVisible}
       animationType="slide"
@@ -112,106 +307,111 @@ const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Summary Stats */}
-          <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <IconSymbol name="chart.bar" size={20} color={theme.primary} />
-              <ThemedText type="semiBold" style={styles.sectionTitle}>
-                Daily Summary
-              </ThemedText>
-            </View>
-            
-            <View style={styles.summaryRow}>
-              <View style={styles.summaryItem}>
-                <IconSymbol name="target" size={20} color={theme.primary} />
-                <ThemedText style={styles.summaryValue}>
-                  {Math.round(dayData.totalProgressMade)}
-                </ThemedText>
-                <ThemedText color="textMuted" style={styles.summaryLabel}>
-                  Total Progress
-                </ThemedText>
-              </View>
-              
-              <View style={styles.summaryItem}>
-                <IconSymbol name="calendar.badge.clock" size={20} color={theme.secondary} />
-                <ThemedText style={styles.summaryValue}>
-                  {filteredDeadlines.length}
-                </ThemedText>
-                <ThemedText color="textMuted" style={styles.summaryLabel}>
-                  Deadlines Worked
-                </ThemedText>
-              </View>
-              
-              <View style={styles.summaryItem}>
-                <IconSymbol name="checkmark.circle" size={20} color={theme.success} />
-                <ThemedText style={styles.summaryValue}>
-                  {filteredDeadlines.filter(d => d.total_progress >= d.total_quantity).length}
-                </ThemedText>
-                <ThemedText color="textMuted" style={styles.summaryLabel}>
-                  Completed
-                </ThemedText>
-              </View>
-            </View>
-          </ThemedView>
-
-          {/* Deadlines List */}
-          <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <IconSymbol name="list.bullet" size={20} color={theme.primary} />
-              <ThemedText type="semiBold" style={styles.sectionTitle}>
-                Deadlines Worked On
-              </ThemedText>
-            </View>
-
-            {filteredDeadlines.length > 0 ? (
-              <View style={styles.booksList}>
-                {filteredDeadlines.map((deadline, index) => (
-                  <View key={`${deadline.id}-${index}`} style={styles.bookItem}>
-                    <View style={styles.bookHeader}>
-                      <IconSymbol
-                        name={getFormatIcon(deadline.format)}
-                        size={18}
-                        color={getFormatColor(deadline.format)}
-                      />
-                      <View style={styles.bookInfo}>
-                        <ThemedText type="semiBold" style={styles.bookTitle} numberOfLines={2}>
-                          {deadline.book_title}
-                        </ThemedText>
-                        {deadline.author && (
-                          <ThemedText color="textMuted" style={styles.bookAuthor}>
-                            by {deadline.author}
-                          </ThemedText>
-                        )}
-                        <ThemedText color="textMuted" style={styles.bookAuthor}>
-                          Due: {new Date(deadline.deadline_date).toLocaleDateString()}
-                        </ThemedText>
-                      </View>
-                    </View>
-
-                    <View style={styles.progressContainer}>
-                      <ThemedText style={styles.progressText}>
-                        Progress: {formatProgress(deadline)}
-                      </ThemedText>
-                      <ThemedText color="textMuted" style={styles.pageRange}>
-                        Total: {deadline.total_progress}/{deadline.total_quantity} ({Math.round((deadline.total_progress / deadline.total_quantity) * 100)}%)
-                      </ThemedText>
-                      <ThemedText color="textMuted" style={styles.pageRange}>
-                        Source: {deadline.source}
-                      </ThemedText>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            ) : (
-              <View style={styles.emptyState}>
-                <IconSymbol name="calendar.badge.exclamationmark" size={32} color={theme.textMuted} />
-                <ThemedText color="textMuted" style={styles.emptyText}>
-                  No deadline progress recorded for this day
-                </ThemedText>
-              </View>
-            )}
-          </ThemedView>
+          <DayContent dayData={dayData} selectedCategory={selectedCategory} theme={theme} />
         </ScrollView>
+      </ThemedView>
+    </Modal>
+    );
+  }
+
+  // Render the swipeable multi-day view
+  return (
+    <Modal
+      visible={isVisible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+    >
+      <ThemedView backgroundColor="background" style={styles.container}>
+        {/* Header */}
+        <View style={[styles.header, { borderBottomColor: theme.border }]}>
+          <View style={styles.headerContent}>
+            <ThemedText type="semiBold" style={styles.headerTitle}>
+              {formatDate(
+                availableDates[currentPage] || dayData.date
+              )}
+            </ThemedText>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <IconSymbol
+                name="xmark"
+                size={Platform.OS === 'ios' ? 24 : 28}
+                color={theme.text}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <PagerView
+          ref={pagerRef}
+          style={styles.pagerView}
+          initialPage={currentDateIndex}
+          onPageSelected={handlePageSelected}
+        >
+          {availableDates.map((date) => {
+            const currentDayData = allDayData.find((d) => d.date === date) || dayData;
+            return (
+              <View key={date} style={styles.pageContainer}>
+                <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                  <DayContent
+                    dayData={currentDayData}
+                    selectedCategory={selectedCategory}
+                    theme={theme}
+                  />
+                </ScrollView>
+              </View>
+            );
+          })}
+        </PagerView>
+
+        {/* Navigation Buttons */}
+        <View style={[styles.navigationContainer, { borderTopColor: theme.border }]}>
+          <TouchableOpacity
+            style={[styles.navButton, currentPage === 0 && styles.navButtonDisabled]}
+            onPress={navigateToPrevious}
+            disabled={currentPage === 0}
+          >
+            <IconSymbol
+              name="chevron.left"
+              size={24}
+              color={currentPage === 0 ? theme.textMuted : theme.primary}
+            />
+            <ThemedText
+              style={[styles.navButtonText, currentPage === 0 && { color: theme.textMuted }]}
+            >
+              Previous
+            </ThemedText>
+          </TouchableOpacity>
+
+          <View style={styles.pageIndicator}>
+            <ThemedText color="textMuted" style={styles.pageIndicatorText}>
+              {currentPage + 1} of {availableDates.length}
+            </ThemedText>
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.navButton,
+              styles.navButtonRight,
+              currentPage === availableDates.length - 1 && styles.navButtonDisabled,
+            ]}
+            onPress={navigateToNext}
+            disabled={currentPage === availableDates.length - 1}
+          >
+            <ThemedText
+              style={[
+                styles.navButtonText,
+                currentPage === availableDates.length - 1 && { color: theme.textMuted },
+              ]}
+            >
+              Next
+            </ThemedText>
+            <IconSymbol
+              name="chevron.right"
+              size={24}
+              color={currentPage === availableDates.length - 1 ? theme.textMuted : theme.primary}
+            />
+          </TouchableOpacity>
+        </View>
       </ThemedView>
     </Modal>
   );
@@ -341,6 +541,44 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 12,
     maxWidth: 200,
+  },
+  pagerView: {
+    flex: 1,
+  },
+  pageContainer: {
+    flex: 1,
+  },
+  navigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+  },
+  navButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    minWidth: 100,
+  },
+  navButtonRight: {
+    justifyContent: 'flex-end',
+  },
+  navButtonDisabled: {
+    opacity: 0.5,
+  },
+  navButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginHorizontal: 4,
+  },
+  pageIndicator: {
+    alignItems: 'center',
+  },
+  pageIndicatorText: {
+    fontSize: 14,
   },
 });
 

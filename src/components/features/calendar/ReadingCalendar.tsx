@@ -25,6 +25,11 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
     formatFilter: selectedCategory,
   });
 
+  // Get all dates with data for navigation
+  const availableDates = data?.entries
+    ? data.entries.map(entry => entry.date).sort()
+    : [];
+
   const handleDayPress = (day: { dateString: string }) => {
     if (!data?.entries) return;
     const dayData = data.entries.find(entry => entry.date === day.dateString);
@@ -39,9 +44,17 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
     setSelectedDate(null);
   };
 
+  const handleDateChange = (newDate: string) => {
+    setSelectedDate(newDate);
+  };
+
   const selectedDayData = selectedDate && data?.entries
     ? data.entries.find(entry => entry.date === selectedDate)
     : null;
+
+  const currentDateIndex = selectedDate
+    ? availableDates.indexOf(selectedDate)
+    : 0;
 
   if (isLoading) {
     return (
@@ -186,6 +199,10 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
           onClose={handleCloseDetails}
           dayData={selectedDayData}
           selectedCategory={selectedCategory}
+          availableDates={availableDates}
+          currentDateIndex={currentDateIndex}
+          onDateChange={handleDateChange}
+          allDayData={data?.entries || []}
         />
       )}
     </>
