@@ -12,7 +12,9 @@ import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { DatabaseProvider } from '@/providers/DatabaseProvider';
 import { ThemeProvider } from '@/theme';
+
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 const queryClient = new QueryClient()
@@ -30,19 +32,21 @@ export default function RootLayout() {
     }
 
     return (
-        <ThemeProvider>
-            <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <QueryClientProvider client={queryClient}>
-                    <ClerkProvider tokenCache={tokenCache} publishableKey={CLERK_PUBLISHABLE_KEY}>
-                        <Stack>
-                            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                            <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
-                        </Stack>
-                        <StatusBar style="auto" />
-                        <Toast />
-                    </ClerkProvider>
-                </QueryClientProvider>
-            </NavigationThemeProvider>
-        </ThemeProvider>
+        <DatabaseProvider>
+            <ThemeProvider>
+                <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                    <QueryClientProvider client={queryClient}>
+                        <ClerkProvider tokenCache={tokenCache} publishableKey={CLERK_PUBLISHABLE_KEY}>
+                            <Stack>
+                                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                                <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
+                            </Stack>
+                            <StatusBar style="auto" />
+                            <Toast />
+                        </ClerkProvider>
+                    </QueryClientProvider>
+                </NavigationThemeProvider>
+            </ThemeProvider>
+        </DatabaseProvider>
     );
 }
