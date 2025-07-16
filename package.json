@@ -11,7 +11,8 @@
     "typecheck": "npx tsc --noEmit",
     "build:local": "npx eas build --platform android --profile preview --local",
     "supabase:genTypes": "npx supabase gen types --lang=typescript --project-id \"azghfvgabktnvdfjtxhl\" --schema public > src/types/supabase.ts",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "test:ff": "jest --runInBand --bail"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^2.12.0",
