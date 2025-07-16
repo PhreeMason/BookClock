@@ -18,22 +18,34 @@ const QuickActionButtons: React.FC<QuickActionButtonsProps> = ({
     return (
         <View style={styles.quickButtons}>
             <ThemedButton
+                title={`-${1}`}
+                variant="accent"
+                style={styles.quickBtn}
+                onPress={() => onQuickUpdate(-1)}
+            />
+            <ThemedButton
+                title={`+${5}`}
+                variant="accent"
+                style={styles.quickBtn}
+                onPress={() => onQuickUpdate(5)}
+            />
+            <ThemedButton
+                title={`+${5 * 2}`}
+                variant="accent"
+                style={styles.quickBtn}
+                onPress={() => onQuickUpdate(5 * 2)}
+            />
+            <ThemedButton
                 title={`+${unitsPerDay}`}
                 variant="accent"
                 style={styles.quickBtn}
                 onPress={() => onQuickUpdate(unitsPerDay)}
             />
             <ThemedButton
-                title={`+${unitsPerDay * 2}`}
+                title={`+1`}
                 variant="accent"
                 style={styles.quickBtn}
-                onPress={() => onQuickUpdate(unitsPerDay * 2)}
-            />
-            <ThemedButton
-                title={`+${unitsPerDay * 3}`}
-                variant="accent"
-                style={styles.quickBtn}
-                onPress={() => onQuickUpdate(unitsPerDay * 3)}
+                onPress={() => onQuickUpdate(1)}
             />
         </View>
     );

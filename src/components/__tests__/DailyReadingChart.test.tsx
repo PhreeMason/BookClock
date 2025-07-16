@@ -10,7 +10,7 @@ jest.mock('react-native-gifted-charts', () => ({
     const { View, Text } = require('react-native');
     return React.createElement(
       View,
-      { testID: testID || 'bar-chart' },
+      { testID: testID },
       React.createElement(Text, {}, `BarChart with ${data?.length || 0} items`)
     );
   }),
@@ -41,15 +41,15 @@ describe('DailyReadingChart', () => {
     progress: [
       {
         id: 'progress-1',
-        created_at: '2025-06-25T00:00:00Z',
-        updated_at: '2025-06-25T00:00:00Z',
+        created_at: '2025-07-14T00:00:00Z',
+        updated_at: '2025-07-14T00:00:00Z',
         current_progress: 50,
         reading_deadline_id: 'test-book-1'
       },
       {
         id: 'progress-2',
-        created_at: '2025-06-26T00:00:00Z',
-        updated_at: '2025-06-26T00:00:00Z',
+        created_at: '2025-07-15T00:00:00Z',
+        updated_at: '2025-07-15T00:00:00Z',
         current_progress: 75,
         reading_deadline_id: 'test-book-1'
       }
@@ -65,15 +65,15 @@ describe('DailyReadingChart', () => {
     progress: [
       {
         id: 'progress-audio-1',
-        created_at: '2025-06-25T00:00:00Z',
-        updated_at: '2025-06-25T00:00:00Z',
+        created_at: '2025-07-14T00:00:00Z',
+        updated_at: '2025-07-14T00:00:00Z',
         current_progress: 120,
         reading_deadline_id: 'test-audio-book'
       },
       {
         id: 'progress-audio-2',
-        created_at: '2025-06-26T00:00:00Z',
-        updated_at: '2025-06-26T00:00:00Z',
+        created_at: '2025-07-15T00:00:00Z',
+        updated_at: '2025-07-15T00:00:00Z',
         current_progress: 180,
         reading_deadline_id: 'test-audio-book'
       }
@@ -89,8 +89,8 @@ describe('DailyReadingChart', () => {
     progress: [
       {
         id: 'progress-ebook-1',
-        created_at: '2025-06-25T00:00:00Z',
-        updated_at: '2025-06-25T00:00:00Z',
+        created_at: '2025-07-14T00:00:00Z',
+        updated_at: '2025-07-14T00:00:00Z',
         current_progress: 25,
         reading_deadline_id: 'test-ebook'
       }
@@ -155,7 +155,7 @@ describe('DailyReadingChart', () => {
 
       const chart = getByTestId('bar-chart');
       expect(chart).toBeTruthy();
-      // The chart should show progress differences: 75-50=25 pages on 6/26
+      // The chart should show progress differences: 75-50=25 pages on 7/15
       expect(getByText(/BarChart with \d+ items/)).toBeTruthy();
     });
 
@@ -165,15 +165,15 @@ describe('DailyReadingChart', () => {
         progress: [
           {
             id: 'progress-1',
-            created_at: '2025-06-26T08:00:00Z',
-            updated_at: '2025-06-26T08:00:00Z',
+            created_at: '2025-07-15T08:00:00Z',
+            updated_at: '2025-07-15T08:00:00Z',
             current_progress: 50,
             reading_deadline_id: 'test-book-1'
           },
           {
             id: 'progress-2',
-            created_at: '2025-06-26T20:00:00Z',
-            updated_at: '2025-06-26T20:00:00Z',
+            created_at: '2025-07-15T20:00:00Z',
+            updated_at: '2025-07-15T20:00:00Z',
             current_progress: 80,
             reading_deadline_id: 'test-book-1'
           }
@@ -185,7 +185,7 @@ describe('DailyReadingChart', () => {
       );
 
       expect(getByTestId('bar-chart')).toBeTruthy();
-      // Should aggregate to 30 pages on 6/26
+      // Should aggregate to 30 pages on 7/15
     });
   });
 
@@ -266,15 +266,15 @@ describe('DailyReadingChart', () => {
         progress: [
           {
             id: 'large-initial',
-            created_at: '2025-06-26T00:00:00Z',
-            updated_at: '2025-06-26T00:00:00Z',
+            created_at: '2025-07-15T00:00:00Z',
+            updated_at: '2025-07-15T00:00:00Z',
             current_progress: 300, // Large initial progress (should be ignored)
             reading_deadline_id: 'test-audio-book'
           },
           {
             id: 'normal-progress',
-            created_at: '2025-06-27T00:00:00Z',
-            updated_at: '2025-06-27T00:00:00Z',
+            created_at: '2025-07-16T00:00:00Z',
+            updated_at: '2025-07-16T00:00:00Z',
             current_progress: 320, // Only 20 minutes of actual reading
             reading_deadline_id: 'test-audio-book'
           }
@@ -286,7 +286,7 @@ describe('DailyReadingChart', () => {
       );
 
       expect(getByTestId('bar-chart')).toBeTruthy();
-      // Should only show 20 minutes on 6/27, ignoring the large initial value
+      // Should only show 20 minutes on 7/16, ignoring the large initial value
     });
 
     it('should handle negative progress changes', () => {
@@ -295,15 +295,15 @@ describe('DailyReadingChart', () => {
         progress: [
           {
             id: 'progress-1',
-            created_at: '2025-06-26T08:00:00Z',
-            updated_at: '2025-06-26T08:00:00Z',
+            created_at: '2025-07-15T08:00:00Z',
+            updated_at: '2025-07-15T08:00:00Z',
             current_progress: 100,
             reading_deadline_id: 'test-book-1'
           },
           {
             id: 'progress-2',
-            created_at: '2025-06-26T20:00:00Z',
-            updated_at: '2025-06-26T20:00:00Z',
+            created_at: '2025-07-15T20:00:00Z',
+            updated_at: '2025-07-15T20:00:00Z',
             current_progress: 90, // User went backwards (correction)
             reading_deadline_id: 'test-book-1'
           }
