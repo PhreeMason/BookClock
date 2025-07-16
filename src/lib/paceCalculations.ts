@@ -32,79 +32,6 @@ export interface PaceBasedStatus {
   message: string;
 }
 
-/**
- * Gets reading days from the last 7 days for physical and ebook deadlines only.
- * No format mixing - only page-based reading data (physical + ebook).
- */
-export const getRecentAudioReadingDays = (
-  deadlines: ReadingDeadlineWithProgress[]
-): ReadingDay[] => {
-  const DAYS_TO_CONSIDER = 7;
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER);
-  const cutoffTime = cutoffDate.getTime();
-
-  let dailyProgress: { [date: string]: number } = {};
-
-  // Filter to only audio deadlines
-  const audioDeadlines = deadlines.filter(d => d.format === 'audio');
-
-  audioDeadlines.forEach(book => {
-    // Sort progress updates by date
-    if (!book.progress || !Array.isArray(book.progress)) return;
-
-    let progress = book.progress.slice().sort(
-      (a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
-    );
-
-    if (progress.length === 0) return;
-
-    // Only count first progress if it's reasonable for a single day
-    const firstProgress = progress[0];
-    const firstDate = new Date(firstProgress.created_at);
-    const INITIAL_LISTENING_THRESHOLD = 300; // 5 hours max for initial listening
-
-    if (firstDate.getTime() >= cutoffTime &&
-        firstProgress.current_progress > 0 &&
-        firstProgress.current_progress <= INITIAL_LISTENING_THRESHOLD) {
-      const dateStr = firstDate.toISOString().slice(0, 10);
-      const minutesListened = firstProgress.current_progress;
-
-      dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + (minutesListened / 1.5);
-    }
-
-    // Calculate differences between consecutive progress entries
-    for (let i = 1; i < progress.length; i++) {
-      let prev = progress[i - 1];
-      let curr = progress[i];
-
-      let endDate = new Date(curr.created_at).getTime();
-
-      // Skip if the end date is before the cutoff
-      if (endDate < cutoffTime) continue;
-
-      let progressDiff = curr.current_progress - prev.current_progress;
-
-      // Only positive progress (minutes listened)
-      if (progressDiff > 0) {
-        let endDateObj = new Date(endDate);
-        if (endDateObj.getTime() >= cutoffTime) {
-          let dateStr = endDateObj.toISOString().slice(0, 10);
-          dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + (progressDiff / 1.5);
-        }
-      }
-    }
-  });
-
-  // Convert dictionary to sorted array
-  return Object.entries(dailyProgress)
-    .map(([date, pagesRead]) => ({
-      date,
-      pagesRead: Number(pagesRead.toFixed(2)),
-      format: 'audio' as const
-    }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-};
 
 export const getRecentReadingDays = (
   deadlines: ReadingDeadlineWithProgress[]
@@ -184,16 +111,14 @@ export const getRecentReadingDays = (
  * Tier 2: <3 reading days - use 25 pages/day default
  */
 export const calculateUserPace = (deadlines: ReadingDeadlineWithProgress[]): UserPaceData => {
+  // Only include physical and ebook reading, not audio
   const recentReadingDays = getRecentReadingDays(deadlines);
-  const recentAudioDays = getRecentAudioReadingDays(deadlines);
 
-  const combinedDays = [...recentReadingDays, ...recentAudioDays].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-  const readingDaysCount = combinedDays.length;
+  const readingDaysCount = recentReadingDays.length;
 
   if (readingDaysCount >= 3) {
     // Tier 1: Recent data available
-    const totalPages = combinedDays.reduce((sum, day) => sum + day.pagesRead, 0);
+    const totalPages = recentReadingDays.reduce((sum, day) => sum + day.pagesRead, 0);
     const averagePace = totalPages / readingDaysCount;
     
     return {
@@ -220,16 +145,14 @@ export const calculateRequiredPace = (
   totalQuantity: number,
   currentProgress: number,
   daysLeft: number,
-  format: 'physical' | 'ebook' | 'audio'
+  _format: 'physical' | 'ebook' | 'audio'
 ): number => {
   const remaining = totalQuantity - currentProgress;
   
   if (daysLeft <= 0) return remaining;
   
-  // Convert audio minutes to page equivalents for comparison
-  const remainingPageEquivalent = format === 'audio' ? remaining / 1.5 : remaining;
-  
-  return Math.ceil(remainingPageEquivalent / daysLeft);
+  // No conversion - return required pace in native units (pages for books, minutes for audio)
+  return Math.ceil(remaining / daysLeft);
 };
 
 /**
@@ -293,7 +216,7 @@ export const getPaceBasedStatus = (
  * Gets a detailed status message based on pace calculations.
  */
 export const getPaceStatusMessage = (
-  userPaceData: UserPaceData,
+  userPaceData: UserPaceData | UserListeningPaceData,
   requiredPace: number,
   status: PaceBasedStatus,
   format: 'physical' | 'ebook' | 'audio' = 'physical'
@@ -329,8 +252,8 @@ export const getPaceStatusMessage = (
  */
 export const formatPaceDisplay = (pace: number, format: 'physical' | 'ebook' | 'audio'): string => {
   if (format === 'audio') {
-    // Convert page equivalents back to minutes for display
-    const minutes = Math.round(pace * 1.5);
+    // Audio pace is already in minutes, no conversion needed
+    const minutes = Math.round(pace);
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     

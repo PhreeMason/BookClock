@@ -1,25 +1,26 @@
-import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
-import ReadingCalendar from '../features/calendar/ReadingCalendar';
+import { getSampleDeadlines } from '@/__tests__/fixtures/sampleDeadlines';
 import { useSupabase } from '@/lib/supabase';
 import { useTheme } from '@/theme';
-import { getSampleDeadlines } from '@/__tests__/fixtures/sampleDeadlines';
+import { useUser } from '@clerk/clerk-expo';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, waitFor } from '@testing-library/react-native';
+import dayjs from 'dayjs';
+import React from 'react';
+import ReadingCalendar from '../features/calendar/ReadingCalendar';
 
 // Mock dependencies
 jest.mock('@clerk/clerk-expo');
 jest.mock('@/lib/supabase');
 jest.mock('@/theme');
 jest.mock('react-native-calendars', () => ({
-  Calendar: ({ onDayPress, markedDates }: any) => {
-    const React = require('react');
-    return React.createElement('Calendar', {
-      testID: 'deadline-calendar',
-      onPress: () => onDayPress({ dateString: '2024-01-02' }),
-      markedDates,
-    });
-  },
+    Calendar: ({ onDayPress, markedDates }: any) => {
+        const React = require('react');
+        return React.createElement('Calendar', {
+            testID: 'deadline-calendar',
+            onPress: () => onDayPress({ dateString: '2024-01-02' }),
+            markedDates,
+        });
+    },
 }));
 
 const mockUseUser = useUser as jest.MockedFunction<typeof useUser>;
@@ -27,367 +28,305 @@ const mockUseSupabase = useSupabase as jest.MockedFunction<typeof useSupabase>;
 const mockUseTheme = useTheme as jest.MockedFunction<typeof useTheme>;
 
 describe('Deadline Calendar Integration', () => {
-  let queryClient: QueryClient;
+    let queryClient: QueryClient;
 
-  const mockUser = {
-    id: 'test-user-id',
-    firstName: 'Test',
-    lastName: 'User',
-  };
+    const mockUser = {
+        id: 'test-user-id',
+        firstName: 'Test',
+        lastName: 'User',
+    };
 
-  const mockTheme = {
-    primary: '#007AFF',
-    secondary: '#FF9500',
-    accent: '#FF3B30',
-    background: '#FFFFFF',
-    surface: '#F8F9FA',
-    text: '#000000',
-    textMuted: '#6C7B7F',
-    border: '#E5E5EA',
-    success: '#34C759',
-    warning: '#FF9500',
-  };
+    const mockTheme = {
+        primary: '#007AFF',
+        secondary: '#FF9500',
+        accent: '#FF3B30',
+        background: '#FFFFFF',
+        surface: '#F8F9FA',
+        text: '#000000',
+        textMuted: '#6C7B7F',
+        border: '#E5E5EA',
+        success: '#34C759',
+        warning: '#FF9500',
+    };
 
-  const mockSupabaseClient = {
-    from: jest.fn().mockReturnThis(),
-    select: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    in: jest.fn().mockReturnThis(),
-    order: jest.fn().mockReturnThis(),
-    gte: jest.fn().mockReturnThis(),
-  };
+    const mockSupabaseClient = {
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        in: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+    };
 
-  // Convert sample deadline data to Supabase format
-  const sampleData = getSampleDeadlines(2);
-  const mockDeadlineData = sampleData.map(deadline => ({
-    id: deadline.id,
-    book_title: deadline.book_title,
-    author: deadline.author,
-    format: deadline.format,
-    total_quantity: deadline.total_quantity,
-    deadline_date: deadline.deadline_date,
-    source: deadline.source,
-    flexibility: deadline.flexibility,
-    created_at: deadline.created_at,
-    reading_deadline_progress: deadline.progress.map(p => ({
-      id: p.id,
-      current_progress: p.current_progress,
-      created_at: p.created_at,
-      updated_at: p.updated_at,
-    })),
-  }));
-
-  beforeEach(() => {
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: { retry: false },
-        mutations: { retry: false },
-      },
+    // Convert sample deadline data to Supabase format
+    const sampleData = getSampleDeadlines(2);
+    const mockDeadlineData = sampleData.map(deadline => {
+        const { progress, ...deadlineWithoutProgress } = deadline;
+        return ({
+            ...deadlineWithoutProgress,
+            reading_deadline_progress: progress.map(p => ({
+                id: p.id,
+                current_progress: p.current_progress,
+                created_at: p.created_at,
+                updated_at: p.updated_at,
+            })),
+        })
     });
 
-    mockUseUser.mockReturnValue({
-      user: mockUser,
-      isLoaded: true,
-      isSignedIn: true,
-    } as any);
+    beforeEach(() => {
+        queryClient = new QueryClient({
+            defaultOptions: {
+                queries: { retry: false },
+                mutations: { retry: false },
+            },
+        });
 
-    mockUseTheme.mockReturnValue({ theme: mockTheme } as any);
+        mockUseUser.mockReturnValue({
+            user: mockUser,
+            isLoaded: true,
+            isSignedIn: true,
+        } as any);
 
-    mockUseSupabase.mockReturnValue(mockSupabaseClient as any);
+        mockUseTheme.mockReturnValue({ theme: mockTheme } as any);
 
-    // Default successful response
-    mockSupabaseClient.from.mockReturnValue({
-      ...mockSupabaseClient,
-      select: jest.fn().mockReturnValue({
-        ...mockSupabaseClient,
-        eq: jest.fn().mockReturnValue({
-          ...mockSupabaseClient,
-          in: jest.fn().mockReturnValue({
-            ...mockSupabaseClient,
-            order: jest.fn().mockResolvedValue({
-              data: mockDeadlineData,
-              error: null,
-            }),
-          }),
-        }),
-      }),
+        mockUseSupabase.mockReturnValue(mockSupabaseClient as any);
+
+        // Default successful response
+        mockSupabaseClient.order.mockResolvedValue({
+            data: mockDeadlineData,
+            error: null,
+        });
+
+        jest.clearAllMocks();
     });
 
-    jest.clearAllMocks();
-  });
-
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-
-  it('should complete full user workflow: load calendar, view data, and interact', async () => {
-    const { getByText, getByTestId } = render(
-      <ReadingCalendar selectedCategory="all" dateRange="30d" />,
-      { wrapper }
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     );
 
-    // 1. Should show loading state initially
-    expect(getByText('Loading calendar...')).toBeTruthy();
+    it('should complete full user workflow: load calendar, view data, and interact', async () => {
+        const { getByText, getByTestId } = render(
+            <ReadingCalendar selectedCategory="all" dateRange="30d" />,
+            { wrapper }
+        );
 
-    // 2. Wait for data to load
-    await waitFor(() => {
-      expect(getByText('Deadline Progress Calendar')).toBeTruthy();
+        // 1. Should show loading state initially
+        expect(getByText('Loading calendar...')).toBeTruthy();
+
+        // 2. Wait for data to load
+        await waitFor(() => {
+            expect(getByText('Deadline Progress Calendar')).toBeTruthy();
+        });
+
+        // 3. Should display summary statistics
+        await waitFor(() => {
+            expect(getByText('2')).toBeTruthy(); // Active deadlines
+            // Progress values will depend on the actual sample data calculations
+        });
+
+        // 4. Should display legend
+        expect(getByText('Reading Deadlines')).toBeTruthy();
+        expect(getByText('Audio Deadlines')).toBeTruthy();
+        expect(getByText('Mixed Deadlines')).toBeTruthy();
+
+        // 5. Calendar should be rendered
+        expect(getByTestId('deadline-calendar')).toBeTruthy();
     });
 
-    // 3. Should display summary statistics
-    await waitFor(() => {
-      expect(getByText('2')).toBeTruthy(); // Active deadlines
-      // Progress values will depend on the actual sample data calculations
+    it('should handle format filtering correctly', async () => {
+        // Test reading filter
+        const { rerender, getByText } = render(
+            <ReadingCalendar selectedCategory="reading" />,
+            { wrapper }
+        );
+
+        await waitFor(() => {
+            expect(getByText('Deadline Progress Calendar')).toBeTruthy();
+        });
+
+        // Verify hook was called with reading filter
+        expect(mockSupabaseClient.in).toHaveBeenCalledWith('format', ['physical', 'ebook']);
+
+        // Test listening filter
+        rerender(
+            <ReadingCalendar selectedCategory="listening" />
+        );
+
+        // Should call with audio filter
+        await waitFor(() => {
+            expect(mockSupabaseClient.in).toHaveBeenCalledWith('format', ['audio']);
+        });
     });
 
-    // 4. Should display legend
-    expect(getByText('Reading Deadlines')).toBeTruthy();
-    expect(getByText('Audio Deadlines')).toBeTruthy();
-    expect(getByText('Mixed Deadlines')).toBeTruthy();
+    it('should handle date range changes', async () => {
+        const { rerender, getByText } = render(
+            <ReadingCalendar selectedCategory="all" dateRange="7d" />,
+            { wrapper }
+        );
 
-    // 5. Calendar should be rendered
-    expect(getByTestId('deadline-calendar')).toBeTruthy();
-  });
+        await waitFor(() => {
+            expect(getByText('Last 7 days')).toBeTruthy();
+        });
 
-  it('should handle format filtering correctly', async () => {
-    // Test reading filter
-    const { rerender, getByText } = render(
-      <ReadingCalendar selectedCategory="reading" />,
-      { wrapper }
-    );
+        rerender(
+            <ReadingCalendar selectedCategory="all" dateRange="1y" />
+        );
 
-    await waitFor(() => {
-      expect(getByText('Deadline Progress Calendar')).toBeTruthy();
+        await waitFor(() => {
+            expect(getByText('Last year')).toBeTruthy();
+        });
     });
 
-    // Verify hook was called with reading filter
-    expect(mockSupabaseClient.in).toHaveBeenCalledWith('format', ['physical', 'ebook']);
+    it('should handle error states gracefully', async () => {
+        // Mock error response
+        mockSupabaseClient.order.mockReturnValue({
+            data: null,
+            error: new Error('Database connection failed'),
+        });
 
-    // Test listening filter
-    rerender(
-      <ReadingCalendar selectedCategory="listening" />
-    );
+        const { getByText } = render(
+            <ReadingCalendar selectedCategory="all" />,
+            { wrapper }
+        );
 
-    // Should call with audio filter
-    await waitFor(() => {
-      expect(mockSupabaseClient.in).toHaveBeenCalledWith('format', ['audio']);
-    });
-  });
-
-  it('should handle date range changes', async () => {
-    const { rerender, getByText } = render(
-      <ReadingCalendar selectedCategory="all" dateRange="7d" />,
-      { wrapper }
-    );
-
-    await waitFor(() => {
-      expect(getByText('Last 7 days')).toBeTruthy();
+        await waitFor(() => {
+            expect(getByText('Unable to load calendar data')).toBeTruthy();
+        });
     });
 
-    rerender(
-      <ReadingCalendar selectedCategory="all" dateRange="1y" />
-    );
+    it('should handle unauthenticated user state', () => {
+        mockUseUser.mockReturnValue({
+            user: null,
+            isLoaded: true,
+            isSignedIn: false,
+        } as any);
 
-    await waitFor(() => {
-      expect(getByText('Last year')).toBeTruthy();
-    });
-  });
+        render(
+            <ReadingCalendar selectedCategory="all" />,
+            { wrapper }
+        );
 
-  it('should handle error states gracefully', async () => {
-    // Mock error response
-    mockSupabaseClient.from.mockReturnValue({
-      ...mockSupabaseClient,
-      select: jest.fn().mockReturnValue({
-        ...mockSupabaseClient,
-        eq: jest.fn().mockReturnValue({
-          ...mockSupabaseClient,
-          in: jest.fn().mockReturnValue({
-            ...mockSupabaseClient,
-            order: jest.fn().mockResolvedValue({
-              data: null,
-              error: new Error('Database connection failed'),
-            }),
-          }),
-        }),
-      }),
+        // Should not call Supabase when user is not authenticated
+        expect(mockSupabaseClient.from).not.toHaveBeenCalled();
     });
 
-    const { getByText } = render(
-      <ReadingCalendar selectedCategory="all" />,
-      { wrapper }
-    );
+    it('should process complex deadline progress correctly', async () => {
+        // Mock data with multiple progress entries per deadline
+        const created_at_date = dayjs(new Date());
+        const updated_at_date = created_at_date.add(1, 'day').toISOString();
+        const complexData = [
+            {
+                id: 'complex-deadline',
+                book_title: 'Complex Progress Book',
+                author: 'Progress Author',
+                format: 'physical',
+                total_quantity: 500,
+                deadline_date: created_at_date.add(30, 'days').toISOString(),
+                source: 'Bookstore',
+                flexibility: 'moderate',
+                updated_at: updated_at_date,
+                created_at: created_at_date.toISOString(),
+                reading_deadline_progress: [
+                    { id: 'p1', current_progress: 25, created_at: created_at_date.add(2, 'days'), updated_at: created_at_date.add(2, 'days') },
+                    { id: 'p2', current_progress: 75, created_at: created_at_date.add(3, 'days'), updated_at: created_at_date.add(3, 'days') },
+                    { id: 'p3', current_progress: 150, created_at: created_at_date.add(4, 'days'), updated_at: created_at_date.add(4, 'days') },
+                    { id: 'p4', current_progress: 250, created_at: created_at_date.add(5, 'days'), updated_at: created_at_date.add(5, 'days') },
+                ],
+            },
+        ];
 
-    await waitFor(() => {
-      expect(getByText('Unable to load calendar data')).toBeTruthy();
-    });
-  });
+        mockSupabaseClient.order.mockResolvedValueOnce({
+            data: complexData,
+            error: null,
+        });
 
-  it('should handle unauthenticated user state', () => {
-    mockUseUser.mockReturnValue({
-      user: null,
-      isLoaded: true,
-      isSignedIn: false,
-    } as any);
+        const { getByText } = render(
+            <ReadingCalendar selectedCategory="all" />,
+            { wrapper }
+        );
 
-    render(
-      <ReadingCalendar selectedCategory="all" />,
-      { wrapper }
-    );
+        await waitFor(() => {
+            expect(getByText('Deadline Progress Calendar')).toBeTruthy();
+        });
 
-    // Should not call Supabase when user is not authenticated
-    expect(mockSupabaseClient.from).not.toHaveBeenCalled();
-  });
-
-  it('should process complex deadline progress correctly', async () => {
-    // Mock data with multiple progress entries per deadline
-    const complexData = [
-      {
-        id: 'complex-deadline',
-        book_title: 'Complex Progress Book',
-        author: 'Progress Author',
-        format: 'physical',
-        total_quantity: 500,
-        deadline_date: '2024-02-01',
-        source: 'Bookstore',
-        flexibility: 'moderate',
-        created_at: '2024-01-01T00:00:00Z',
-        reading_deadline_progress: [
-          { id: 'p1', current_progress: 25, created_at: '2024-01-01T10:00:00Z', updated_at: '2024-01-01T10:00:00Z' },
-          { id: 'p2', current_progress: 75, created_at: '2024-01-02T10:00:00Z', updated_at: '2024-01-02T10:00:00Z' },
-          { id: 'p3', current_progress: 150, created_at: '2024-01-03T10:00:00Z', updated_at: '2024-01-03T10:00:00Z' },
-          { id: 'p4', current_progress: 250, created_at: '2024-01-04T10:00:00Z', updated_at: '2024-01-04T10:00:00Z' },
-        ],
-      },
-    ];
-
-    mockSupabaseClient.from.mockReturnValue({
-      ...mockSupabaseClient,
-      select: jest.fn().mockReturnValue({
-        ...mockSupabaseClient,
-        eq: jest.fn().mockReturnValue({
-          ...mockSupabaseClient,
-          in: jest.fn().mockReturnValue({
-            ...mockSupabaseClient,
-            order: jest.fn().mockResolvedValue({
-              data: complexData,
-              error: null,
-            }),
-          }),
-        }),
-      }),
+        // Should have calculated daily progress correctly:
+        // Based on sample data progress entries
+        await waitFor(() => {
+            expect(getByText('4')).toBeTruthy(); // Active days
+            expect(getByText('250')).toBeTruthy(); // Total progress
+        });
     });
 
-    const { getByText } = render(
-      <ReadingCalendar selectedCategory="all" />,
-      { wrapper }
-    );
+    it('should handle empty data state', async () => {
+        mockSupabaseClient.order.mockReturnValue({
+            data: [],
+            error: null,
+        });
 
-    await waitFor(() => {
-      expect(getByText('Deadline Progress Calendar')).toBeTruthy();
+        const { getByText } = render(
+            <ReadingCalendar selectedCategory="all" />,
+            { wrapper }
+        );
+
+        await waitFor(() => {
+            expect(getByText('Deadline Progress Calendar')).toBeTruthy();
+        });
+
+        // Should show zero values for all metrics
+        await waitFor(() => {
+            expect(getByText('0')).toBeTruthy(); // Multiple zeros for different metrics
+        });
     });
 
-    // Should have calculated daily progress correctly:
-    // Based on sample data progress entries
-    await waitFor(() => {
-      expect(getByText('4')).toBeTruthy(); // Active days
-      expect(getByText('250')).toBeTruthy(); // Total progress
+    it('should respect progress threshold for initial entries', async () => {
+        // Test that initial progress > 50 is not counted as daily progress
+        const thresholdData = [
+            {
+                id: 'threshold-test',
+                book_title: 'Threshold Test Book',
+                author: 'Test Author',
+                format: 'physical',
+                total_quantity: 300,
+                deadline_date: '2024-01-15',
+                source: 'Library',
+                flexibility: 'moderate',
+                created_at: '2024-01-01T00:00:00Z',
+                reading_deadline_progress: [
+                    {
+                        id: 'big-initial',
+                        current_progress: 100, // Large initial value - should not count as daily progress
+                        created_at: '2024-01-01T10:00:00Z',
+                        updated_at: '2024-01-01T10:00:00Z',
+                    },
+                    {
+                        id: 'actual-progress',
+                        current_progress: 125, // This difference should count
+                        created_at: '2024-01-02T10:00:00Z',
+                        updated_at: '2024-01-02T10:00:00Z',
+                    },
+                ],
+            },
+        ];
+
+        mockSupabaseClient.from.mockReturnValue({
+            data: thresholdData,
+            error: null,
+        });
+
+        const { getByText } = render(
+            <ReadingCalendar selectedCategory="all" />,
+            { wrapper }
+        );
+
+        await waitFor(() => {
+            expect(getByText('Deadline Progress Calendar')).toBeTruthy();
+        });
+
+        // Should only count the actual daily progress
+        // Large initial progress should be ignored based on threshold logic
+        await waitFor(() => {
+            expect(getByText('1')).toBeTruthy(); // Only 1 active day
+            expect(getByText('25')).toBeTruthy(); // Only 25 progress counted
+        });
     });
-  });
-
-  it('should handle empty data state', async () => {
-    mockSupabaseClient.from.mockReturnValue({
-      ...mockSupabaseClient,
-      select: jest.fn().mockReturnValue({
-        ...mockSupabaseClient,
-        eq: jest.fn().mockReturnValue({
-          ...mockSupabaseClient,
-          in: jest.fn().mockReturnValue({
-            ...mockSupabaseClient,
-            order: jest.fn().mockResolvedValue({
-              data: [],
-              error: null,
-            }),
-          }),
-        }),
-      }),
-    });
-
-    const { getByText } = render(
-      <ReadingCalendar selectedCategory="all" />,
-      { wrapper }
-    );
-
-    await waitFor(() => {
-      expect(getByText('Deadline Progress Calendar')).toBeTruthy();
-    });
-
-    // Should show zero values for all metrics
-    await waitFor(() => {
-      expect(getByText('0')).toBeTruthy(); // Multiple zeros for different metrics
-    });
-  });
-
-  it('should respect progress threshold for initial entries', async () => {
-    // Test that initial progress > 50 is not counted as daily progress
-    const thresholdData = [
-      {
-        id: 'threshold-test',
-        book_title: 'Threshold Test Book',
-        author: 'Test Author',
-        format: 'physical',
-        total_quantity: 300,
-        deadline_date: '2024-01-15',
-        source: 'Library',
-        flexibility: 'moderate',
-        created_at: '2024-01-01T00:00:00Z',
-        reading_deadline_progress: [
-          {
-            id: 'big-initial',
-            current_progress: 100, // Large initial value - should not count as daily progress
-            created_at: '2024-01-01T10:00:00Z',
-            updated_at: '2024-01-01T10:00:00Z',
-          },
-          {
-            id: 'actual-progress',
-            current_progress: 125, // This difference should count
-            created_at: '2024-01-02T10:00:00Z',
-            updated_at: '2024-01-02T10:00:00Z',
-          },
-        ],
-      },
-    ];
-
-    mockSupabaseClient.from.mockReturnValue({
-      ...mockSupabaseClient,
-      select: jest.fn().mockReturnValue({
-        ...mockSupabaseClient,
-        eq: jest.fn().mockReturnValue({
-          ...mockSupabaseClient,
-          in: jest.fn().mockReturnValue({
-            ...mockSupabaseClient,
-            order: jest.fn().mockResolvedValue({
-              data: thresholdData,
-              error: null,
-            }),
-          }),
-        }),
-      }),
-    });
-
-    const { getByText } = render(
-      <ReadingCalendar selectedCategory="all" />,
-      { wrapper }
-    );
-
-    await waitFor(() => {
-      expect(getByText('Deadline Progress Calendar')).toBeTruthy();
-    });
-
-    // Should only count the actual daily progress
-    // Large initial progress should be ignored based on threshold logic
-    await waitFor(() => {
-      expect(getByText('1')).toBeTruthy(); // Only 1 active day
-      expect(getByText('25')).toBeTruthy(); // Only 25 progress counted
-    });
-  });
 });
