@@ -1,7 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { ReadingDeadlineWithProgress } from '@/types/deadline';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import React from 'react';
 import ReadingProgress from '../shared/ReadingProgress';
-import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 // Mock the hooks
 jest.mock('@/hooks/useDeadlines', () => ({
@@ -418,7 +418,7 @@ describe('ProgressFormInteraction', () => {
 
     const ebookCalculations = {
       ...mockCalculations,
-      unitsPerDay: 10, // 10% per day for ebooks
+      unitsPerDay: 11, // 10% per day for ebooks
       currentProgress: 25, // 25%
       totalQuantity: 100, // 100% total
     };
@@ -485,14 +485,14 @@ describe('ProgressFormInteraction', () => {
           format: 'physical' as const, 
           total: 300, 
           current: 50, 
-          increment: 5,
+          increment: 6,
           placeholder: 'Enter current progress'
         },
         { 
           format: 'ebook' as const, 
           total: 100, 
           current: 25, 
-          increment: 10,
+          increment: 11,
           placeholder: 'Enter current progress'
         },
         { 

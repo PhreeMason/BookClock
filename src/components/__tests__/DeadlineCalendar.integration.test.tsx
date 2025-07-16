@@ -17,7 +17,7 @@ jest.mock('react-native-calendars', () => ({
         const React = require('react');
         return React.createElement('Calendar', {
             testID: 'deadline-calendar',
-            onPress: () => onDayPress({ dateString: '2024-01-02' }),
+            onPress: () => onDayPress({ dateString: '2025-07-16' }),
             markedDates,
         });
     },
@@ -263,7 +263,7 @@ describe('Deadline Calendar Integration', () => {
             error: null,
         });
 
-        const { getByText } = render(
+        const { getByText, getAllByText } = render(
             <ReadingCalendar selectedCategory="all" />,
             { wrapper }
         );
@@ -274,7 +274,8 @@ describe('Deadline Calendar Integration', () => {
 
         // Should show zero values for all metrics
         await waitFor(() => {
-            expect(getByText('0')).toBeTruthy(); // Multiple zeros for different metrics
+            const zeroElements = getAllByText('0');
+            expect(zeroElements.length).toBeGreaterThan(0); // Multiple zeros for different metrics
         });
     });
 
@@ -287,28 +288,28 @@ describe('Deadline Calendar Integration', () => {
                 author: 'Test Author',
                 format: 'physical',
                 total_quantity: 300,
-                deadline_date: '2024-01-15',
+                deadline_date: '2025-08-15T00:00:00Z',
                 source: 'Library',
                 flexibility: 'moderate',
-                created_at: '2024-01-01T00:00:00Z',
+                created_at: '2025-07-15T00:00:00Z',
                 reading_deadline_progress: [
                     {
                         id: 'big-initial',
                         current_progress: 100, // Large initial value - should not count as daily progress
-                        created_at: '2024-01-01T10:00:00Z',
-                        updated_at: '2024-01-01T10:00:00Z',
+                        created_at: '2025-07-15T10:00:00Z',
+                        updated_at: '2025-07-15T10:00:00Z',
                     },
                     {
                         id: 'actual-progress',
                         current_progress: 125, // This difference should count
-                        created_at: '2024-01-02T10:00:00Z',
-                        updated_at: '2024-01-02T10:00:00Z',
+                        created_at: '2025-07-16T10:00:00Z',
+                        updated_at: '2025-07-16T10:00:00Z',
                     },
                 ],
             },
         ];
 
-        mockSupabaseClient.from.mockReturnValue({
+        mockSupabaseClient.order.mockResolvedValueOnce({
             data: thresholdData,
             error: null,
         });
