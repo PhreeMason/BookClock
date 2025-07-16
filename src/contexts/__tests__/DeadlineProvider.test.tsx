@@ -4,7 +4,7 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { DeadlineProvider, useDeadlines } from '../DeadlineProvider';
 
-import { useAddDeadline, useGetDeadlines, useUpdateDeadline, useDeleteDeadline } from '@/hooks/useDeadlines';
+import { useAddDeadline, useGetDeadlines, useUpdateDeadline, useDeleteDeadline, useCompleteDeadline, useSetAsideDeadline } from '@/hooks/useDeadlines';
 
 // Mock the hooks with simpler types
 jest.mock('@/hooks/useDeadlines', () => ({
@@ -22,12 +22,20 @@ jest.mock('@/hooks/useDeadlines', () => ({
   useDeleteDeadline: jest.fn(() => ({
     mutate: jest.fn(),
   })),
+  useCompleteDeadline: jest.fn(() => ({
+    mutate: jest.fn(),
+  })),
+    useSetAsideDeadline: jest.fn(() => ({
+    mutate: jest.fn(),
+  })),
 }));
 
 const mockUseGetDeadlines = useGetDeadlines as jest.MockedFunction<typeof useGetDeadlines>;
 const mockUseAddDeadline = useAddDeadline as jest.MockedFunction<typeof useAddDeadline>;
 const mockUseUpdateDeadline = useUpdateDeadline as jest.MockedFunction<typeof useUpdateDeadline>;
 const mockUseDeleteDeadline = useDeleteDeadline as jest.MockedFunction<typeof useDeleteDeadline>;
+const mockUseCompleteDeadline = useCompleteDeadline as jest.MockedFunction<typeof useCompleteDeadline>;
+const mockUseSetAsideDeadline = useSetAsideDeadline as jest.MockedFunction<typeof useSetAsideDeadline>;
 
 // Mock data for testing
 const createMockDeadline = (
@@ -86,6 +94,8 @@ describe('DeadlineProvider', () => {
   const mockMutate = jest.fn();
   const mockUpdateMutate = jest.fn();
   const mockDeleteMutate = jest.fn();
+  const mockCompleteMutate = jest.fn();
+    const mockSetAsideMutate = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -97,6 +107,12 @@ describe('DeadlineProvider', () => {
     } as any);
     mockUseDeleteDeadline.mockReturnValue({
       mutate: mockDeleteMutate,
+    } as any);
+    mockUseCompleteDeadline.mockReturnValue({
+        mutate: mockCompleteMutate,
+    } as any);
+    mockUseSetAsideDeadline.mockReturnValue({
+        mutate: mockSetAsideMutate,
     } as any);
   });
 
@@ -628,9 +644,11 @@ describe('DeadlineProvider', () => {
       };
 
       render(
-        <DeadlineProvider>
-          <TestAudioPaceComponent />
-        </DeadlineProvider>
+        <PaceProvider deadlines={[...existingDeadlines, testAudioDeadline]}>
+          <DeadlineProviderInternal>
+            <TestAudioPaceComponent />
+          </DeadlineProviderInternal>
+        </PaceProvider>
       );
 
       // User pace: 60 page equivalents/day from recent reading differences
