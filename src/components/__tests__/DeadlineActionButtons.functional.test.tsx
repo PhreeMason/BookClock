@@ -35,6 +35,12 @@ jest.mock('@/hooks/useDeadlines', () => ({
   useDeleteDeadline: jest.fn(() => ({
     mutate: jest.fn(),
   })),
+  useCompleteDeadline: jest.fn(() => ({
+    mutate: jest.fn(),
+  })),
+  useSetAsideDeadline: jest.fn(() => ({
+    mutate: jest.fn(),
+  })),
 }));
 
 // Mock Supabase

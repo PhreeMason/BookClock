@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import { StyleSheet, View, Platform } from 'react-native';
-import { Calendar } from 'react-native-calendars';
 import { ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { DateRange, FormatFilter, useDeadlineHistory } from '@/hooks/useReadingHistory';
 import { useTheme } from '@/theme';
-import { useDeadlineHistory, DateRange, FormatFilter } from '@/hooks/useReadingHistory';
+import React, { useMemo, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 import ReadingDayDetails from './ReadingDayDetails';
 
 interface ReadingCalendarProps {
@@ -14,7 +14,7 @@ interface ReadingCalendarProps {
 
 const ReadingCalendar: React.FC<ReadingCalendarProps> = ({ 
   selectedCategory, 
-  dateRange = '90d' 
+  dateRange = '90d'
 }) => {
   const { theme } = useTheme();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -24,7 +24,6 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
     dateRange,
     formatFilter: selectedCategory,
   });
-
 
   // Get all dates in range (including empty ones) for navigation
   const allDatesInRange = useMemo(() => {
@@ -183,9 +182,9 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
             disabledArrowColor: theme.textMuted,
             monthTextColor: theme.text,
             indicatorColor: theme.primary,
-            textDayFontFamily: Platform.OS === 'ios' ? 'Inter-Regular' : 'Inter-Regular',
-            textMonthFontFamily: Platform.OS === 'ios' ? 'Inter-Regular' : 'Inter-Regular',
-            textDayHeaderFontFamily: Platform.OS === 'ios' ? 'Inter-Regular' : 'Inter-Regular',
+            textDayFontFamily: 'Inter-Regular',
+            textMonthFontFamily: 'Inter-Regular',
+            textDayHeaderFontFamily: 'Inter-Regular',
             textDayFontSize: 14,
             textMonthFontSize: 16,
             textDayHeaderFontSize: 12,
