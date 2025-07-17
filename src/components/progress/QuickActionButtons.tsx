@@ -12,9 +12,6 @@ const QuickActionButtons: React.FC<QuickActionButtonsProps> = ({
     onQuickUpdate
 }) => {
 
-    // const { theme } = useTheme();
-    // const backgroundColor = theme.accent;
-
     return (
         <View style={styles.quickButtons}>
             <ThemedButton
@@ -22,6 +19,12 @@ const QuickActionButtons: React.FC<QuickActionButtonsProps> = ({
                 variant="accent"
                 style={styles.quickBtn}
                 onPress={() => onQuickUpdate(-1)}
+            />
+            <ThemedButton
+                title={`+1`}
+                variant="accent"
+                style={styles.quickBtn}
+                onPress={() => onQuickUpdate(1)}
             />
             <ThemedButton
                 title={`+${5}`}
@@ -34,18 +37,6 @@ const QuickActionButtons: React.FC<QuickActionButtonsProps> = ({
                 variant="accent"
                 style={styles.quickBtn}
                 onPress={() => onQuickUpdate(5 * 2)}
-            />
-            <ThemedButton
-                title={`+${unitsPerDay}`}
-                variant="accent"
-                style={styles.quickBtn}
-                onPress={() => onQuickUpdate(unitsPerDay)}
-            />
-            <ThemedButton
-                title={`+1`}
-                variant="accent"
-                style={styles.quickBtn}
-                onPress={() => onQuickUpdate(1)}
             />
         </View>
     );

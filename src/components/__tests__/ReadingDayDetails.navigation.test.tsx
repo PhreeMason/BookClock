@@ -16,14 +16,9 @@ jest.mock('react-native-pager-view', () => {
     
     React.useImperativeHandle(ref, () => ({
       setPage: (page: number) => {
-        const { act } = require('@testing-library/react-native');
-        act(() => {
-          setCurrentPage(page);
-        });
+        setCurrentPage(page);
         if (onPageSelected) {
-          act(() => {
-            onPageSelected({ nativeEvent: { position: page } });
-          });
+          onPageSelected({ nativeEvent: { position: page } });
         }
       },
     }));
