@@ -89,7 +89,8 @@
     "globalTeardown": "<rootDir>/src/__tests__/teardown.ts",
     "testPathIgnorePatterns": [
       "<rootDir>/src/__tests__/setup.ts",
-      "<rootDir>/src/__tests__/teardown.ts"
+      "<rootDir>/src/__tests__/teardown.ts",
+      "<rootDir>/src/__tests__/fixtures/"
     ],
     "transformIgnorePatterns": [
       "/node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|isows|@supabase/.*)",
@@ -102,6 +103,8 @@
     "detectOpenHandles": false,
     "workerIdleMemoryLimit": "512MB",
     "silent": false,
+    "openHandlesTimeout": 1000,
+    "collectCoverage": false,
     "verbose": false
   },
   "private": true

@@ -115,9 +115,10 @@ describe('DeadlineActionButtons - Functional Tests', () => {
     queryClient.clear();
     mockAlert?.mockRestore();
     
-    // Wait for any pending async operations
+    // Wait for any pending async operations using act
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      // Use flushPromises to wait for pending promises instead of setTimeout
+      await Promise.resolve();
     });
   });
 

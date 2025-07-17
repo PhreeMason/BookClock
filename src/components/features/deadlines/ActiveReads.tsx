@@ -6,7 +6,6 @@ import { StyleSheet } from 'react-native'
 
 const ActiveReads = () => {
     const { activeDeadlines, isLoading, error } = useDeadlines();
-    console.log(JSON.stringify(activeDeadlines, null, 2)); // Debugging output
     if (isLoading) {
         return (
             <ThemedScrollView>
