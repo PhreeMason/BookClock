@@ -4,7 +4,7 @@ import { DeadlineFormStep1 } from '../forms/DeadlineFormStep1';
 
 // Mock the ThemedText component
 // Mock the CustomInput component
-jest.mock('@/components/CustomInput', () => {
+jest.mock('@/components/shared/CustomInput', () => {
   const { TextInput } = require('react-native');
   return jest.fn(({ control, name, placeholder, keyboardType, style, ...props }) => {
     return (

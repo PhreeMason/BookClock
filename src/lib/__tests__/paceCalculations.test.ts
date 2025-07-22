@@ -64,13 +64,13 @@ describe('paceCalculations', () => {
       ]);
       
       const audioBook = createMockDeadline('2', 'audio', 600, [
-        { current_progress: 30, created_at: daysAgo(3) } // 30 minutes = 20 page equivalents
+        { current_progress: 30, created_at: daysAgo(3) } // 30 minutes - no conversion
       ]);
 
       const result = getRecentReadingDays([physicalBook, audioBook]);
       
       expect(result).toHaveLength(1);
-      expect(result[0].pagesRead).toBe(45); // 25 + 20 page equivalents
+      expect(result[0].pagesRead).toBe(25); // Only physical books count, audio handled separately
     });
   });
 
@@ -124,10 +124,10 @@ describe('paceCalculations', () => {
       expect(result).toBe(20); // 200 pages remaining / 10 days = 20 pages/day
     });
 
-    it('should calculate required pace for audio books (convert to page equivalents)', () => {
+    it('should calculate required pace for audio books (no conversion)', () => {
       const result = calculateRequiredPace(300, 150, 5, 'audio');
-      // 150 minutes remaining / 1.5 = 100 page equivalents / 5 days = 20 pages/day equivalent
-      expect(result).toBe(20);
+      // 150 minutes remaining / 5 days = 30 minutes/day
+      expect(result).toBe(30);
     });
 
     it('should handle zero days left', () => {
@@ -201,15 +201,15 @@ describe('paceCalculations', () => {
       expect(formatPaceDisplay(30, 'ebook')).toBe('30 pages/day');
     });
 
-    it('should format audio book pace (convert page equivalents back to minutes)', () => {
-      expect(formatPaceDisplay(40, 'audio')).toBe('1h 0m/day'); // 40 * 1.5 = 60 minutes = 1h
-      expect(formatPaceDisplay(30, 'audio')).toBe('45m/day'); // 30 * 1.5 = 45 minutes
-      expect(formatPaceDisplay(50, 'audio')).toBe('1h 15m/day'); // 50 * 1.5 = 75 minutes
+    it('should format audio book pace (no conversion)', () => {
+      expect(formatPaceDisplay(40, 'audio')).toBe('40m/day'); // 40 minutes directly
+      expect(formatPaceDisplay(30, 'audio')).toBe('30m/day'); // 30 minutes directly
+      expect(formatPaceDisplay(50, 'audio')).toBe('50m/day'); // 50 minutes directly
     });
 
     it('should handle edge cases for audio format', () => {
       expect(formatPaceDisplay(0, 'audio')).toBe('0m/day');
-      expect(formatPaceDisplay(1, 'audio')).toBe('2m/day'); // 1 * 1.5 = 1.5, rounded to 2
+      expect(formatPaceDisplay(1, 'audio')).toBe('1m/day'); // 1 minute directly
     });
   });
 
@@ -228,10 +228,10 @@ describe('paceCalculations', () => {
         ])
       ];
 
-      // Calculate user pace
+      // Calculate user pace (only physical books counted for reading pace)
       const userPace = calculateUserPace(deadlines);
       expect(userPace.isReliable).toBe(true);
-      expect(userPace.averagePace).toBeCloseTo(36, 1); // (40+40+40+30+30)/5 = 180/5 = 36
+      expect(userPace.averagePace).toBeCloseTo(40, 1); // (40+40+40)/3 = 120/3 = 40 (audio not mixed in)
 
       // Calculate status for a new deadline
       const requiredPace = calculateRequiredPace(200, 50, 5, 'physical'); // Need 30 pages/day

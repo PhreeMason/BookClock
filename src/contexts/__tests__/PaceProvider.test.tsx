@@ -150,13 +150,13 @@ describe('PaceProvider', () => {
       expect(getByTestId('reading-days').props.children).toBe(0);
     });
 
-    it('should combine progress from multiple books including audio conversion', () => {
+    it('should handle multiple books but separate audio and reading formats', () => {
       const deadlines = [
         createMockDeadline('physical', 'physical', 300, daysFromNow(10), [
           { current_progress: 40, created_at: daysAgo(5) }
         ]),
         createMockDeadline('audio', 'audio', 600, daysFromNow(10), [
-          { current_progress: 90, created_at: daysAgo(5) } // 90 minutes = 60 page equivalents
+          { current_progress: 90, created_at: daysAgo(5) } // 90 minutes - not converted to pages
         ])
       ];
 
@@ -167,11 +167,11 @@ describe('PaceProvider', () => {
       );
       const { getByTestId } = renderResult;
 
-      // Should combine: 40 pages + 60 page equivalents = 100 total for 1 day = 100 pages/day
-      // But since we only have 1 reading day, should fall back to default
+      // Should only count physical book progress (40 pages for 1 day)
+      // Since we only have 1 reading day, should fall back to default
       expect(getByTestId('user-pace').props.children).toBe(25);
       expect(getByTestId('pace-method').props.children).toBe('default_fallback');
-      expect(getByTestId('reading-days').props.children).toBe(1);
+      expect(getByTestId('reading-days').props.children).toBe(1); // Only physical book counts for reading days
     });
   });
 
@@ -275,7 +275,7 @@ describe('PaceProvider', () => {
       expect(getByTestId('deadline-status-level').props.children).toBe('impossible');
     });
 
-    it('should handle audio book deadline with proper conversion', () => {
+    it('should handle audio book deadline properly without conversion', () => {
       const deadline = createMockDeadline('audio-test', 'audio', 300, daysFromNow(10), [
         { current_progress: 150, created_at: daysAgo(1) } // 150 minutes progress
       ]);
@@ -287,9 +287,10 @@ describe('PaceProvider', () => {
       );
       const { getByTestId } = renderResult;
 
-      // Required pace: (300-150 minutes) / 1.5 / 10 days = 100 page equivalents / 10 = 10 pages/day equivalent
-      expect(getByTestId('deadline-required-pace').props.children).toBe(10);
-      expect(getByTestId('deadline-status-color').props.children).toBe('green'); // User pace ~33 > required 10
+      // Required pace: (300-150 minutes) / 10 days = 15 minutes/day
+      // Default listening pace is 30 minutes/day, so should be green
+      expect(getByTestId('deadline-required-pace').props.children).toBe(15);
+      expect(getByTestId('deadline-status-color').props.children).toBe('green'); // User pace 30 > required 15
     });
   });
 
@@ -309,8 +310,8 @@ describe('PaceProvider', () => {
         </PaceProvider>
       );
 
-      // 30 page equivalents * 1.5 = 45 minutes
-      expect(getByTestId('formatted-pace').props.children).toBe('45m/day');
+      // For audio format, should show the actual user listening pace (30 minutes/day by default)
+      expect(getByTestId('formatted-pace').props.children).toBe('30m/day');
     });
 
     it('should provide reliability information', () => {

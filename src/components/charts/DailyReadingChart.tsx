@@ -78,18 +78,11 @@ const getBookReadingDays = (deadline: ReadingDeadlineWithProgress): ReadingDay[]
 const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   const { theme } = useTheme();
   
-  const recentDays = getBookReadingDays(deadline);
-  
-  // If no reading data, don't show the chart
-  if (recentDays.length === 0) {
-    return null;
-  }
-
-  // Get format-specific labels
+  // Get format-specific labels (moved up before early return)
   const getUnitLabel = (format: string) => {
     switch (format) {
       case 'audio': return 'min';
-      case 'ebook': return 'pg';
+      case 'ebook': return '%';
       case 'physical': return 'pg';
       default: return 'pg';
     }
@@ -107,7 +100,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   const getSubtitle = (format: string) => {
     switch (format) {
       case 'audio': return 'Minutes listened per day';
-      case 'ebook': return 'Pages read per day';
+      case 'ebook': return 'Percentage read per day';
       case 'physical': return 'Pages read per day';
       default: return 'Progress per day';
     }
@@ -116,6 +109,25 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   const unitLabel = getUnitLabel(deadline.format);
   const chartTitle = getChartTitle(deadline.format);
   const subtitle = getSubtitle(deadline.format);
+
+  const recentDays = getBookReadingDays(deadline);
+  
+  // If no reading data, show empty state
+  if (recentDays.length === 0) {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText style={[styles.title, { color: theme.text }]}>Daily Reading Progress</ThemedText>
+        <ThemedView style={styles.emptyState}>
+          <ThemedText style={[styles.emptyStateText, { color: theme.textMuted }]}>
+            No reading activity in the last 7 days
+          </ThemedText>
+          <ThemedText style={[styles.emptyStateSubtext, { color: theme.textMuted }]}>
+            Start reading to see your daily progress
+          </ThemedText>
+        </ThemedView>
+      </ThemedView>
+    );
+  }
 
   // Calculate daily minimum goal
   const currentProgress = deadline.progress?.length > 0 
@@ -133,10 +145,8 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
     deadline.format
   );
   
-  // Convert back to original format for display (calculateRequiredPace returns page equivalents)
-  const displayDailyMinimum = deadline.format === 'audio' 
-    ? Math.round(dailyMinimum * 1.5) // Convert page equivalents back to minutes
-    : dailyMinimum;
+  // Display daily minimum directly (no conversion needed)
+  const displayDailyMinimum = dailyMinimum;
 
   // Prepare data for the chart
   const chartData = recentDays.map((day, index) => ({
@@ -165,7 +175,8 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
       </ThemedText>
       
       <View style={styles.chartContainer}>
-        <BarChart
+        <View testID="bar-chart">
+          <BarChart
           data={chartData}
           width={300}
           height={180}
@@ -204,7 +215,8 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
           }}
           isAnimated
           animationDuration={800}
-        />
+          />
+        </View>
       </View>
       
       <View style={styles.legendContainer}>
@@ -273,6 +285,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });
 

@@ -55,8 +55,14 @@ describe('useDeleteDeadline', () => {
     // Clear query cache to prevent test pollution
     queryClient.clear();
     
-    // Wait for any pending async operations
-    await new Promise(resolve => setTimeout(resolve, 0));
+    // Reset timers to prevent hanging
+    jest.useRealTimers();
+    jest.clearAllTimers();
+    
+    // Force garbage collection if available
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (

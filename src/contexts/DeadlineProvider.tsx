@@ -16,6 +16,7 @@ interface DeadlineContextType {
   deadlines: ReadingDeadlineWithProgress[];
   activeDeadlines: ReadingDeadlineWithProgress[];
   overdueDeadlines: ReadingDeadlineWithProgress[];
+  completedDeadlines: ReadingDeadlineWithProgress[];
   isLoading: boolean;
   error: Error | null;
   
@@ -87,7 +88,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
   const { getDeadlinePaceStatus } = usePace();
   
   // Separate deadlines by active and overdue status
-  const { active: activeDeadlines, overdue: overdueDeadlines } = separateDeadlines(deadlines);
+  const { active: activeDeadlines, overdue: overdueDeadlines, completed: completedDeadlines } = separateDeadlines(deadlines);
   
   // Calculate units per day needed based on format
   const calculateUnitsPerDay = (
@@ -276,6 +277,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     deadlines,
     activeDeadlines,
     overdueDeadlines,
+    completedDeadlines,
     isLoading,
     error,
     

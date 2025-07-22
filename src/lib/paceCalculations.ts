@@ -32,10 +32,7 @@ export interface PaceBasedStatus {
   message: string;
 }
 
-/**
- * Gets reading days from the last 7 days for physical and ebook deadlines only.
- * No format mixing - only page-based reading data (physical + ebook).
- */
+
 export const getRecentReadingDays = (
   deadlines: ReadingDeadlineWithProgress[]
 ): ReadingDay[] => {
@@ -114,12 +111,14 @@ export const getRecentReadingDays = (
  * Tier 2: <3 reading days - use 25 pages/day default
  */
 export const calculateUserPace = (deadlines: ReadingDeadlineWithProgress[]): UserPaceData => {
-  const recentDays = getRecentReadingDays(deadlines);
-  const readingDaysCount = recentDays.length;
+  // Only include physical and ebook reading, not audio
+  const recentReadingDays = getRecentReadingDays(deadlines);
+
+  const readingDaysCount = recentReadingDays.length;
 
   if (readingDaysCount >= 3) {
     // Tier 1: Recent data available
-    const totalPages = recentDays.reduce((sum, day) => sum + day.pagesRead, 0);
+    const totalPages = recentReadingDays.reduce((sum, day) => sum + day.pagesRead, 0);
     const averagePace = totalPages / readingDaysCount;
     
     return {
@@ -146,16 +145,14 @@ export const calculateRequiredPace = (
   totalQuantity: number,
   currentProgress: number,
   daysLeft: number,
-  format: 'physical' | 'ebook' | 'audio'
+  _format: 'physical' | 'ebook' | 'audio'
 ): number => {
   const remaining = totalQuantity - currentProgress;
   
   if (daysLeft <= 0) return remaining;
   
-  // Convert audio minutes to page equivalents for comparison
-  const remainingPageEquivalent = format === 'audio' ? remaining / 1.5 : remaining;
-  
-  return Math.ceil(remainingPageEquivalent / daysLeft);
+  // No conversion - return required pace in native units (pages for books, minutes for audio)
+  return Math.ceil(remaining / daysLeft);
 };
 
 /**
@@ -219,35 +216,35 @@ export const getPaceBasedStatus = (
  * Gets a detailed status message based on pace calculations.
  */
 export const getPaceStatusMessage = (
-  userPaceData: UserPaceData,
+  userPaceData: UserPaceData | UserListeningPaceData,
   requiredPace: number,
   status: PaceBasedStatus,
-  format?: 'physical' | 'ebook' | 'audio'
+  format: 'physical' | 'ebook' | 'audio' = 'physical'
 ): string => {
-  if (status.level === 'overdue') {
-    return 'Return or renew';
-  }
+  const paceDisplay = formatPaceDisplay(userPaceData.averagePace, format).replace('/day', '');
+  const requiredPaceDisplay = formatPaceDisplay(requiredPace, format).replace('/day', '');
 
-  if (status.level === 'impossible') {
-    if (userPaceData.calculationMethod === 'default_fallback') {
-      return 'Start reading to track pace';
-    }
-    return 'Pace too ambitious';
+  switch (status.level) {
+    case 'overdue':
+      return 'Return or renew';
+    case 'impossible':
+      if (userPaceData.calculationMethod === 'default_fallback') {
+        return `Required: ${requiredPaceDisplay}/day`;
+      }
+      return `Current: ${paceDisplay} vs Required: ${requiredPaceDisplay}`;
+    case 'urgent':
+      return 'Tough timeline';
+    case 'good':
+      if (userPaceData.calculationMethod === 'default_fallback') {
+        return `On track (default pace)`;
+      }
+      return `On track at ${paceDisplay}/day`;
+    case 'approaching':
+      const difference = formatPaceDisplay(requiredPace - userPaceData.averagePace, format);
+      return `Read ~${difference} more`;
+    default:
+      return 'Good';
   }
-
-  if (status.level === 'urgent') {
-    return 'Tough timeline';
-  }
-
-  if (status.level === 'good' || status.color === 'green') {
-    return "You're doing great";
-  }
-
-  if (status.level === 'approaching' || status.color === 'orange') {
-    return 'A bit more daily';
-  }
-
-  return 'Good';
 };
 
 /**
@@ -255,8 +252,8 @@ export const getPaceStatusMessage = (
  */
 export const formatPaceDisplay = (pace: number, format: 'physical' | 'ebook' | 'audio'): string => {
   if (format === 'audio') {
-    // Convert page equivalents back to minutes for display
-    const minutes = Math.round(pace * 1.5);
+    // Audio pace is already in minutes, no conversion needed
+    const minutes = Math.round(pace);
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     

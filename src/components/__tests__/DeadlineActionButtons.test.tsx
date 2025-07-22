@@ -42,6 +42,8 @@ const mockDeadline: ReadingDeadlineWithProgress = {
 
 describe('DeadlineActionButtons', () => {
   const mockDeleteDeadline = jest.fn();
+  const mockCompleteDeadline = jest.fn();
+  const mockSetAsideDeadline = jest.fn();
   const mockOnComplete = jest.fn();
   const mockOnSetAside = jest.fn();
   const mockOnDelete = jest.fn();
@@ -52,6 +54,8 @@ describe('DeadlineActionButtons', () => {
     const { useDeadlines } = require('@/contexts/DeadlineProvider');
     useDeadlines.mockReturnValue({
       deleteDeadline: mockDeleteDeadline,
+      completeDeadline: mockCompleteDeadline,
+      setAsideDeadline: mockSetAsideDeadline,
     });
   });
 
@@ -91,19 +95,16 @@ describe('DeadlineActionButtons', () => {
       expect(mockOnComplete).toHaveBeenCalled();
     });
 
-    it('should show coming soon toast when onComplete not provided', () => {
+    it('should call completeDeadline when onComplete not provided', () => {
       render(<DeadlineActionButtons deadline={mockDeadline} />);
 
       fireEvent.press(screen.getByText('✓ Mark as Complete'));
       
-      expect(Toast.show).toHaveBeenCalledWith({
-        type: 'info',
-        text1: 'Mark as Complete',
-        text2: 'This feature is coming soon!',
-        autoHide: true,
-        visibilityTime: 2000,
-        position: 'top',
-      });
+      expect(mockCompleteDeadline).toHaveBeenCalledWith(
+        mockDeadline.id,
+        expect.any(Function), // success callback
+        expect.any(Function)  // error callback
+      );
     });
   });
 
@@ -120,19 +121,16 @@ describe('DeadlineActionButtons', () => {
       expect(mockOnSetAside).toHaveBeenCalled();
     });
 
-    it('should show coming soon toast when onSetAside not provided', () => {
+    it('should call setAsideDeadline when onSetAside not provided', () => {
       render(<DeadlineActionButtons deadline={mockDeadline} />);
 
       fireEvent.press(screen.getByText('📚 Set Aside'));
       
-      expect(Toast.show).toHaveBeenCalledWith({
-        type: 'info',
-        text1: 'Set Aside',
-        text2: 'This feature is coming soon!',
-        autoHide: true,
-        visibilityTime: 2000,
-        position: 'top',
-      });
+      expect(mockSetAsideDeadline).toHaveBeenCalledWith(
+        mockDeadline.id,
+        expect.any(Function), // success callback
+        expect.any(Function)  // error callback
+      );
     });
   });
 

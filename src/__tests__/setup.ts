@@ -49,6 +49,19 @@ afterEach(() => {
   // Clean up any timers after each test
   jest.clearAllTimers();
   
+  // Only reset to real timers if we're not in a test that explicitly uses fake timers
+  // This prevents conflicts with tests that specifically need fake timers
+  const testPath = expect.getState().testPath;
+  const needsFakeTimers = testPath && (
+    testPath.includes('ReadingDayDetails.navigation.test.tsx') ||
+    testPath.includes('timer') ||
+    testPath.includes('fake')
+  );
+  
+  if (!needsFakeTimers) {
+    jest.useRealTimers();
+  }
+  
   // Force garbage collection of any pending async operations
   jest.clearAllMocks();
   
@@ -71,13 +84,25 @@ afterAll(async () => {
     global.gc();
   }
   
-  // Clear any remaining timeouts/intervals
-  const maxId = setTimeout(() => {}, 0);
-  for (let i = 1; i <= maxId; i++) {
-    clearTimeout(i);
-    clearInterval(i);
-  }
+  // Clear any remaining timeouts/intervals more aggressively
+  const activeHandles = (process as any)._getActiveHandles?.() || [];
+  const activeRequests = (process as any)._getActiveRequests?.() || [];
   
-  // Give async operations time to complete before exit
-  await new Promise(resolve => setTimeout(resolve, 100));
+  // Clear all active timers
+  activeHandles.forEach((handle: any) => {
+    if (handle && typeof handle.unref === 'function') {
+      handle.unref();
+    }
+  });
+  
+  // Clear all active requests
+  activeRequests.forEach((request: any) => {
+    if (request && typeof request.abort === 'function') {
+      request.abort();
+    }
+  });
+  
+  // Flush any remaining promise chains
+  await Promise.resolve();
+  await Promise.resolve(); // Double flush for nested promises
 });
