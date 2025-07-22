@@ -188,7 +188,7 @@ describe('useDeadlineHistory', () => {
         expect(july16Entry?.deadlines.length).toBeGreaterThan(0);
 
         // Check progress calculations for any deadline that has progress on this date
-        if (july16Entry?.deadlines.length > 0) {
+        if (july16Entry?.deadlines.length && july16Entry?.deadlines.length > 0) {
             const deadline = july16Entry.deadlines[0];
             expect(deadline.progress_made).toBeGreaterThan(0);
         }
@@ -200,7 +200,6 @@ describe('useDeadlineHistory', () => {
             error: null,
         });
 
-        console.log(JSON.stringify(mockDeadlineData, null, 2));
         const { result } = renderHook(() => useDeadlineHistory(), { wrapper });
 
         await waitFor(() => {

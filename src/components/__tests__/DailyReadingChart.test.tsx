@@ -1,7 +1,7 @@
+import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { render } from '@testing-library/react-native';
 import React from 'react';
 import DailyReadingChart from '../charts/DailyReadingChart';
-import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 // Mock the gifted charts
 jest.mock('react-native-gifted-charts', () => ({
@@ -41,15 +41,15 @@ describe('DailyReadingChart', () => {
     progress: [
       {
         id: 'progress-1',
-        created_at: '2025-07-14T00:00:00Z',
-        updated_at: '2025-07-14T00:00:00Z',
+        created_at: '2025-07-21T00:00:00Z',
+        updated_at: '2025-07-21T00:00:00Z',
         current_progress: 50,
         reading_deadline_id: 'test-book-1'
       },
       {
         id: 'progress-2',
-        created_at: '2025-07-15T00:00:00Z',
-        updated_at: '2025-07-15T00:00:00Z',
+        created_at: '2025-07-22T00:00:00Z',
+        updated_at: '2025-07-22T00:00:00Z',
         current_progress: 75,
         reading_deadline_id: 'test-book-1'
       }
@@ -65,15 +65,15 @@ describe('DailyReadingChart', () => {
     progress: [
       {
         id: 'progress-audio-1',
-        created_at: '2025-07-14T00:00:00Z',
-        updated_at: '2025-07-14T00:00:00Z',
+        created_at: '2025-07-21T00:00:00Z',
+        updated_at: '2025-07-21T00:00:00Z',
         current_progress: 120,
         reading_deadline_id: 'test-audio-book'
       },
       {
         id: 'progress-audio-2',
-        created_at: '2025-07-15T00:00:00Z',
-        updated_at: '2025-07-15T00:00:00Z',
+        created_at: '2025-07-22T00:00:00Z',
+        updated_at: '2025-07-22T00:00:00Z',
         current_progress: 180,
         reading_deadline_id: 'test-audio-book'
       }
@@ -89,8 +89,8 @@ describe('DailyReadingChart', () => {
     progress: [
       {
         id: 'progress-ebook-1',
-        created_at: '2025-07-14T00:00:00Z',
-        updated_at: '2025-07-14T00:00:00Z',
+        created_at: '2025-07-21T00:00:00Z',
+        updated_at: '2025-07-21T00:00:00Z',
         current_progress: 25,
         reading_deadline_id: 'test-ebook'
       }
@@ -165,15 +165,15 @@ describe('DailyReadingChart', () => {
         progress: [
           {
             id: 'progress-1',
-            created_at: '2025-07-15T08:00:00Z',
-            updated_at: '2025-07-15T08:00:00Z',
+            created_at: '2025-07-22T08:00:00Z',
+            updated_at: '2025-07-22T08:00:00Z',
             current_progress: 50,
             reading_deadline_id: 'test-book-1'
           },
           {
             id: 'progress-2',
-            created_at: '2025-07-15T20:00:00Z',
-            updated_at: '2025-07-15T20:00:00Z',
+            created_at: '2025-07-22T20:00:00Z',
+            updated_at: '2025-07-22T20:00:00Z',
             current_progress: 80,
             reading_deadline_id: 'test-book-1'
           }
@@ -266,8 +266,8 @@ describe('DailyReadingChart', () => {
         progress: [
           {
             id: 'large-initial',
-            created_at: '2025-07-15T00:00:00Z',
-            updated_at: '2025-07-15T00:00:00Z',
+            created_at: '2025-07-22T00:00:00Z',
+            updated_at: '2025-07-22T00:00:00Z',
             current_progress: 300, // Large initial progress (should be ignored)
             reading_deadline_id: 'test-audio-book'
           },
@@ -295,15 +295,15 @@ describe('DailyReadingChart', () => {
         progress: [
           {
             id: 'progress-1',
-            created_at: '2025-07-15T08:00:00Z',
-            updated_at: '2025-07-15T08:00:00Z',
+            created_at: '2025-07-22T08:00:00Z',
+            updated_at: '2025-07-22T08:00:00Z',
             current_progress: 100,
             reading_deadline_id: 'test-book-1'
           },
           {
             id: 'progress-2',
-            created_at: '2025-07-15T20:00:00Z',
-            updated_at: '2025-07-15T20:00:00Z',
+            created_at: '2025-07-22T20:00:00Z',
+            updated_at: '2025-07-22T20:00:00Z',
             current_progress: 90, // User went backwards (correction)
             reading_deadline_id: 'test-book-1'
           }
