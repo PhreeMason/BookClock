@@ -1,4 +1,4 @@
-import { useAddDeadline, useGetDeadlines, useUpdateDeadline, useDeleteDeadline, useCompleteDeadline, useSetAsideDeadline } from '@/hooks/useDeadlines';
+import { useAddDeadline, useCompleteDeadline, useDeleteDeadline, useGetDeadlines, useSetAsideDeadline, useUpdateDeadline } from '@/hooks/useDeadlines';
 import {
     calculateCurrentProgress,
     calculateRemaining,
@@ -8,8 +8,8 @@ import {
 } from '@/lib/deadlineCalculations';
 import { calculateDaysLeft, calculateProgress, calculateProgressPercentage, getTotalReadingTimePerDay, getUnitForFormat, separateDeadlines } from '@/lib/deadlineUtils';
 import { ReadingDeadlineInsert, ReadingDeadlineProgressInsert, ReadingDeadlineWithProgress } from '@/types/deadline';
-import { PaceProvider, usePace } from './PaceProvider';
 import React, { createContext, ReactNode, useContext } from 'react';
+import { PaceProvider, usePace } from './PaceProvider';
 
 interface DeadlineContextType {
   // Data
@@ -53,12 +53,7 @@ interface DeadlineContextType {
     paceStatus: 'green' | 'orange' | 'red';
     paceMessage: string;
   };
-  
-  // Legacy utility functions (kept for backward compatibility)
-  calculateUnitsPerDay: (totalQuantity: number, currentProgress: number, daysLeft: number, format: 'physical' | 'ebook' | 'audio') => number;
-  getUrgencyLevel: (daysLeft: number) => 'overdue' | 'urgent' | 'good' | 'approaching';
-  getUrgencyColor: (urgencyLevel: string) => string;
-  getStatusMessage: (urgencyLevel: string) => string;
+
   formatUnitsPerDay: (units: number, format: 'physical' | 'ebook' | 'audio') => string;
   
   // Counts
@@ -103,32 +98,6 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     
     if (daysLeft <= 0) return remaining;
     return Math.ceil(remaining / daysLeft);
-  };
-
-  // Get color coding based on urgency
-  const getUrgencyLevel = (daysLeft: number): 'overdue' | 'urgent' | 'good' | 'approaching' => {
-    if (daysLeft <= 0) return 'overdue';
-    if (daysLeft <= 7) return 'urgent';
-    if (daysLeft <= 14) return 'approaching';
-    return 'good';
-  };
-
-  const getUrgencyColor = (urgencyLevel: string): string => {
-    switch (urgencyLevel) {
-      case 'overdue': return '#ef4444';
-      case 'urgent': return '#dc2626';
-      case 'good': return '#10b981';
-      case 'approaching': return '#f59e0b';
-      default: return '#7bc598';
-    }
-  };
-
-  const getStatusMessage = (urgencyLevel: string): string => {
-    if (urgencyLevel === 'overdue') return 'Return or renew';
-    if (urgencyLevel === 'urgent') return 'Tough timeline';
-    if (urgencyLevel === 'good') return "You're doing great";
-    if (urgencyLevel === 'approaching') return 'A bit more daily';
-    return 'Good';
   };
 
   // Format the units per day display based on format
@@ -288,14 +257,8 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     completeDeadline,
     setAsideDeadline,
     
-    // Calculations
     getDeadlineCalculations,
     
-    // Utility functions
-    calculateUnitsPerDay,
-    getUrgencyLevel,
-    getUrgencyColor,
-    getStatusMessage,
     formatUnitsPerDay,
     
     // Counts
@@ -317,7 +280,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
 
 // Main DeadlineProvider that wraps both pace and deadline logic
 export const DeadlineProvider: React.FC<DeadlineProviderProps> = ({ children }) => {
-  const { data: deadlines = [] } = useGetDeadlines();
+  const { data: deadlines = [] } = useGetDeadlines({includeNonActive: true});
   
   return (
     <PaceProvider deadlines={deadlines}>
