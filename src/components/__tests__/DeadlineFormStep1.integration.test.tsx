@@ -9,7 +9,7 @@ import { DeadlineFormData, deadlineFormSchema } from '@/lib/deadlineFormSchema';
 // Mock the theme hook
 // Mock ThemedText
 // Mock CustomInput to properly pass through testID
-jest.mock('@/components/CustomInput', () => {
+jest.mock('@/components/shared/CustomInput', () => {
   const React = require('react');
   const { Controller } = require('react-hook-form');
   const { TextInput, View } = require('react-native');

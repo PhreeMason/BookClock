@@ -72,9 +72,13 @@ export const PaceProvider: React.FC<PaceProviderProps> = ({ children, deadlines 
       deadline.format
     );
     
+    // Use appropriate pace data based on format
+    const relevantUserPaceData = deadline.format === 'audio' ? userListeningPaceData : userPaceData;
+    const userPace = relevantUserPaceData.averagePace;
+    
     // Get status based on user's pace vs required pace
     const status = getPaceBasedStatus(
-      userPaceData.averagePace,
+      userPace,
       requiredPace,
       daysLeft,
       progressPercentage
@@ -82,18 +86,18 @@ export const PaceProvider: React.FC<PaceProviderProps> = ({ children, deadlines 
     
     // Generate detailed status message
     const statusMessage = getPaceStatusMessage(
-      userPaceData,
+      relevantUserPaceData,
       requiredPace,
       status,
       deadline.format
     );
     
     return {
-      userPace: userPaceData.averagePace,
+      userPace,
       requiredPace,
       status,
       statusMessage,
-      paceDisplay: formatPaceDisplay(userPaceData.averagePace, deadline.format),
+      paceDisplay: formatPaceDisplay(userPace, deadline.format),
       requiredPaceDisplay: formatPaceDisplay(requiredPace, deadline.format),
       daysLeft,
       progressPercentage

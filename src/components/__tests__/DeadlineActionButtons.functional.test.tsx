@@ -35,6 +35,12 @@ jest.mock('@/hooks/useDeadlines', () => ({
   useDeleteDeadline: jest.fn(() => ({
     mutate: jest.fn(),
   })),
+  useCompleteDeadline: jest.fn(() => ({
+    mutate: jest.fn(),
+  })),
+  useSetAsideDeadline: jest.fn(() => ({
+    mutate: jest.fn(),
+  })),
 }));
 
 // Mock Supabase
@@ -109,9 +115,10 @@ describe('DeadlineActionButtons - Functional Tests', () => {
     queryClient.clear();
     mockAlert?.mockRestore();
     
-    // Wait for any pending async operations
+    // Wait for any pending async operations using act
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      // Use flushPromises to wait for pending promises instead of setTimeout
+      await Promise.resolve();
     });
   });
 

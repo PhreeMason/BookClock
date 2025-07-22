@@ -30,32 +30,40 @@ export const sortDeadlines = (a: ReadingDeadlineWithProgress, b: ReadingDeadline
 };
 
 /**
- * Separates deadlines into active and overdue categories based on their due dates.
- * Both categories are sorted using the sortDeadlines function.
+ * Separates deadlines into active, overdue, and completed categories.
+ * Active and overdue are sorted by due date, while completed are sorted by last update.
  * @param deadlines - Array of deadlines to separate
- * @returns Object containing active and overdue deadline arrays
+ * @returns Object containing active, overdue, and completed deadline arrays
  */
 export const separateDeadlines = (deadlines: ReadingDeadlineWithProgress[]) => {
     const now = new Date();
     
     const active: ReadingDeadlineWithProgress[] = [];
     const overdue: ReadingDeadlineWithProgress[] = [];
-    
+    const completed: ReadingDeadlineWithProgress[] = [];
+
     deadlines.forEach(deadline => {
-        const deadlineDate = new Date(deadline.deadline_date);
-        
-        if (deadlineDate < now) {
+        if (deadline.status === 'completed') {
+            completed.push(deadline);
+        } else if (new Date(deadline.deadline_date) < now) {
             overdue.push(deadline);
         } else {
             active.push(deadline);
         }
     });
     
-    // Sort both arrays
+    // Sort active and overdue by priority
     active.sort(sortDeadlines);
     overdue.sort(sortDeadlines);
+
+    // Sort completed by most recently updated
+    completed.sort((a, b) => {
+        const aDate = a.updated_at ? new Date(a.updated_at) : new Date(0);
+        const bDate = b.updated_at ? new Date(b.updated_at) : new Date(0);
+        return bDate.getTime() - aDate.getTime();
+    });
     
-    return { active, overdue };
+    return { active, overdue, completed };
 };
 
 /**

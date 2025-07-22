@@ -288,6 +288,33 @@ const blushNavyTheme: SimpleTheme = {
     isDark: false,
 };
 
+const corporateTheme: SimpleTheme = {
+    text: '#000000',
+    background: '#ffffff',
+    primary: '#14213d',
+    secondary: '#e5e5e5',
+    accent: '#fca311',
+    isDark: false,
+};
+
+const engineeringTheme: SimpleTheme = {
+    text: '#f4d58d',
+    background: '#001427',
+    primary: '#bf0603',
+    secondary: '#708d81',
+    accent: '#8d0801',
+    isDark: true,
+};
+
+const vibrantTheme: SimpleTheme = {
+    text: '#8338ec',
+    background: '#ffffff',
+    primary: '#fb5607',
+    secondary: '#3a86ff',
+    accent: '#ff006e',
+    isDark: false,
+};
+
 export const themes: Record<ThemeMode, SimpleTheme> = {
     light: lightTheme,
     bae: baeTheme,
@@ -321,6 +348,9 @@ export const themes: Record<ThemeMode, SimpleTheme> = {
     quantumFlux: quantumFluxTheme,
     viralGreen: viralGreenTheme,
     blushNavy: blushNavyTheme,
+    corporate: corporateTheme,
+    engineering: engineeringTheme,
+    vibrant: vibrantTheme,
 };
 
 export const themeNames: Record<ThemeMode, string> = {
@@ -356,4 +386,7 @@ export const themeNames: Record<ThemeMode, string> = {
     quantumFlux: 'Quantum Flux',
     viralGreen: 'Viral Green',
     blushNavy: 'Blush Navy',
+    corporate: 'Corporate',
+    engineering: 'Engineering',
+    vibrant: 'Vibrant',
 };
