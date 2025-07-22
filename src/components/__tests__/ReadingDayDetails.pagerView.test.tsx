@@ -1,7 +1,7 @@
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
-import ReadingDayDetails from '../features/calendar/ReadingDayDetails';
 import { DailyDeadlineEntry } from '@/hooks/useReadingHistory';
+import { fireEvent, render } from '@testing-library/react-native';
+import React from 'react';
+import ReadingDayDetails from '../features/calendar/ReadingDayDetails';
 
 // Mock PagerView with proper initialization behavior
 jest.mock('react-native-pager-view', () => {
@@ -212,7 +212,7 @@ describe('ReadingDayDetails PagerView Tests', () => {
   });
 
   test('Previous button should be disabled on first page', () => {
-    const { getByText, getAllByText } = render(
+    const { getByText } = render(
       <ReadingDayDetails
         isVisible={true}
         onClose={jest.fn()}

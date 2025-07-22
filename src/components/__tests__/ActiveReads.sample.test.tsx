@@ -1,8 +1,7 @@
+import { mockUseGetDeadlines } from '@/__mocks__/useDeadlinesMock';
 import { render, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import ActiveReads from '../features/deadlines/ActiveReads';
-import { mockUseGetDeadlines } from '@/__mocks__/useDeadlinesMock';
-import { sampleDeadlines } from '@/__tests__/fixtures/sampleDeadlines';
 
 // Mock the deadline hooks
 jest.mock('@/hooks/useDeadlines', () => ({
