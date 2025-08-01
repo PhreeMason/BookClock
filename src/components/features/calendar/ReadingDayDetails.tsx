@@ -12,6 +12,7 @@ import { ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTheme } from '@/theme';
 import { DailyDeadlineEntry, FormatFilter } from '@/hooks/useReadingHistory';
+import { formatDisplayDate } from '@/lib/dateUtils';
 
 interface ReadingDayDetailsProps {
   isVisible: boolean;
@@ -185,7 +186,7 @@ const DayContent: React.FC<DayContentProps> = React.memo(({ dayData, selectedCat
                       </ThemedText>
                     )}
                     <ThemedText color="textMuted" style={styles.bookAuthor}>
-                      Due: {new Date(deadline.deadline_date).toLocaleDateString()}
+                      Due: {formatDisplayDate(deadline.deadline_date)}
                     </ThemedText>
                   </View>
                 </View>

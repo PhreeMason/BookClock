@@ -1,5 +1,6 @@
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { calculateTotalQuantity } from './deadlineCalculations';
+import { isDateBefore, calculateDaysLeft as calculateDaysLeftUtil } from './dateUtils';
 
 /**
  * Sorts deadlines by priority: first by due date (earliest first), then by updated_at (most recent first), 
@@ -36,16 +37,19 @@ export const sortDeadlines = (a: ReadingDeadlineWithProgress, b: ReadingDeadline
  * @returns Object containing active, overdue, and completed deadline arrays
  */
 export const separateDeadlines = (deadlines: ReadingDeadlineWithProgress[]) => {
-    const now = new Date();
-    
     const active: ReadingDeadlineWithProgress[] = [];
     const overdue: ReadingDeadlineWithProgress[] = [];
     const completed: ReadingDeadlineWithProgress[] = [];
 
     deadlines.forEach(deadline => {
-        if (deadline.status === 'completed') {
+        // Get the latest status from the status array
+        const latestStatus = deadline.status && deadline.status.length > 0 
+            ? deadline.status[deadline.status.length - 1].status 
+            : 'reading';
+            
+        if (latestStatus === 'complete' || latestStatus === 'set_aside') {
             completed.push(deadline);
-        } else if (new Date(deadline.deadline_date) < now) {
+        } else if (isDateBefore(deadline.deadline_date)) {
             overdue.push(deadline);
         } else {
             active.push(deadline);
@@ -73,11 +77,7 @@ export const separateDeadlines = (deadlines: ReadingDeadlineWithProgress[]) => {
  * @returns Number of days left (positive) or overdue (negative)
  */
 export const calculateDaysLeft = (deadlineDate: string): number => {
-    const now = new Date();
-    const deadline = new Date(deadlineDate);
-    const diffTime = deadline.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return calculateDaysLeftUtil(deadlineDate);
 };
 
 /**

@@ -2,6 +2,7 @@ import { useSupabase } from '@/lib/supabase';
 import { useUser } from '@clerk/clerk-expo';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import { utcToLocalDate } from '@/lib/dateUtils';
 
 export interface DailyDeadlineEntry {
   date: string;
@@ -58,13 +59,7 @@ const getDateRangeStart = (range: DateRange): Date | null => {
 
 // Helper to convert UTC date string to local date string (YYYY-MM-DD)
 const getLocalDateString = (utcDateString: string): string => {
-  // Parse the UTC date and extract just the date portion
-  // This ensures consistent date handling regardless of timezone
-  const date = new Date(utcDateString);
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return utcToLocalDate(utcDateString);
 };
 
 const getFormatFilter = (filter: FormatFilter): string[] => {
