@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ThemedText, ThemedView } from '../themed';
+import { formatDisplayDate } from '@/lib/dateUtils';
 
 interface ProgressBarProps {
   progressPercentage: number;
@@ -12,11 +13,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   deadlineDate
 }) => {
   const formatDeadlineDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    return formatDisplayDate(dateString, 'MMMM D');
   };
 
   return (
