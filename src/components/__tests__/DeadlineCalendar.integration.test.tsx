@@ -291,7 +291,7 @@ describe('Deadline Calendar Integration', () => {
                 deadline_date: '2025-08-15T00:00:00Z',
                 source: 'Library',
                 flexibility: 'moderate',
-                created_at: '2025-07-15T00:00:00Z',
+                created_at: '2025-07-15T12:00:00Z',
                 reading_deadline_progress: [
                     {
                         id: 'big-initial',

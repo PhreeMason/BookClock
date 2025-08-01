@@ -201,9 +201,9 @@ describe('ReadingDayDetails', () => {
         const { getByText, getAllByText } = render(<ReadingDayDetails {...defaultProps} />);
 
         // Check deadline dates (using actual sample data dates)
-        expect(getByText('Due: 7/11/2025')).toBeTruthy();
-        expect(getByText('Due: 7/31/2025')).toBeTruthy();
-        expect(getByText('Due: 8/31/2025')).toBeTruthy();
+        expect(getByText('Due: Jul 11, 2025')).toBeTruthy();
+        expect(getByText('Due: Jul 31, 2025')).toBeTruthy();
+        expect(getByText('Due: Aug 31, 2025')).toBeTruthy();
 
         // Check sources (multiple books can have same source)
         const personalSources = getAllByText('Source: personal');

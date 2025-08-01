@@ -49,3 +49,5 @@ android/
 .env
 
 supabase/.temp/
+
+coverage/

@@ -183,15 +183,14 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
           const currentProgress = dayProgress[dayProgress.length - 1];
           
           let progressMade = 0;
-          let isDeadlineAddedEntry = false;
           
           if (dateIndex === 0) {
-            // First date - if deadline was created this day, always show it
+            // First date - if deadline was created this day, apply progress threshold logic
             if (showDeadlineCreation) {
-              isDeadlineAddedEntry = true;
-              // For deadline creation day, show the initial progress as "starting point"
-              // but don't count it as progress made that day
-              progressMade = 0;
+              // For deadline creation day, apply progress threshold logic:
+              // If initial progress > 50, treat as starting point (progress made = 0)
+              // If initial progress <= 50, count it as progress made
+              progressMade = currentProgress.current_progress > 50 ? 0 : currentProgress.current_progress;
             } else {
               // If first entry is not on creation date, it means progress was made
               progressMade = currentProgress.current_progress;
@@ -204,8 +203,8 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
             progressMade = Math.max(0, currentProgress.current_progress - prevProgress.current_progress);
           }
 
-          // Add entries where deadline was added OR actual progress was made
-          if (isDeadlineAddedEntry || progressMade > 0) {
+          // Add entries only where actual progress was made
+          if (progressMade > 0) {
             if (!dailyEntries[date]) {
               dailyEntries[date] = {
                 date,
