@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { LineChart } from 'react-native-gifted-charts';
 import { ThemedText, ThemedView } from '@/components/themed';
 import { useTheme } from '@/theme';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { LineChart } from 'react-native-gifted-charts';
 
 interface ProgressAreaChartProps {
   deadline: ReadingDeadlineWithProgress;
@@ -116,10 +116,18 @@ const ProgressAreaChart: React.FC<ProgressAreaChartProps> = ({ deadline }) => {
       
       <View style={styles.chartContainer}>
         <LineChart
+          focusEnabled
+          showStripOnFocus
+          showTextOnFocus
+          focusedDataPointShape="circle"
+          focusedDataPointWidth={10}
+          focusedDataPointHeight={20}
+          // blue
+          focusedDataPointColor={theme.secondary}
+          showValuesAsDataPointsText
           data={chartData}
           width={300}
           height={180}
-          curved
           areaChart
           startFillColor={theme.primary}
           startOpacity={0.3}
