@@ -1,37 +1,30 @@
 /**
  * Test setup file
  * This file is imported by Jest before running tests
+ * 
+ * CENTRALIZED MOCK SYSTEM:
+ * Most mocks are now imported from centralized mock files.
+ * This reduces duplication and ensures consistency across tests.
  */
 
-// Import the unified theme mock
+// Import centralized mocks - these will automatically apply jest.mock() calls
 import '../__mocks__/theme';
+import '../__mocks__/externalLibraries';
+import '../__mocks__/supabase';
+import '../__mocks__/achievementSystem';
+import '../__mocks__/hooks';
+import '../__mocks__/contextProviders';
+import '../__mocks__/reactNativeComponents';
 
 // Mock React Native modules that aren't available in test environment
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
 
-// Note: Alert mocking is done per test file to avoid conflicts
+// Note: Alert mocking is done per test file to avoid conflicts since different
+// tests need different Alert behaviors
 
-// Mock Expo modules
-jest.mock('expo-router', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-  }),
-  useLocalSearchParams: () => ({}),
-  Link: ({ children }: { children: React.ReactNode }) => children,
-  router: {
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-  },
-}));
-
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  getItem: jest.fn(() => Promise.resolve(null)),
-  setItem: jest.fn(() => Promise.resolve()),
-  removeItem: jest.fn(() => Promise.resolve()),
-}));
+// Legacy mocks that will be gradually migrated to centralized system:
+// - expo-router (now in externalLibraries.ts)
+// - @react-native-async-storage/async-storage (now in externalLibraries.ts)
 
 // Mock themed components globally
 jest.mock('@/components/themed', () => ({

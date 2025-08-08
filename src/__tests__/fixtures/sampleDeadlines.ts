@@ -8,7 +8,7 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
     format: "physical",
     source: "personal",
     total_quantity: 52,
-    deadline_date: "2025-07-11T21:11:00+00:00",
+    deadline_date: "2025-09-11T21:11:00+00:00",
     flexibility: "flexible",
     user_id: "user_2yqCu9TotmCYVGwIJlnr5XfOMxJ",
     created_at: "2025-07-15T21:13:29.617564+00:00",
@@ -16,15 +16,15 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
     progress: [
       {
         id: "rdp_09af60dd299b40dd",
-        created_at: "2025-07-15T21:13:29.773601+00:00",
-        updated_at: "2025-07-15T05:13:59.913+00:00",
+        created_at: "2025-07-31T21:13:29.773601+00:00",
+        updated_at: "2025-07-31T05:13:59.913+00:00",
         current_progress: 37,
         reading_deadline_id: "rd_3334d0efe76545e9"
       },
       {
         id: "rdp_32f359f56c4d4ab2",
-        created_at: "2025-07-16T00:54:07.324+00:00",
-        updated_at: "2025-07-16T00:54:07.324+00:00",
+        created_at: "2025-08-01T00:54:07.324+00:00",
+        updated_at: "2025-08-01T00:54:07.324+00:00",
         current_progress: 39,
         reading_deadline_id: "rd_3334d0efe76545e9"
       }
@@ -45,36 +45,36 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
     progress: [
       {
         id: "rdp_6c150511684b407b",
-        created_at: "2025-07-12T05:46:43.766915+00:00",
-        updated_at: "2025-07-12T05:46:43.766915+00:00",
+        created_at: "2025-07-26T05:46:43.766915+00:00",
+        updated_at: "2025-07-26T05:46:43.766915+00:00",
         current_progress: 281,
         reading_deadline_id: "rd_1546b109fce34579"
       },
       {
         id: "rdp_f28d8558fb9445f9",
-        created_at: "2025-07-15T02:49:52.547+00:00",
-        updated_at: "2025-07-15T02:49:52.547+00:00",
+        created_at: "2025-07-28T02:49:52.547+00:00",
+        updated_at: "2025-07-28T02:49:52.547+00:00",
         current_progress: 302,
         reading_deadline_id: "rd_1546b109fce34579"
       },
       {
         id: "rdp_02fdff7295a84fa4",
-        created_at: "2025-07-15T17:04:16.402+00:00",
-        updated_at: "2025-07-15T17:04:16.402+00:00",
+        created_at: "2025-07-30T17:04:16.402+00:00",
+        updated_at: "2025-07-30T17:04:16.402+00:00",
         current_progress: 344,
         reading_deadline_id: "rd_1546b109fce34579"
       },
       {
         id: "rdp_fdce0dfcc22249dd",
-        created_at: "2025-07-15T17:59:24.503+00:00",
-        updated_at: "2025-07-15T17:59:24.503+00:00",
+        created_at: "2025-07-31T17:59:24.503+00:00",
+        updated_at: "2025-07-31T17:59:24.503+00:00",
         current_progress: 346,
         reading_deadline_id: "rd_1546b109fce34579"
       },
       {
         id: "rdp_09670755ee9142dd",
-        created_at: "2025-07-15T17:59:32.686+00:00",
-        updated_at: "2025-07-15T17:59:32.686+00:00",
+        created_at: "2025-08-01T17:59:32.686+00:00",
+        updated_at: "2025-08-01T17:59:32.686+00:00",
         current_progress: 344,
         reading_deadline_id: "rd_1546b109fce34579"
       }
@@ -124,22 +124,22 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
     progress: [
       {
         id: "rdp_b3a5f80a71d84374",
-        created_at: "2025-07-14T23:13:21.809276+00:00",
-        updated_at: "2025-07-14T23:13:21.809276+00:00",
+        created_at: "2025-07-27T23:13:21.809276+00:00",
+        updated_at: "2025-07-27T23:13:21.809276+00:00",
         current_progress: 938,
         reading_deadline_id: "rd_84d0ec8cb5b94bea"
       },
       {
         id: "rdp_84517a2a1d7642ab",
-        created_at: "2025-07-14T23:34:40.168+00:00",
-        updated_at: "2025-07-14T23:34:40.168+00:00",
+        created_at: "2025-07-29T23:34:40.168+00:00",
+        updated_at: "2025-07-29T23:34:40.168+00:00",
         current_progress: 962,
         reading_deadline_id: "rd_84d0ec8cb5b94bea"
       },
       {
         id: "rdp_248671b352584083",
-        created_at: "2025-07-16T02:06:36.833+00:00",
-        updated_at: "2025-07-16T02:06:36.833+00:00",
+        created_at: "2025-08-01T02:06:36.833+00:00",
+        updated_at: "2025-08-01T02:06:36.833+00:00",
         current_progress: 984,
         reading_deadline_id: "rd_84d0ec8cb5b94bea"
       }

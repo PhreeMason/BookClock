@@ -1,31 +1,15 @@
 import { getSampleDeadlines } from '@/__tests__/fixtures/sampleDeadlines';
-import { useSupabase } from '@/lib/supabase';
-import { useTheme } from '@/theme';
-import { useUser } from '@clerk/clerk-expo';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, waitFor } from '@testing-library/react-native';
 import dayjs from 'dayjs';
 import React from 'react';
 import ReadingCalendar from '../features/calendar/ReadingCalendar';
 
-// Mock dependencies
-jest.mock('@clerk/clerk-expo');
-jest.mock('@/lib/supabase');
-jest.mock('@/theme');
-jest.mock('react-native-calendars', () => ({
-    Calendar: ({ onDayPress, markedDates }: any) => {
-        const React = require('react');
-        return React.createElement('Calendar', {
-            testID: 'deadline-calendar',
-            onPress: () => onDayPress({ dateString: '2025-07-16' }),
-            markedDates,
-        });
-    },
-}));
-
-const mockUseUser = useUser as jest.MockedFunction<typeof useUser>;
-const mockUseSupabase = useSupabase as jest.MockedFunction<typeof useSupabase>;
-const mockUseTheme = useTheme as jest.MockedFunction<typeof useTheme>;
+// Import centralized mocks
+import { mockUseTheme } from '@/__mocks__/contextProviders';
+import { mockUseUser } from '@/__mocks__/externalLibraries';
+import '@/__mocks__/reactNativeComponents'; // This includes Calendar mock
+import { mockUseSupabase } from '@/__mocks__/supabase';
 
 describe('Deadline Calendar Integration', () => {
     let queryClient: QueryClient;

@@ -3,18 +3,8 @@ import React from 'react';
 import ProgressAreaChart from '../charts/ProgressAreaChart';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
-// Mock the gifted charts
-jest.mock('react-native-gifted-charts', () => ({
-  LineChart: jest.fn(({ testID, data, areaChart, ...props }: any) => {
-    const React = require('react');
-    const { View, Text } = require('react-native');
-    return React.createElement(
-      View,
-      { testID: testID || 'line-chart' },
-      React.createElement(Text, {}, `${areaChart ? 'Area' : 'Line'}Chart with ${data?.length || 0} points`)
-    );
-  }),
-}));
+// Import centralized React Native component mocks
+import '@/__mocks__/reactNativeComponents';
 
 describe('ProgressAreaChart', () => {
   const mockPhysicalBook: ReadingDeadlineWithProgress = {

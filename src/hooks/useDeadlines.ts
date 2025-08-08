@@ -76,13 +76,15 @@ export const useAddDeadline = () => {
                 console.error('Error inserting initial status:', statusError);
                 throw new Error(statusError.message);
             }
-
-            data.status = [statusData];
-            data.id = finalDeadlineId;
-            data.user_id = userId;
     
-            data.progress = progressData;
-            return data;
+            const result = {
+                ...data,
+                id: finalDeadlineId,
+                user_id: userId,
+                progress: progressData,
+                status: [statusData]
+            }
+            return result;
         },
         onSuccess: () => {
             // Invalidate and refetch deadlines after successful addition
@@ -137,9 +139,10 @@ export const useUpdateDeadline = () => {
             }
 
             // Update or create progress entry
+            let progressData;
             if (progressDetails.id) {
                 // Update existing progress
-                const { data: progressData, error: progressError } = await supabase
+                const { data, error: progressError } = await supabase
                     .from('reading_deadline_progress')
                     .update({
                         current_progress: progressDetails.current_progress,
@@ -154,7 +157,7 @@ export const useUpdateDeadline = () => {
                     throw new Error(progressError.message);
                 }
                 
-                deadlineData.progress = progressData;
+                progressData = data;
             } else {
                 // Create new progress entry
                 const { data: progressId, error: progressIdError } = await supabase.rpc('generate_prefixed_id', { prefix: 'rdp' });
@@ -163,7 +166,7 @@ export const useUpdateDeadline = () => {
                     console.warn('RPC ID generation failed, using crypto fallback for progress ID:', progressIdError);
                 }
                 
-                const { data: progressData, error: progressError } = await supabase
+                const { data, error: progressError } = await supabase
                     .from('reading_deadline_progress')
                     .insert({
                         id: finalProgressId,
@@ -180,10 +183,9 @@ export const useUpdateDeadline = () => {
                     throw new Error(progressError.message);
                 }
                 
-                deadlineData.progress = progressData;
+                progressData = data;
             }
-            
-            return deadlineData;
+            return {...deadlineData, progress: progressData};
         },
         onSuccess: () => {
             // Invalidate and refetch deadlines after successful update
@@ -407,6 +409,7 @@ export const useGetArchivedDeadlines = () => {
             filteredData.sort((a, b) => {
                 const aDate = a.status?.[a.status.length - 1]?.created_at || a.created_at;
                 const bDate = b.status?.[b.status.length - 1]?.created_at || b.created_at;
+                if (!aDate || !bDate) return 0; // Handle cases where dates might be missing
                 return new Date(bDate).getTime() - new Date(aDate).getTime();
             });
             

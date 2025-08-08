@@ -54,4 +54,4 @@ export interface BookData {
   epub_url?: string;
 }
 
-export type BookFormat = 'physical' | 'digital' | 'audiobook' | string;
+export type BookFormat = 'physical' | 'ebook' | 'audiobook' | string;

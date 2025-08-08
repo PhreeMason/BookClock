@@ -52,11 +52,10 @@ describe('DeadlineCard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseDeadlines.mockReturnValue({
-      getDeadlineCalculations: mockGetDeadlineCalculations,
-      formatUnitsPerDay: mockFormatUnitsPerDay,
       deadlines: [],
-      activeDeadlines: [],
-      overdueDeadlines: [],
+      activebooks: [],
+      overduebooks: [],
+      completedDeadlines: [],
       isLoading: false,
       error: null,
       addDeadline: jest.fn(),
@@ -64,14 +63,29 @@ describe('DeadlineCard', () => {
       deleteDeadline: jest.fn(),
       completeDeadline: jest.fn(),
       setAsideDeadline: jest.fn(),
-      calculateUnitsPerDay: jest.fn(),
-      getUrgencyLevel: jest.fn(),
-      getUrgencyColor: jest.fn(),
-      getStatusMessage: jest.fn(),
+      getDeadlineCalculations: jest.fn(() => ({
+        currentProgress: 50,
+        totalQuantity: 100,
+        remaining: 50,
+        progressPercentage: 50,
+        daysLeft: 10,
+        unitsPerDay: 5,
+        urgencyLevel: 'good' as const,
+        urgencyColor: '#22c55e',
+        statusMessage: 'On track',
+        readingEstimate: '10 days',
+        paceEstimate: '5 pages/day',
+        unit: 'pages',
+        userPace: 5,
+        requiredPace: 5,
+        paceStatus: 'green' as const,
+        paceMessage: 'Good pace'
+      })),
+      formatUnitsPerDay: jest.fn(),
       getTotalReadingTimePerDay: jest.fn(),
       activeCount: 0,
       overdueCount: 0,
-    });
+    } as any);
   });
 
   describe('Rendering', () => {

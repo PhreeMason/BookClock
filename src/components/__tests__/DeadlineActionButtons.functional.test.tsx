@@ -1,23 +1,13 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
-import React from 'react';
-import { Alert } from 'react-native';
-import Toast from 'react-native-toast-message';
-import { router } from 'expo-router';
-import DeadlineActionButtons from '../features/deadlines/DeadlineActionButtons';
 import { DeadlineProvider } from '@/contexts/DeadlineProvider';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import React from 'react';
+import { Alert } from 'react-native';
+import DeadlineActionButtons from '../features/deadlines/DeadlineActionButtons';
 
-// Mock dependencies
-jest.mock('react-native-toast-message', () => ({
-  show: jest.fn(),
-}));
-
-jest.mock('expo-router', () => ({
-  router: {
-    replace: jest.fn(),
-  },
-}));
+// Import centralized mocks
+import { mockRouter, mockToast, mockUseUser } from '@/__mocks__/externalLibraries';
 
 // Mock the hooks
 jest.mock('@/hooks/useDeadlines', () => ({
@@ -40,24 +30,6 @@ jest.mock('@/hooks/useDeadlines', () => ({
   })),
   useSetAsideDeadline: jest.fn(() => ({
     mutate: jest.fn(),
-  })),
-}));
-
-// Mock Supabase
-jest.mock('@/lib/supabase', () => ({
-  useSupabase: jest.fn(() => ({
-    from: jest.fn(() => ({
-      delete: jest.fn(() => ({
-        eq: jest.fn(() => Promise.resolve({ error: null })),
-      })),
-    })),
-  })),
-}));
-
-// Mock Clerk
-jest.mock('@clerk/clerk-expo', () => ({
-  useUser: jest.fn(() => ({
-    user: { id: 'test-user-id' },
   })),
 }));
 
@@ -101,6 +73,13 @@ describe('DeadlineActionButtons - Functional Tests', () => {
         mutations: { retry: false },
       },
     });
+
+    // Setup default authenticated user
+    mockUseUser.mockReturnValue({
+      user: { id: 'test-user-id' },
+      isLoaded: true,
+      isSignedIn: true,
+    } as any);
 
     // Setup delete mutation mock
     mockDeleteMutate = jest.fn();
@@ -181,7 +160,7 @@ describe('DeadlineActionButtons - Functional Tests', () => {
 
       // Step 7: Success toast is shown
       await waitFor(() => {
-        expect(Toast.show).toHaveBeenCalledWith({
+        expect(mockToast.show).toHaveBeenCalledWith({
           type: 'success',
           text1: 'Deadline deleted',
           text2: '"The Great Gatsby" has been removed',
@@ -193,13 +172,13 @@ describe('DeadlineActionButtons - Functional Tests', () => {
       });
 
       // Step 8: Navigation occurs after toast
-      const toastCall = (Toast.show as jest.Mock).mock.calls[0];
+      const toastCall = (mockToast.show as jest.Mock).mock.calls[0];
       const onHideCallback = toastCall[0].onHide;
       act(() => {
         onHideCallback();
       });
 
-      expect(router.replace).toHaveBeenCalledWith('/');
+      expect(mockRouter.replace).toHaveBeenCalledWith('/');
     });
 
     it('should handle cancellation properly', async () => {
@@ -221,8 +200,8 @@ describe('DeadlineActionButtons - Functional Tests', () => {
 
       // Nothing should happen
       expect(mockDeleteMutate).not.toHaveBeenCalled();
-      expect(Toast.show).not.toHaveBeenCalled();
-      expect(router.replace).not.toHaveBeenCalled();
+      expect(mockToast.show).not.toHaveBeenCalled();
+      expect(mockRouter.replace).not.toHaveBeenCalled();
       
       // Button should still be in normal state
       expect(screen.getByText('🗑️ Delete Deadline')).toBeTruthy();
@@ -255,7 +234,7 @@ describe('DeadlineActionButtons - Functional Tests', () => {
 
       // Step 4: Error toast is shown
       await waitFor(() => {
-        expect(Toast.show).toHaveBeenCalledWith({
+        expect(mockToast.show).toHaveBeenCalledWith({
           type: 'error',
           text1: 'Failed to delete deadline',
           text2: 'Network connection failed',

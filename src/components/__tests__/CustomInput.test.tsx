@@ -4,6 +4,9 @@ import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import CustomInput from '../shared/CustomInput';
 
+// Unmock react-hook-form for consistent testing
+jest.unmock('react-hook-form');
+
 // Mock the theme hook
 // Mock ThemedText
 // Test component that uses CustomInput with react-hook-form

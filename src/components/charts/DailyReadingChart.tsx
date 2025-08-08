@@ -207,7 +207,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
       <ThemedText style={[styles.title, { color: theme.text }]}>
         {chartTitle}
       </ThemedText>
-
+      
       <View style={styles.chartContainer}>
         <View testID="bar-chart">
           <BarChart

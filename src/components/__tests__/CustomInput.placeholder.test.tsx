@@ -4,6 +4,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import CustomInput from '../shared/CustomInput';
 
+// Unmock react-hook-form for consistent testing
+jest.unmock('react-hook-form');
+
 // Mock the theme
 jest.mock('@/theme', () => ({
     useTheme: () => ({

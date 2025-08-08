@@ -1,18 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import AchievementsCard from '../AchievementsCard';
-import { useAchievementsQuery } from '@/hooks/useAchievementsQuery';
-import { useTheme } from '@/theme';
+import { mockUseAchievementsQuery } from '@/__mocks__/hooks';
+import { mockUseTheme } from '@/__mocks__/contextProviders';
 
-// Mock the dependencies
-jest.mock('@/hooks/useAchievementsQuery');
-jest.mock('@/theme');
-jest.mock('@/components/ui/IconSymbol', () => ({
-  IconSymbol: ({ name }: { name: string }) => `Icon: ${name}`
-}));
-
-const mockUseAchievementsQuery = useAchievementsQuery as jest.MockedFunction<typeof useAchievementsQuery>;
-const mockUseTheme = useTheme as jest.MockedFunction<typeof useTheme>;
+// Centralized mocks are imported via setup.ts
+// No need for manual jest.mock() calls
 
 describe('AchievementsCard', () => {
   const mockTheme = {

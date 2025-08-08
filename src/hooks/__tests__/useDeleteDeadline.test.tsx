@@ -1,5 +1,5 @@
-import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import { useDeleteDeadline } from '../useDeadlines';
 
@@ -13,13 +13,11 @@ jest.mock('@/lib/supabase', () => ({
 }));
 
 // Mock Clerk
-jest.mock('@clerk/clerk-expo', () => ({
-  useUser: jest.fn(() => ({
-    user: { id: 'test-user-id' },
-  })),
-}));
+jest.mock('@clerk/clerk-expo');
 
-describe('useDeleteDeadline', () => {
+const mockUseUser = require('@clerk/clerk-expo').useUser as jest.MockedFunction<typeof import('@clerk/clerk-expo').useUser>;
+
+describe('useDeletebook', () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
@@ -30,6 +28,13 @@ describe('useDeleteDeadline', () => {
         mutations: { retry: false },
       },
     });
+
+    // Setup default authenticated user
+    mockUseUser.mockReturnValue({
+      user: { id: 'test-user-id' },
+      isLoaded: true,
+      isSignedIn: true,
+    } as any);
 
     // Setup default mock chain for chained .eq() calls
     mockFrom.mockImplementation((table: string) => ({
