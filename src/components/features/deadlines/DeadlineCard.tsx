@@ -6,6 +6,8 @@ import React from 'react';
 import { ImageBackground, Pressable, StyleSheet, View } from 'react-native';
 
 const urgencyBorderColorMap = {
+  'complete': '#3B82F6',
+  'set_aside': '#9CA3AF',
   'overdue': '#DC2626',
   'urgent': '#EF4444',
   'good': '#4ADE80',
@@ -43,14 +45,19 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
     statusMessage
   } = getDeadlineCalculations(deadline);
 
-  const countdownColor = urgencyBorderColorMap[urgencyLevel];
-  const borderColor = urgencyBorderColorMap[urgencyLevel];
+  let countdownColor = urgencyBorderColorMap[urgencyLevel];
+  let borderColor = urgencyBorderColorMap[urgencyLevel];
 
   // Check if deadline is archived (completed or set aside)
   const latestStatus = deadline.status && deadline.status.length > 0 
     ? deadline.status[deadline.status.length - 1].status 
     : 'reading';
+  
   const isArchived = latestStatus === 'complete' || latestStatus === 'set_aside';
+  if (isArchived) {
+    borderColor = urgencyBorderColorMap[latestStatus];
+    countdownColor = urgencyBorderColorMap[latestStatus];
+  }
 
   // Consolidated book content rendering
   const renderBookContent = () => (

@@ -125,8 +125,6 @@ npm run test:watch
    - Show user's current pace in UI
 
 **2. Visual Status Indicators**
-   - Set aside deadlines → gray border
-   - Completed deadlines → blue border
    - Calendar markers:
      - Red square for due dates
      - Blue for completed
