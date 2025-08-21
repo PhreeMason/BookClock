@@ -95,7 +95,7 @@ const ProgressAreaChart: React.FC<ProgressAreaChartProps> = ({ deadline }) => {
 
   // Prepare data for the chart
   const chartData = progressPoints.map((point, index) => ({
-    value: point.totalProgress,
+    value: Number(point.totalProgress) || 0,
     label: index === 0 || index === progressPoints.length - 1 ? 
       new Date(point.date).toLocaleDateString('en-US', { 
         month: 'short', 
@@ -104,7 +104,7 @@ const ProgressAreaChart: React.FC<ProgressAreaChartProps> = ({ deadline }) => {
   }));
 
   // Add goal line if we have a target
-  const goalValue = deadline.total_quantity || 0;
+  const goalValue = Number(deadline.total_quantity) || 0;
   const maxProgress = chartData.length > 0 ? Math.max(...chartData.map(d => d.value)) : 0;
   const yAxisMax = Math.max(goalValue, maxProgress, 1) * 1.1; // Add 10% padding, minimum 1
 
