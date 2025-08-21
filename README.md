@@ -111,3 +111,83 @@ npm run test:watch
 - Required daily pace = Pages remaining ÷ Days remaining
 - Reading day definition = Any day with >0 pages logged
 - Minimum data threshold = 3 reading days for reliable pace calculation
+
+## 📋 MVP Polish Plan - Organized & Triaged
+
+### 🚨 **Critical Bugs** (Fix First)
+1. **Time/Date Issues**
+   - ❌ Time is not local, it's UTC - fix timezone handling
+   - ❌ Ignore first entry for pace calculation if submitted with book creation
+
+2. **Status Management**
+   - ❌ Completed deadlines should stop the countdown
+   - ❌ Set aside deadlines should stop the countdown and remove countdown box
+   - ❌ When picking up set aside books, prompt to update deadline date (especially if passed)
+
+### 🎯 **Core Feature Improvements** (High Priority)
+
+**1. Pace Calculator Overhaul**
+   - Always use pace calculator with ≥3 days of reading data
+   - If no recent reading, use last 7 logged days average
+   - Remove default 25 pages/day pace
+   - Show user's current pace in UI
+
+**2. Visual Status Indicators**
+   - Set aside deadlines → gray border
+   - Completed deadlines → blue border
+   - Calendar markers:
+     - Red square for due dates
+     - Blue for completed
+     - Gray for set aside
+
+**3. Daily Reading Chart Updates**
+   - Rename "Daily Reading" to clearer title
+   - Always show chart (don't hide when empty)
+   - Add average line to bar graph
+   - Press and hold bars to show exact numbers
+
+### 🔧 **UI/UX Polish** (Medium Priority)
+
+**1. Remove/Hide Elements**
+   - Remove "Progress Over Time" section
+   - Remove overall reading progress pie chart/card
+   - Remove "progress made" from deadline progress calendar
+   - Hide edit profile button
+
+**2. Settings Reorganization**
+   - Move theme picker to new "Appearance" screen linked from settings
+   - Add username display
+
+**3. Calendar Enhancements**
+   - Heat map click to show date details
+   - Change active deadlines counter to total deadlines for past 90 days
+
+**4. Format Distribution**
+   - Add toggle: Lifetime vs Active Deadline distribution
+
+### 📱 **Notifications** (Lower Priority - Post-MVP)
+- Daily reading reminders
+- Book due tomorrow/today notifications
+
+### 📝 **Implementation Order**
+
+**Phase 1: Critical Fixes (1-2 days)**
+1. Fix UTC/timezone issues
+2. Fix countdown behavior for completed/set aside
+3. Fix pace calculation edge cases
+
+**Phase 2: Core Features (2-3 days)**
+1. Implement new pace calculation logic
+2. Add visual status borders
+3. Update calendar with status markers
+4. Enhance daily reading chart
+
+**Phase 3: UI Polish (1-2 days)**
+1. Remove deprecated components
+2. Reorganize settings
+3. Add interactive elements (press/hold, click)
+4. Add format distribution toggle
+
+**Phase 4: Post-MVP (Future)**
+1. Notification system
+2. Additional analytics/insights

@@ -1,4 +1,3 @@
-import AchievementsCard from '@/components/features/achievements/AchievementsCard';
 import DailyListeningProgressChart from '@/components/charts/DailyListeningProgressChart';
 import DailyPagesChart from '@/components/charts/DailyPagesChart';
 import DailyReadingProgressChart from '@/components/charts/DailyReadingProgressChart';
@@ -100,10 +99,7 @@ export default function StatsScreen() {
                 {/* 7. Format Distribution - Reading habits */}
                 <FormatDistributionChart />
 
-                {/* 8. Achievements - Motivational and goal-oriented */}
-                <AchievementsCard />
-
-                {/* 9. Reading & Listening Pace Analysis */}
+                {/* 8. Reading & Listening Pace Analysis */}
                 <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <IconSymbol name="speedometer" size={24} color={iconColor} />

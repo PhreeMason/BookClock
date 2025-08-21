@@ -24,6 +24,10 @@ export default function SettingsScreen() {
         router.push('/stats');
     };
 
+    const handleAchievementsPress = () => {
+        router.push('/achievements');
+    };
+
     return (
         <ThemedView backgroundColor="background" style={styles.container}>
             {/* Header */}
@@ -70,6 +74,16 @@ export default function SettingsScreen() {
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="chart.bar.fill" size={20} color={iconColor} />
                                 <ThemedText style={styles.settingText}>Reading Stats</ThemedText>
+                            </View>
+                            <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
+                        </TouchableOpacity>
+
+                        <View style={[styles.divider, { backgroundColor: borderColor }]} />
+
+                        <TouchableOpacity style={styles.settingItem} onPress={handleAchievementsPress}>
+                            <View style={styles.settingLeft}>
+                                <IconSymbol name="trophy.fill" size={20} color={iconColor} />
+                                <ThemedText style={styles.settingText}>Achievements</ThemedText>
                             </View>
                             <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
                         </TouchableOpacity>

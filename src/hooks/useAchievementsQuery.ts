@@ -1,19 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { AchievementService } from '@/services/achievementService';
-import { useAuth } from '@clerk/clerk-expo';
 import { useSupabase } from '@/lib/supabase';
-import { useDeadlines } from '@/contexts/DeadlineProvider';
-import Toast from 'react-native-toast-message';
 import { Database } from '@/types/supabase';
+import { useAuth } from '@clerk/clerk-expo';
+import { useQuery } from '@tanstack/react-query';
+import { ACHIEVEMENT_CONFIGS } from '@/services/achievements/achievementConfigs';
+import * as achievementCalculators from '@/services/achievementCalculator';
 
 type Achievement = Database['public']['Tables']['achievements']['Row'];
-type AchievementCategory = Achievement['category'];
+type UserAchievement = Database['public']['Tables']['user_achievements']['Row'];
 
-interface AchievementWithStatus extends Achievement {
+interface AchievementWithProgress extends Achievement {
     isUnlocked: boolean;
     progress?: number;
-    maxProgress?: number;
     percentage?: number;
     unlockedAt?: string;
 }
@@ -22,150 +19,118 @@ const ACHIEVEMENTS_QUERY_KEY = ['achievements'] as const;
 const STALE_TIME = 5 * 60 * 1000; // 5 minutes
 const CACHE_TIME = 30 * 60 * 1000; // 30 minutes
 
-export function useAchievementsQuery() {
-  const { userId } = useAuth();
-  const queryClient = useQueryClient();
-  const supabase = useSupabase();
-  const { activeDeadlines } = useDeadlines();
-
-  // Memoize the service instance
-  const achievementService = useMemo(() => {
-    return userId ? new AchievementService(supabase, userId, activeDeadlines) : null;
-  }, [userId, supabase, activeDeadlines]);
-
-  // Main query for fetching achievements with status
-  const achievementsQuery = useQuery({
-    queryKey: [...ACHIEVEMENTS_QUERY_KEY, userId],
-    queryFn: async () => {
-      if (!achievementService) {
-        throw new Error('No user ID available');
-      }
-      return achievementService.getAchievementsWithStatus();
-    },
-    enabled: !!userId && !!achievementService,
-    staleTime: STALE_TIME,
-    gcTime: CACHE_TIME,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-  });
-
-  // Mutation for unlocking achievements
-  const unlockMutation = useMutation({
-    mutationFn: async (achievementId: string) => {
-      if (!achievementService) {
-        throw new Error('No achievement service available');
-      }
-      // For now, we'll just mark it as unlocked in the database
-      const { data, error } = await supabase
-        .from('user_achievements')
-        .insert({
-          user_id: userId!,
-          achievement_id: achievementId,
-          unlocked_at: new Date().toISOString()
-        })
-        .select('*, achievements(*)')
-        .single();
-      
-      if (error) throw error;
-      return data.achievements;
-    },
-    onMutate: async (achievementId) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: [...ACHIEVEMENTS_QUERY_KEY, userId] });
-
-      // Snapshot the previous value
-      const previousAchievements = queryClient.getQueryData<AchievementWithStatus[]>([
-        ...ACHIEVEMENTS_QUERY_KEY,
-        userId,
-      ]);
-
-      // Optimistically update the achievement
-      if (previousAchievements) {
-        queryClient.setQueryData<AchievementWithStatus[]>(
-          [...ACHIEVEMENTS_QUERY_KEY, userId],
-          (old) =>
-            old?.map((achievement) =>
-              achievement.id === achievementId
-                ? { ...achievement, isUnlocked: true, unlockedAt: new Date().toISOString() }
-                : achievement
-            ) ?? []
-        );
-      }
-
-      return { previousAchievements };
-    },
-    onError: (err, achievementId, context) => {
-      // Revert to the previous state on error
-      if (context?.previousAchievements) {
-        queryClient.setQueryData(
-          [...ACHIEVEMENTS_QUERY_KEY, userId],
-          context.previousAchievements
-        );
-      }
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to unlock achievement'
-      });
-    },
-    onSuccess: (data) => {
-      Toast.show({
-        type: 'success',
-        text1: 'Achievement Unlocked!',
-        text2: data.title
-      });
-    },
-    onSettled: () => {
-      // Always refetch after error or success
-      queryClient.invalidateQueries({ queryKey: [...ACHIEVEMENTS_QUERY_KEY, userId] });
-    },
-  });
-
-  // Memoized data transformations
-  const { achievementsByCategory, totalUnlocked, totalAchievements } = useMemo(() => {
-    const achievements = achievementsQuery.data || [];
+/**
+ * Fetch all active achievements from database
+ */
+async function fetchAchievements(supabase: ReturnType<typeof useSupabase>): Promise<Achievement[]> {
+    const { data, error } = await supabase
+        .from('achievements')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
     
-    const byCategory = achievements.reduce((acc, achievement) => {
-      const category = achievement.category;
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(achievement);
-      return acc;
-    }, {} as Record<AchievementCategory, AchievementWithStatus[]>);
+    if (error) throw error;
+    return data || [];
+}
 
-    // Sort achievements within each category
-    Object.keys(byCategory).forEach((category) => {
-      byCategory[category as AchievementCategory].sort((a, b) => {
-        // Unlocked achievements first
+/**
+ * Fetch user's achievement progress
+ */
+async function fetchUserAchievements(supabase: ReturnType<typeof useSupabase>, userId: string): Promise<UserAchievement[]> {
+    const { data, error } = await supabase
+        .from('user_achievements')
+        .select('*')
+        .eq('user_id', userId);
+    
+    if (error) throw error;
+    return data || [];
+}
+
+/**
+ * Main query function that combines achievements with progress calculation
+ */
+async function fetchAchievementsWithProgress(
+    supabase: ReturnType<typeof useSupabase>,
+    userId: string
+): Promise<AchievementWithProgress[]> {
+    // Fetch base data in parallel
+    const [achievements, userAchievements] = await Promise.all([
+        fetchAchievements(supabase),
+        fetchUserAchievements(supabase, userId)
+    ]);
+
+    // Create lookup map for user achievements
+    const userAchievementMap = new Map(
+        userAchievements.map(ua => [ua.achievement_id, ua])
+    );
+
+    // Process each achievement with progress calculation
+    const achievementsWithProgress = await Promise.all(
+        achievements.map(async (achievement) => {
+            const userAchievement = userAchievementMap.get(achievement.id);
+            const config = ACHIEVEMENT_CONFIGS.find(c => c.id === achievement.id);
+            
+            let progress = 0;
+            let percentage: number | undefined;
+            
+            // Calculate current progress using calculator functions
+            if (config?.calculatorFunction) {
+                try {
+                    const calculatorFn = (achievementCalculators as any)[config.calculatorFunction];
+                    if (calculatorFn) {
+                        progress = await calculatorFn(userId, config);
+                        percentage = config.targetValue > 0 ? Math.min((progress / config.targetValue) * 100, 100) : 0;
+                    }
+                } catch (error) {
+                    console.warn(`Failed to calculate progress for ${achievement.id}:`, error);
+                }
+            }
+
+            // Determine if achievement is unlocked
+            const isUnlocked = userAchievement?.unlocked_at !== null || 
+                              (config?.targetValue && progress >= config.targetValue) || 
+                              false;
+
+            return {
+                ...achievement,
+                isUnlocked,
+                progress,
+                percentage,
+                unlockedAt: userAchievement?.unlocked_at || undefined
+            } as AchievementWithProgress;
+        })
+    );
+
+    // Sort achievements: unlocked first, then by progress percentage
+    return achievementsWithProgress.sort((a, b) => {
         if (a.isUnlocked !== b.isUnlocked) {
-          return a.isUnlocked ? -1 : 1;
+            return a.isUnlocked ? -1 : 1;
         }
-        // Then by progress percentage
         return (b.percentage ?? 0) - (a.percentage ?? 0);
-      });
+    });
+}
+
+export function useAchievementsQuery() {
+    const supabase = useSupabase();
+    const { userId } = useAuth();
+
+    const { data, isLoading, isError } = useQuery({
+        queryKey: [...ACHIEVEMENTS_QUERY_KEY, userId],
+        queryFn: () => fetchAchievementsWithProgress(supabase, userId!),
+        enabled: !!userId,
+        staleTime: STALE_TIME,
+        cacheTime: CACHE_TIME,
     });
 
-    const unlocked = achievements.filter((a) => a.isUnlocked).length;
-    const total = achievements.length;
+    const achievements = data || [];
+    const totalUnlocked = achievements.filter(a => a.isUnlocked).length;
+    const totalAchievements = achievements.length;
 
     return {
-      achievementsByCategory: byCategory,
-      totalUnlocked: unlocked,
-      totalAchievements: total,
+        achievements,
+        totalUnlocked,
+        totalAchievements,
+        isLoading,
+        isError
     };
-  }, [achievementsQuery.data]);
-
-  return {
-    achievements: achievementsQuery.data || [],
-    achievementsByCategory,
-    totalUnlocked,
-    totalAchievements,
-    isLoading: achievementsQuery.isLoading,
-    isError: achievementsQuery.isError,
-    error: achievementsQuery.error,
-    refetch: achievementsQuery.refetch,
-    unlockAchievement: unlockMutation.mutate,
-    isUnlocking: unlockMutation.isPending,
-  };
 }
