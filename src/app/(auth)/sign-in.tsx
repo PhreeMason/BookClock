@@ -66,9 +66,15 @@ export default function Page() {
             if (isClerkAPIResponseError(err)) {
                 err.errors.forEach((error) => {
                     const fieldName = mapClerkErrorToFormField(error);
-                    setError(fieldName as keyof SignInFields | 'root', {
-                        message: error.longMessage,
-                    });
+                    if (fieldName === 'email' || fieldName === 'password') {
+                        setError(fieldName, {
+                            message: error.message || error.longMessage,
+                        });
+                    } else {
+                        setError('root', {
+                            message: error.message || error.longMessage,
+                        });
+                    }
                 });
             } else {
                 setError('root', { message: 'Unknown error occurred' });
