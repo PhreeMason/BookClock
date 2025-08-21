@@ -1,4 +1,4 @@
-import { useAddDeadline, useCompleteDeadline, useDeleteDeadline, useGetDeadlines, useSetAsideDeadline, useUpdateDeadline } from '@/hooks/useDeadlines';
+import { useAddDeadline, useCompleteDeadline, useDeleteDeadline, useGetDeadlines, useReactivateDeadline, useSetAsideDeadline, useUpdateDeadline } from '@/hooks/useDeadlines';
 import {
     calculateCurrentProgress,
     calculateRemaining,
@@ -32,6 +32,7 @@ interface DeadlineContextType {
   deleteDeadline: (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => void;
   completeDeadline: (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => void;
   setAsideDeadline: (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => void;
+  reactivateDeadline: (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => void;
   
   // Calculations for individual deadlines (updated with pace-based logic)
   getDeadlineCalculations: (deadline: ReadingDeadlineWithProgress) => {
@@ -78,6 +79,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
   const { mutate: deleteDeadlineMutation } = useDeleteDeadline();
   const { mutate: completeDeadlineMutation } = useCompleteDeadline();
   const { mutate: setAsideDeadlineMutation } = useSetAsideDeadline();
+  const { mutate: reactivateDeadlineMutation } = useReactivateDeadline();
   
   // Access pace calculations
   const { getDeadlinePaceStatus } = usePace();
@@ -126,33 +128,63 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
       undefined
     );
     const progressPercentage = calculateProgressPercentage(deadline);
-    const daysLeft = calculateDaysLeft(deadline.deadline_date);
-    const unitsPerDay = calculateUnitsPerDay(deadline.total_quantity, currentProgress, daysLeft, deadline.format);
-    const readingEstimate = getReadingEstimate(deadline.format, remaining);
-    const paceEstimate = getPaceEstimate(deadline.format, new Date(deadline.deadline_date), remaining);
     const unit = getUnitForFormat(deadline.format);
 
-    // Get pace-based calculations
-    const paceData = getDeadlinePaceStatus(deadline);
+    // Check if deadline is completed or set aside
+    const latestStatus = deadline.status && deadline.status.length > 0 
+      ? deadline.status[deadline.status.length - 1].status 
+      : 'reading';
     
-    // Map pace status to urgency level for backward compatibility
-    const paceToUrgencyMap: Record<string, 'overdue' | 'urgent' | 'good' | 'approaching' | 'impossible'> = {
-      'overdue': 'overdue',
-      'impossible': 'impossible',
-      'good': 'good',
-      'approaching': 'approaching'
-    };
+    const isCompleted = latestStatus === 'complete';
+    const isSetAside = latestStatus === 'set_aside';
+    const isArchived = isCompleted || isSetAside;
+
+    // For archived deadlines, don't calculate countdown-related metrics
+    let daysLeft, unitsPerDay, urgencyLevel, urgencyColor, statusMessage, paceData;
     
-    const urgencyLevel = paceToUrgencyMap[paceData.status.level] || (daysLeft <= 7 ? 'urgent' : 'good');
-    
-    // Map pace color to urgency color
-    const paceColorToUrgencyColorMap: Record<string, string> = {
-      'green': '#10b981',
-      'orange': '#f59e0b',
-      'red': '#ef4444'
-    };
-    
-    const urgencyColor = paceColorToUrgencyColorMap[paceData.status.color] || '#7bc598';
+    if (isArchived) {
+      daysLeft = 0; // No countdown for archived deadlines
+      unitsPerDay = 0; // No daily requirement
+      urgencyLevel = 'good' as const; // Neutral status for archived deadlines
+      urgencyColor = '#10b981'; // Green for completed/set aside
+      statusMessage = isCompleted ? 'Completed!' : 'Set aside';
+      paceData = {
+        userPace: 0,
+        requiredPace: 0,
+        status: { color: 'green' as const, level: 'good' },
+        statusMessage: statusMessage
+      };
+    } else {
+      // Calculate normally for active deadlines
+      daysLeft = calculateDaysLeft(deadline.deadline_date);
+      unitsPerDay = calculateUnitsPerDay(deadline.total_quantity, currentProgress, daysLeft, deadline.format);
+      
+      // Get pace-based calculations
+      paceData = getDeadlinePaceStatus(deadline);
+      
+      // Map pace status to urgency level for backward compatibility
+      const paceToUrgencyMap: Record<string, 'overdue' | 'urgent' | 'good' | 'approaching' | 'impossible'> = {
+        'overdue': 'overdue',
+        'impossible': 'impossible',
+        'good': 'good',
+        'approaching': 'approaching'
+      };
+      
+      urgencyLevel = paceToUrgencyMap[paceData.status.level] || (daysLeft <= 7 ? 'urgent' : 'good');
+      
+      // Map pace color to urgency color
+      const paceColorToUrgencyColorMap: Record<string, string> = {
+        'green': '#10b981',
+        'orange': '#f59e0b',
+        'red': '#ef4444'
+      };
+      
+      urgencyColor = paceColorToUrgencyColorMap[paceData.status.color] || '#7bc598';
+      statusMessage = paceData.statusMessage;
+    }
+
+    const readingEstimate = getReadingEstimate(deadline.format, remaining);
+    const paceEstimate = getPaceEstimate(deadline.format, new Date(deadline.deadline_date), remaining);
 
     return {
       currentProgress,
@@ -163,7 +195,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
       unitsPerDay,
       urgencyLevel,
       urgencyColor,
-      statusMessage: paceData.statusMessage,
+      statusMessage,
       readingEstimate,
       paceEstimate,
       unit,
@@ -241,6 +273,18 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     });
   };
 
+  const reactivateDeadline = (deadlineId: string, onSuccess?: () => void, onError?: (error: Error) => void) => {
+    reactivateDeadlineMutation(deadlineId, {
+      onSuccess: () => {
+        onSuccess?.();
+      },
+      onError: (error) => {
+        console.error("Error reactivating deadline:", error);
+        onError?.(error);
+      }
+    });
+  };
+
   const value: DeadlineContextType = {
     // Data
     deadlines,
@@ -256,6 +300,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     deleteDeadline,
     completeDeadline,
     setAsideDeadline,
+    reactivateDeadline,
     
     getDeadlineCalculations,
     

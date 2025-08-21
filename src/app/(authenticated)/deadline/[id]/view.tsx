@@ -2,10 +2,11 @@ import BookDetailsSection from '@/components/features/deadlines/BookDetailsSecti
 import DeadlineActionButtons from '@/components/features/deadlines/DeadlineActionButtons';
 import DeadlineHeroSection from '@/components/features/deadlines/DeadlineHeroSection';
 import DeadlineViewHeader from '@/components/features/deadlines/DeadlineViewHeader';
-import ReadingProgress from '@/components/shared/ReadingProgress';
 import SwipeableCharts from '@/components/features/stats/SwipeableCharts';
-import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
+import ReadingProgress from '@/components/shared/ReadingProgress';
+import { ThemedButton, ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
+import { useGetDeadlineById } from '@/hooks/useDeadlines';
 import { useTheme } from '@/theme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
@@ -19,12 +20,41 @@ const DeadlineView = () => {
     const { theme } = useTheme();
     const backgroundColor = theme.surfaceHover;
 
-    const deadline = deadlines.find(d => d.id === id);
-    if (!deadline) {
+    // First try to find deadline in context (for active deadlines)
+    let deadline = deadlines.find(d => d.id === id);
+    
+    // If not found, use fallback hook (for archived deadlines)
+    const { data: fallbackDeadline, isLoading: isFallbackLoading, error: fallbackError } = useGetDeadlineById(deadline ? undefined : id);
+    
+    // Use fallback deadline if context deadline not found
+    if (!deadline && fallbackDeadline) {
+        deadline = fallbackDeadline;
+    }
+
+    // Show loading state when using fallback
+    if (!deadline && isFallbackLoading) {
         return (
-            <ThemedView style={styles.container}>
-                <ThemedText>Deadline not found</ThemedText>
-            </ThemedView>
+            <SafeAreaView style={{ flex: 1, backgroundColor }}>
+                <ThemedView style={[styles.container, {padding: 20, justifyContent: 'center', alignItems: 'center'}]}>
+                    <ThemedText>Loading deadline...</ThemedText>
+                </ThemedView>
+            </SafeAreaView>
+        );
+    }
+
+    // Show error or not found state
+    if (!deadline || fallbackError) {
+        return (
+            <SafeAreaView style={{ flex: 1, backgroundColor }}>
+                <ThemedView style={[styles.container, {padding: 20}]}>
+                    <ThemedText type="title">Deadline not found</ThemedText>
+                    <ThemedButton
+                        title="Go Back"
+                        onPress={() => router.back()}
+                        style={{ marginTop: 16 }}
+                    />
+                </ThemedView>
+            </SafeAreaView>
         );
     }
 
@@ -32,16 +62,30 @@ const DeadlineView = () => {
         router.push(`/deadline/${id}/edit`);
     };
 
+    const handleBack = () => {
+        // Check if this is an archived deadline
+        const latestStatus = deadline.status && deadline.status.length > 0 
+            ? deadline.status[deadline.status.length - 1].status 
+            : 'reading';
+        const isArchived = latestStatus === 'complete' || latestStatus === 'set_aside';
+        
+        if (isArchived) {
+            router.push('/archive');
+        } else {
+            router.push('/');
+        }
+    };
+
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <DeadlineViewHeader
-                onBack={() => router.push('/')}
+                onBack={handleBack}
                 onEdit={handleEdit}
             />
 
             <ThemedScrollView style={styles.content}>
                 <DeadlineHeroSection deadline={deadline} />
-                
+
                 <ReadingProgress deadline={deadline} />
 
                 <SwipeableCharts deadline={deadline} />

@@ -332,14 +332,32 @@ export const useGetDeadlines = (options?: { includeNonActive?: boolean }) => {
     })
 }
 
-const useUpdateDeadlineStatus = (status: 'complete' | 'set_aside') => {
+const useUpdateDeadlineStatus = (status: 'complete' | 'set_aside' | 'reading') => {
     const supabase = useSupabase();
     const user = useUser();
     const userId = user?.user?.id;
     const queryClient = useQueryClient();
     
-    const actionName = status === 'complete' ? 'completing' : 'setting aside';
-    const mutationKey = status === 'complete' ? 'completeDeadline' : 'setAsideDeadline';
+    const getActionName = (status: string) => {
+        switch (status) {
+            case 'complete': return 'completing';
+            case 'set_aside': return 'setting aside';
+            case 'reading': return 'reactivating';
+            default: return 'updating';
+        }
+    };
+    
+    const getMutationKey = (status: string) => {
+        switch (status) {
+            case 'complete': return 'completeDeadline';
+            case 'set_aside': return 'setAsideDeadline';
+            case 'reading': return 'reactivateDeadline';
+            default: return 'updateDeadlineStatus';
+        }
+    };
+    
+    const actionName = getActionName(status);
+    const mutationKey = getMutationKey(status);
     
     return useMutation({
         mutationKey: [mutationKey],
@@ -377,6 +395,8 @@ const useUpdateDeadlineStatus = (status: 'complete' | 'set_aside') => {
 export const useCompleteDeadline = () => useUpdateDeadlineStatus('complete');
 
 export const useSetAsideDeadline = () => useUpdateDeadlineStatus('set_aside');
+
+export const useReactivateDeadline = () => useUpdateDeadlineStatus('reading');
 
 export const useGetArchivedDeadlines = () => {
     const supabase = useSupabase();
@@ -417,5 +437,42 @@ export const useGetArchivedDeadlines = () => {
         },
         enabled: !!userId,
         refetchOnWindowFocus: false,
+    })
+}
+
+export const useGetDeadlineById = (deadlineId: string | undefined) => {
+    const supabase = useSupabase();
+    const user = useUser();
+    const userId = user?.user?.id;
+
+    return useQuery<ReadingDeadlineWithProgress | null>({
+        queryKey: ['deadline', userId, deadlineId],
+        queryFn: async () => {
+            if (!userId || !deadlineId) return null;
+            
+            const { data, error } = await supabase
+                .from('reading_deadlines')
+                .select(`
+                    *,
+                    progress:reading_deadline_progress(*),
+                    status:reading_deadline_status(*)
+                `)
+                .eq('user_id', userId)
+                .eq('id', deadlineId)
+                .single();
+
+            if (error) {
+                if (error.code === 'PGRST116') {
+                    // No rows returned
+                    return null;
+                }
+                throw new Error(error.message);
+            }
+            
+            return data as ReadingDeadlineWithProgress;
+        },
+        enabled: !!userId && !!deadlineId,
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }

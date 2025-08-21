@@ -115,14 +115,6 @@ npm run test:watch
 ## 📋 MVP Polish Plan - Organized & Triaged
 
 ### 🚨 **Critical Bugs** (Fix First)
-1. **Time/Date Issues**
-   - ❌ Time is not local, it's UTC - fix timezone handling
-   - ❌ Ignore first entry for pace calculation if submitted with book creation
-
-2. **Status Management**
-   - ❌ Completed deadlines should stop the countdown
-   - ❌ Set aside deadlines should stop the countdown and remove countdown box
-   - ❌ When picking up set aside books, prompt to update deadline date (especially if passed)
 
 ### 🎯 **Core Feature Improvements** (High Priority)
 

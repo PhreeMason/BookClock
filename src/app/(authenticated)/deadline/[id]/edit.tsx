@@ -30,8 +30,9 @@ import { DeadlineFormData, deadlineFormSchema } from '@/lib/deadlineFormSchema';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EditDeadline = () => {
-    const { id } = useLocalSearchParams<{ id: string }>();
-    const [currentStep, setCurrentStep] = useState(1);
+    const { id, page } = useLocalSearchParams<{ id: string; page?: string }>();
+    const initialStep = page === '2' ? 2 : 1; // Start on page 2 if specified, otherwise page 1
+    const [currentStep, setCurrentStep] = useState(initialStep);
     const [selectedFormat, setSelectedFormat] = useState<'physical' | 'ebook' | 'audio'>('physical');
     const [selectedSource, setSelectedSource] = useState<'arc' | 'library' | 'personal'>('arc');
     const [selectedPriority, setSelectedPriority] = useState<'flexible' | 'strict'>('flexible');

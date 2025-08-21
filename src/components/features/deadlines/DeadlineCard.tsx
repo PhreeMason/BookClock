@@ -46,18 +46,37 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
   const countdownColor = urgencyBorderColorMap[urgencyLevel];
   const borderColor = urgencyBorderColorMap[urgencyLevel];
 
+  // Check if deadline is archived (completed or set aside)
+  const latestStatus = deadline.status && deadline.status.length > 0 
+    ? deadline.status[deadline.status.length - 1].status 
+    : 'reading';
+  const isArchived = latestStatus === 'complete' || latestStatus === 'set_aside';
+
   // Consolidated book content rendering
   const renderBookContent = () => (
     <View style={styles.contentContainer}>
       <View style={{ flex: 1, flexDirection: 'row' }}>
         {/* Days Left Counter - Top Left */}
         <View style={styles.daysLeftContainer}>
-          <ThemedText type='title' style={[styles.daysLeftNumber, { color: countdownColor }]}>
-            {daysLeft}
-          </ThemedText>
-          <ThemedText style={styles.daysLeftLabel}>
-            Days Left
-          </ThemedText>
+          {isArchived ? (
+            <>
+              <ThemedText type='title' style={[styles.archivedIcon, { color: countdownColor }]}>
+                {latestStatus === 'complete' ? '✓' : '📌'}
+              </ThemedText>
+              <ThemedText style={styles.daysLeftLabel}>
+                {latestStatus === 'complete' ? 'Complete' : 'Set Aside'}
+              </ThemedText>
+            </>
+          ) : (
+            <>
+              <ThemedText type='title' style={[styles.daysLeftNumber, { color: countdownColor }]}>
+                {daysLeft}
+              </ThemedText>
+              <ThemedText style={styles.daysLeftLabel}>
+                Days Left
+              </ThemedText>
+            </>
+          )}
         </View>
 
         {/* Centered Title and Author */}
@@ -161,6 +180,17 @@ const styles = StyleSheet.create({
     paddingTop: 6,
     paddingHorizontal: 4,
     fontSize: 28,
+    fontWeight: '700',
+    lineHeight: 28,
+    marginBottom: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 6,
+  },
+  archivedIcon: {
+    paddingTop: 6,
+    paddingHorizontal: 4,
+    fontSize: 24,
     fontWeight: '700',
     lineHeight: 28,
     marginBottom: 2,

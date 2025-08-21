@@ -19,10 +19,20 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
   onSetAside,
   onDelete,
 }) => {
-  const { deleteDeadline, completeDeadline, setAsideDeadline } = useDeadlines();
+  const { deleteDeadline, completeDeadline, setAsideDeadline, reactivateDeadline } = useDeadlines();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const [isSettingAside, setIsSettingAside] = useState(false);
+  const [isReactivating, setIsReactivating] = useState(false);
+
+  // Get current status
+  const latestStatus = deadline.status && deadline.status.length > 0 
+    ? deadline.status[deadline.status.length - 1].status 
+    : 'reading';
+  
+  const isCompleted = latestStatus === 'complete';
+  const isSetAside = latestStatus === 'set_aside';
+  const isActive = latestStatus === 'reading';
   const handleComplete = () => {
     if (onComplete) {
       onComplete();
@@ -39,10 +49,7 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
             text2: `Congratulations on finishing "${deadline.book_title}"!`,
             autoHide: true,
             visibilityTime: 3000,
-            position: 'top',
-            onHide: () => {
-              router.replace('/');
-            }
+            position: 'top'
           });
         },
         // Error callback
@@ -78,9 +85,6 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
             autoHide: true,
             visibilityTime: 2000,
             position: 'top',
-            onHide: () => {
-              router.replace('/');
-            }
           });
         },
         // Error callback
@@ -155,22 +159,115 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
     );
   };
 
+  const handleReactivate = () => {
+    setIsReactivating(true);
+    reactivateDeadline(
+      deadline.id,
+      // Success callback
+      () => {
+        setIsReactivating(false);
+        Toast.show({
+          type: 'success',
+          text1: 'Deadline reactivated!',
+          text2: `"${deadline.book_title}" is now active again`,
+          autoHide: true,
+          visibilityTime: 2000,
+          position: 'top',
+        });
+        
+        // Only show update prompt for set-aside deadlines (not completed ones)
+        if (isSetAside) {
+          // Show prompt to update deadline after reactivation
+          setTimeout(() => {
+            Alert.alert(
+              'Update Deadline?',
+              'Would you like to update the deadline date since you\'re resuming this book?',
+              [
+                {
+                  text: 'Not Now',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Yes, Update',
+                  onPress: () => {
+                    // Navigate to edit form page 2 (deadline page)
+                    router.push(`/deadline/${deadline.id}/edit?page=2`);
+                  }
+                }
+              ]
+            );
+          }, 2500); // Wait for toast to show first
+        }
+      },
+      // Error callback
+      (error) => {
+        setIsReactivating(false);
+        Toast.show({
+          type: 'error',
+          text1: 'Failed to reactivate deadline',
+          text2: error.message || 'Please try again',
+          autoHide: true,
+          visibilityTime: 3000,
+          position: 'top'
+        });
+      }
+    );
+  };
+
   return (
     <ThemedView style={styles.actionButtons}>
-      <ThemedButton
-        title={isCompleting ? "Completing..." : "✓ Mark as Complete"}
-        variant="success"
-        style={styles.completeBtn}
-        onPress={handleComplete}
-        disabled={isCompleting}
-      />
-      <ThemedButton
-        title={isSettingAside ? "Setting aside..." : "📚 Set Aside"}
-        variant="secondary"
-        style={styles.archiveBtn}
-        onPress={handleSetAside}
-        disabled={isSettingAside}
-      />
+      {/* For active deadlines - show complete and set aside */}
+      {isActive && (
+        <>
+          <ThemedButton
+            title={isCompleting ? "Completing..." : "✓ Mark as Complete"}
+            variant="success"
+            style={styles.completeBtn}
+            onPress={handleComplete}
+            disabled={isCompleting}
+          />
+          <ThemedButton
+            title={isSettingAside ? "Setting aside..." : "📚 Set Aside"}
+            variant="secondary"
+            style={styles.archiveBtn}
+            onPress={handleSetAside}
+            disabled={isSettingAside}
+          />
+        </>
+      )}
+
+      {/* For set aside deadlines - show reactivate and complete */}
+      {isSetAside && (
+        <>
+          <ThemedButton
+            title={isReactivating ? "Reactivating..." : "📖 Resume Reading"}
+            variant="primary"
+            style={styles.reactivateBtn}
+            onPress={handleReactivate}
+            disabled={isReactivating}
+          />
+          <ThemedButton
+            title={isCompleting ? "Completing..." : "✓ Mark as Complete"}
+            variant="success"
+            style={styles.completeBtn}
+            onPress={handleComplete}
+            disabled={isCompleting}
+          />
+        </>
+      )}
+
+      {/* For completed deadlines - show reactivate only */}
+      {isCompleted && (
+        <ThemedButton
+          title={isReactivating ? "Reactivating..." : "📖 Resume Reading"}
+          variant="primary"
+          style={styles.reactivateBtn}
+          onPress={handleReactivate}
+          disabled={isReactivating}
+        />
+      )}
+
+      {/* Delete is always available */}
       <ThemedButton
         title={isDeleting ? "Deleting..." : "🗑️ Delete Deadline"}
         variant="dangerOutline"
@@ -192,6 +289,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   archiveBtn: {
+    marginBottom: 8,
+  },
+  reactivateBtn: {
     marginBottom: 8,
   },
   deleteBtn: {
