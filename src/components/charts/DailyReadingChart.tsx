@@ -24,12 +24,12 @@ const getBookReadingDays = (
   cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER);
   const cutoffTime = cutoffDate.getTime();
 
-  let dailyProgress: { [date: string]: number } = {};
+  const dailyProgress: { [date: string]: number } = {};
 
   // Sort progress updates by date
   if (!deadline.progress || !Array.isArray(deadline.progress)) return [];
 
-  let progress = deadline.progress
+  const progress = deadline.progress
     .slice()
     .sort(
       (a, b) =>
@@ -54,20 +54,20 @@ const getBookReadingDays = (
 
   // Calculate differences between consecutive progress entries
   for (let i = 1; i < progress.length; i++) {
-    let prev = progress[i - 1];
-    let curr = progress[i];
+    const prev = progress[i - 1];
+    const curr = progress[i];
 
-    let endDate = new Date(curr.created_at).getTime();
+    const endDate = new Date(curr.created_at).getTime();
 
     // Skip if the end date is before the cutoff
     if (endDate < cutoffTime) continue;
 
-    let progressDiff = curr.current_progress - prev.current_progress;
+    const progressDiff = curr.current_progress - prev.current_progress;
 
     // Only assign the progress to the end date (when progress was recorded)
-    let endDateObj = new Date(endDate);
+    const endDateObj = new Date(endDate);
     if (endDateObj.getTime() >= cutoffTime) {
-      let dateStr = endDateObj.toISOString().slice(0, 10);
+      const dateStr = endDateObj.toISOString().slice(0, 10);
       dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + progressDiff;
     }
   }

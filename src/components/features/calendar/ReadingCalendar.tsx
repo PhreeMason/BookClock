@@ -61,6 +61,15 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
+    // Add all dates that have actual data entries, even if they fall outside the range
+    if (data?.entries) {
+      data.entries.forEach(entry => {
+        if (!dates.includes(entry.date)) {
+          dates.push(entry.date);
+        }
+      });
+    }
+
     return dates.sort();
   }, [dateRange, data?.entries]);
   
@@ -84,9 +93,11 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
     ? data.entries.find(entry => entry.date === selectedDate) || {
         date: selectedDate,
         deadlines: [],
+        statusChanges: [],
         totalProgressMade: 0,
       }
     : null;
+
 
   const currentDateIndex = selectedDate
     ? allDatesInRange.indexOf(selectedDate)
@@ -96,9 +107,14 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
   const allDayData = useMemo(() => 
     allDatesInRange.map(date => {
       const existingEntry = data?.entries?.find(e => e.date === date);
-      return existingEntry || {
+      if (existingEntry) {
+        return existingEntry;
+      }
+      // Create fallback that maintains same structure as DailyDeadlineEntry
+      return {
         date,
         deadlines: [],
+        statusChanges: [],
         totalProgressMade: 0,
       };
     }), [allDatesInRange, data?.entries]
@@ -150,17 +166,56 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
         </View>
 
         <View style={styles.legendContainer}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#007AFF' }]} />
-            <ThemedText color="textMuted" style={styles.legendText}>Reading Deadlines</ThemedText>
+          <ThemedText color="textMuted" style={styles.legendTitle}>Progress Activity</ThemedText>
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#007AFF' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Reading</ThemedText>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#FF9500' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Audio</ThemedText>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#AF52DE' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Mixed</ThemedText>
+            </View>
           </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#FF9500' }]} />
-            <ThemedText color="textMuted" style={styles.legendText}>Audio Deadlines</ThemedText>
+          
+          <ThemedText color="textMuted" style={[styles.legendTitle, { marginTop: 12 }]}>Status Changes</ThemedText>
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#6366F1' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Requested</ThemedText>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#10B981' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Approved</ThemedText>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#F59E0B' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Reading</ThemedText>
+            </View>
           </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#AF52DE' }]} />
-            <ThemedText color="textMuted" style={styles.legendText}>Mixed Deadlines</ThemedText>
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#059669' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Complete</ThemedText>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#FB923C' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Set Aside</ThemedText>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#EF4444' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Rejected</ThemedText>
+            </View>
+          </View>
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#DC2626' }]} />
+              <ThemedText color="textMuted" style={styles.legendText}>Deadline Due</ThemedText>
+            </View>
           </View>
         </View>
 
@@ -191,7 +246,7 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
           }}
           markedDates={calendarData}
           onDayPress={handleDayPress}
-          markingType="dot"
+          markingType="multi-dot"
           firstDay={1} // Start week on Monday
           showWeekNumbers={false}
           enableSwipeMonths={true}
@@ -200,7 +255,6 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
           disableMonthChange={false}
           hideDayNames={false}
           minDate="2020-01-01"
-          maxDate={new Date().toISOString().split('T')[0]}
         />
 
         {data?.summary && (
@@ -288,10 +342,21 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   legendContainer: {
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+  legendTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  legendRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 16,
     gap: 16,
+    flexWrap: 'wrap',
+    marginBottom: 4,
   },
   legendItem: {
     flexDirection: 'row',
@@ -304,7 +369,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   legendText: {
-    fontSize: 12,
+    fontSize: 11,
   },
   calendar: {
     borderRadius: 8,

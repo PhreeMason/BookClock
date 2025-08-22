@@ -1,9 +1,9 @@
 import { useSupabase } from '@/lib/supabase';
+import * as achievementCalculators from '@/services/achievementCalculator';
+import { ACHIEVEMENT_CONFIGS } from '@/services/achievements/achievementConfigs';
 import { Database } from '@/types/supabase';
 import { useAuth } from '@clerk/clerk-expo';
 import { useQuery } from '@tanstack/react-query';
-import { ACHIEVEMENT_CONFIGS } from '@/services/achievements/achievementConfigs';
-import * as achievementCalculators from '@/services/achievementCalculator';
 
 type Achievement = Database['public']['Tables']['achievements']['Row'];
 type UserAchievement = Database['public']['Tables']['user_achievements']['Row'];
@@ -17,7 +17,6 @@ interface AchievementWithProgress extends Achievement {
 
 const ACHIEVEMENTS_QUERY_KEY = ['achievements'] as const;
 const STALE_TIME = 5 * 60 * 1000; // 5 minutes
-const CACHE_TIME = 30 * 60 * 1000; // 30 minutes
 
 /**
  * Fetch all active achievements from database
@@ -119,7 +118,6 @@ export function useAchievementsQuery() {
         queryFn: () => fetchAchievementsWithProgress(supabase, userId!),
         enabled: !!userId,
         staleTime: STALE_TIME,
-        cacheTime: CACHE_TIME,
     });
 
     const achievements = data || [];

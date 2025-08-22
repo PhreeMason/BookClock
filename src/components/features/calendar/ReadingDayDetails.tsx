@@ -97,6 +97,17 @@ const DayContent: React.FC<DayContentProps> = React.memo(({ dayData, selectedCat
   // Calculate total progress for filtered deadlines only
   const filteredTotalProgress = filteredDeadlines.reduce((sum, deadline) => sum + deadline.progress_made, 0);
   
+  // Check if there's a deadline due that matches the selected category
+  const hasMatchingDeadlineDue = dayData.deadlineInfo && (
+    selectedCategory === 'all' || 
+    selectedCategory === 'combined' ||
+    (selectedCategory === 'reading' && (dayData.deadlineInfo.format === 'physical' || dayData.deadlineInfo.format === 'ebook')) ||
+    (selectedCategory === 'listening' && dayData.deadlineInfo.format === 'audio')
+  );
+
+  // Calculate total items to show (deadlines worked + deadline due if applicable)
+  const totalDeadlinesCount = filteredDeadlines.length + (hasMatchingDeadlineDue ? 1 : 0);
+  
   // Format the total based on the selected category
   const formatTotalProgress = () => {
     if (selectedCategory === 'listening' && filteredTotalProgress > 0) {
@@ -136,12 +147,16 @@ const DayContent: React.FC<DayContentProps> = React.memo(({ dayData, selectedCat
           </View>
           
           <View style={styles.summaryItem}>
-            <IconSymbol name="calendar.badge.clock" size={20} color={theme.secondary} />
+            <IconSymbol 
+              name={hasMatchingDeadlineDue ? "alarm" : "calendar.badge.clock"} 
+              size={20} 
+              color={hasMatchingDeadlineDue ? "#DC2626" : theme.secondary} 
+            />
             <ThemedText style={styles.summaryValue}>
-              {filteredDeadlines.length}
+              {totalDeadlinesCount}
             </ThemedText>
             <ThemedText color="textMuted" style={styles.summaryLabel}>
-              Deadlines Worked
+              {hasMatchingDeadlineDue ? "Deadlines Due" : "Deadlines Worked"}
             </ThemedText>
           </View>
           
@@ -214,9 +229,169 @@ const DayContent: React.FC<DayContentProps> = React.memo(({ dayData, selectedCat
           </View>
         )}
       </ThemedView>
+
+      {/* Deadline Due Section */}
+      {dayData.deadlineInfo && (
+        <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <IconSymbol name="alarm" size={20} color="#DC2626" />
+            <ThemedText type="semiBold" style={styles.sectionTitle}>
+              Deadline Due
+            </ThemedText>
+          </View>
+
+          <View style={styles.deadlineItem}>
+            <View style={styles.deadlineHeader}>
+              <IconSymbol
+                name={getFormatIcon(dayData.deadlineInfo.format)}
+                size={18}
+                color={getFormatColor(dayData.deadlineInfo.format)}
+              />
+              <View style={styles.deadlineInfo}>
+                <ThemedText type="semiBold" style={styles.deadlineTitle} numberOfLines={2}>
+                  {dayData.deadlineInfo.book_title}
+                </ThemedText>
+                {dayData.deadlineInfo.author && (
+                  <ThemedText color="textMuted" style={styles.deadlineAuthor}>
+                    by {dayData.deadlineInfo.author}
+                  </ThemedText>
+                )}
+              </View>
+            </View>
+            
+            <View style={styles.deadlineDetails}>
+              <ThemedText color="textMuted" style={styles.deadlineDetail}>
+                Source: {dayData.deadlineInfo.source}
+              </ThemedText>
+              <ThemedText color="textMuted" style={styles.deadlineDetail}>
+                Total: {formatQuantity(dayData.deadlineInfo.total_quantity, dayData.deadlineInfo.format)}
+              </ThemedText>
+              <ThemedText color="textMuted" style={styles.deadlineDetail}>
+                Flexibility: {dayData.deadlineInfo.flexibility}
+              </ThemedText>
+            </View>
+          </View>
+        </ThemedView>
+      )}
+
+      {/* Status Changes Section */}
+      {(dayData.statusChanges || []).length > 0 && (
+        <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <IconSymbol name="flag" size={20} color={theme.accent} />
+            <ThemedText type="semiBold" style={styles.sectionTitle}>
+              Status Changes
+            </ThemedText>
+          </View>
+
+          <View style={styles.statusChangesList}>
+            {(dayData.statusChanges || []).map((change, index) => (
+              <View key={change.status_id} style={styles.statusChangeItem}>
+                <View style={styles.statusChangeHeader}>
+                  <View style={[
+                    styles.statusIndicator, 
+                    { backgroundColor: getStatusColor(change.status) }
+                  ]} />
+                  <View style={styles.statusInfo}>
+                    <ThemedText type="semiBold" style={styles.statusText}>
+                      {getStatusDisplayName(change.status)}
+                    </ThemedText>
+                    <ThemedText color="textMuted" style={styles.statusTime}>
+                      {new Date(change.created_at).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      })}
+                    </ThemedText>
+                  </View>
+                </View>
+                
+                <View style={styles.statusBookInfo}>
+                  <ThemedText style={styles.statusBookTitle} numberOfLines={1}>
+                    {change.book_title}
+                  </ThemedText>
+                  {change.author && (
+                    <ThemedText color="textMuted" style={styles.statusBookAuthor}>
+                      by {change.author}
+                    </ThemedText>
+                  )}
+                </View>
+              </View>
+            ))}
+          </View>
+        </ThemedView>
+      )}
     </>
   );
 });
+
+// Helper function to get status colors (duplicate from hook for component use)
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'requested': return '#6366F1'; // Indigo (changed from blue)
+    case 'approved': return '#10B981'; // Green
+    case 'reading': return '#F59E0B'; // Yellow
+    case 'complete': return '#059669'; // Dark Green
+    case 'set_aside': return '#FB923C'; // Orange
+    case 'rejected': return '#EF4444'; // Red
+    case 'withdrew': return '#9CA3AF'; // Gray
+    default: return '#8E8E93'; // Default gray
+  }
+};
+
+// Helper function to get display names for status
+const getStatusDisplayName = (status: string) => {
+  switch (status) {
+    case 'requested': return 'Requested';
+    case 'approved': return 'Approved';
+    case 'reading': return 'Started Reading';
+    case 'complete': return 'Completed';
+    case 'set_aside': return 'Set Aside';
+    case 'rejected': return 'Rejected';
+    case 'withdrew': return 'Withdrew';
+    default: return status;
+  }
+};
+
+// Helper functions for deadline display
+const getFormatIcon = (format: string) => {
+  switch (format) {
+    case 'physical':
+      return 'book.closed';
+    case 'ebook':
+      return 'ipad';
+    case 'audio':
+      return 'headphones';
+    default:
+      return 'book.closed';
+  }
+};
+
+const getFormatColor = (format: string) => {
+  switch (format) {
+    case 'physical':
+      return '#007AFF'; // Blue
+    case 'ebook':
+      return '#007AFF'; // Blue  
+    case 'audio':
+      return '#FF9500'; // Orange
+    default:
+      return '#007AFF';
+  }
+};
+
+const formatQuantity = (quantity: number, format: string) => {
+  if (format === 'audio') {
+    const hours = Math.floor(quantity / 60);
+    const minutes = quantity % 60;
+    if (hours > 0) {
+      return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+    }
+    return `${minutes}m`;
+  } else {
+    return `${quantity} pages`;
+  }
+};
 
 DayContent.displayName = 'DayContent';
 
@@ -366,7 +541,14 @@ const ReadingDayDetails: React.FC<ReadingDayDetailsProps> = ({
           overdrag={true}
         >
           {availableDates.map((date, index) => {
-            const currentDayData = allDayData.find((d) => d.date === date) || dayData;
+            const currentDayData = allDayData.find((d) => d.date === date) || {
+              date,
+              deadlines: [],
+              statusChanges: [],
+              totalProgressMade: 0,
+            };
+            
+            
             // Only render content for current page and adjacent pages for performance
             const shouldRender = Math.abs(index - currentPage) <= 1;
             
@@ -604,6 +786,78 @@ const styles = StyleSheet.create({
   },
   pageIndicatorText: {
     fontSize: 14,
+  },
+  statusChangesList: {
+    gap: 12,
+  },
+  statusChangeItem: {
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  statusChangeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  statusIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 12,
+  },
+  statusInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statusText: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  statusTime: {
+    fontSize: 13,
+  },
+  statusBookInfo: {
+    marginLeft: 24,
+  },
+  statusBookTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  statusBookAuthor: {
+    fontSize: 13,
+  },
+  deadlineItem: {
+    paddingBottom: 16,
+  },
+  deadlineHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  deadlineInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  deadlineTitle: {
+    fontSize: 16,
+    lineHeight: 22,
+    marginBottom: 2,
+  },
+  deadlineAuthor: {
+    fontSize: 14,
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  deadlineDetails: {
+    marginLeft: 30,
+  },
+  deadlineDetail: {
+    fontSize: 13,
+    marginBottom: 4,
   },
 });
 

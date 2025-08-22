@@ -4,6 +4,33 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { utcToLocalDate } from '@/lib/dateUtils';
 
+// Helper function to get status colors
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'requested': return '#6366F1'; // Indigo (changed from blue)
+    case 'approved': return '#10B981'; // Green
+    case 'reading': return '#F59E0B'; // Yellow
+    case 'complete': return '#059669'; // Dark Green
+    case 'set_aside': return '#FB923C'; // Orange
+    case 'rejected': return '#EF4444'; // Red
+    case 'withdrew': return '#9CA3AF'; // Gray
+    default: return '#8E8E93'; // Default gray
+  }
+};
+
+export interface DeadlineStatusChange {
+  deadline_id: string;
+  status_id: string;
+  book_title: string;
+  author?: string;
+  format: 'physical' | 'ebook' | 'audio';
+  status: 'requested' | 'approved' | 'reading' | 'rejected' | 'withdrew' | 'complete' | 'set_aside';
+  deadline_date: string;
+  source: string;
+  flexibility: string;
+  created_at: string;
+}
+
 export interface DailyDeadlineEntry {
   date: string;
   deadlines: {
@@ -18,7 +45,18 @@ export interface DailyDeadlineEntry {
     source: string;
     flexibility: string;
   }[];
+  statusChanges: DeadlineStatusChange[]; // status changes that occurred on this day
   totalProgressMade: number; // total progress made across all deadlines this day
+  deadlineInfo?: { // deadline info for deadline-due dates
+    id: string;
+    book_title: string;
+    author?: string;
+    format: 'physical' | 'ebook' | 'audio';
+    deadline_date: string;
+    source: string;
+    flexibility: string;
+    total_quantity: number;
+  };
 }
 
 export interface DeadlineHistoryData {
@@ -88,8 +126,8 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
       const startDate = getDateRangeStart(dateRange);
       const formats = getFormatFilter(formatFilter);
 
-      // Query reading deadlines with their progress
-      let deadlineQuery = supabase
+      // Query reading deadlines with their progress and status changes
+      const deadlineQuery = supabase
         .from('reading_deadlines')
         .select(`
           id,
@@ -106,10 +144,15 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
             current_progress,
             created_at,
             updated_at
+          ),
+          reading_deadline_status (
+            id,
+            status,
+            created_at
           )
         `)
         .eq('user_id', user.id)
-        .in('format', formats)
+        .in('format', formats as ('physical' | 'ebook' | 'audio')[])
         .order('created_at', { ascending: false });
 
       const { data: deadlines, error } = await deadlineQuery;
@@ -131,6 +174,7 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
               dailyEntries[deadlineCreatedDate] = {
                 date: deadlineCreatedDate,
                 deadlines: [],
+                statusChanges: [],
                 totalProgressMade: 0,
               };
             }
@@ -176,9 +220,11 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
           const date = dates[dateIndex];
           
           // Apply date filter
-          if (startDate && new Date(date) < startDate) continue;
+          if (!date || (startDate && new Date(date) < startDate)) continue;
 
           const dayProgress = progressByDate[date];
+          if (!dayProgress || dayProgress.length === 0) continue;
+          
           // Use the last (most recent) progress entry for the day
           const currentProgress = dayProgress[dayProgress.length - 1];
           
@@ -198,9 +244,13 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
           } else {
             // Subsequent dates - difference from previous day's final progress
             const prevDate = dates[dateIndex - 1];
-            const prevDayProgress = progressByDate[prevDate];
-            const prevProgress = prevDayProgress[prevDayProgress.length - 1];
-            progressMade = Math.max(0, currentProgress.current_progress - prevProgress.current_progress);
+            if (prevDate) {
+              const prevDayProgress = progressByDate[prevDate];
+              if (prevDayProgress && prevDayProgress.length > 0) {
+                const prevProgress = prevDayProgress[prevDayProgress.length - 1];
+                progressMade = Math.max(0, currentProgress.current_progress - prevProgress.current_progress);
+              }
+            }
           }
 
           // Add entries only where actual progress was made
@@ -209,6 +259,7 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
               dailyEntries[date] = {
                 date,
                 deadlines: [],
+                statusChanges: [],
                 totalProgressMade: 0,
               };
             }
@@ -231,6 +282,70 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
         }
       });
 
+      // Process status changes for each deadline
+      deadlines?.forEach((deadline: any) => {
+        const statusChanges = deadline.reading_deadline_status || [];
+        
+        statusChanges.forEach((statusChange: any) => {
+          const statusDate = getLocalDateString(statusChange.created_at);
+          
+          // Apply date filter
+          if (startDate && new Date(statusDate) < startDate) return;
+          
+          if (!dailyEntries[statusDate]) {
+            dailyEntries[statusDate] = {
+              date: statusDate,
+              deadlines: [],
+              statusChanges: [],
+              totalProgressMade: 0,
+            };
+          }
+          
+          dailyEntries[statusDate].statusChanges.push({
+            deadline_id: deadline.id,
+            status_id: statusChange.id,
+            book_title: deadline.book_title,
+            author: deadline.author,
+            format: deadline.format,
+            status: statusChange.status,
+            deadline_date: deadline.deadline_date,
+            source: deadline.source,
+            flexibility: deadline.flexibility,
+            created_at: statusChange.created_at,
+          });
+        });
+
+      });
+
+      // Add entries for deadline dates that don't already exist
+      // Force create entries for ALL deadline dates to ensure they're clickable
+      deadlines?.forEach((deadline: any) => {
+        const deadlineDate = getLocalDateString(deadline.deadline_date);
+        
+        // Apply date filter for deadline dates
+        if (!startDate || new Date(deadlineDate) >= startDate) {
+          // Always create entry if it doesn't exist, regardless of completion status
+          if (!dailyEntries[deadlineDate]) {
+            dailyEntries[deadlineDate] = {
+              date: deadlineDate,
+              deadlines: [],
+              statusChanges: [],
+              totalProgressMade: 0,
+              deadlineInfo: {
+                id: deadline.id,
+                book_title: deadline.book_title,
+                author: deadline.author,
+                format: deadline.format,
+                deadline_date: deadline.deadline_date,
+                source: deadline.source,
+                flexibility: deadline.flexibility,
+                total_quantity: deadline.total_quantity,
+              }
+            };
+          }
+        }
+      });
+
       // Convert to array and sort by date
       const entries = Object.values(dailyEntries).sort(
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -245,7 +360,7 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
         const progress = d.reading_deadline_progress || [];
         if (progress.length === 0) return true; // No progress yet, so it's active
         const latestProgress = progress[progress.length - 1];
-        return latestProgress.current_progress < d.total_quantity;
+        return latestProgress ? latestProgress.current_progress < d.total_quantity : true;
       }).length || 0;
       
       const ArchivedDeadlines = (deadlines?.length || 0) - activeDeadlines;
@@ -273,30 +388,73 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
     if (!query.data?.entries) return {};
 
     const markedDates: { [date: string]: any } = {};
+    const startDate = getDateRangeStart(dateRange);
 
     query.data.entries.forEach((entry: DailyDeadlineEntry) => {
-      const hasReadingDeadlines = entry.deadlines.some(d => d.format === 'physical' || d.format === 'ebook');
-      const hasListeningDeadlines = entry.deadlines.some(d => d.format === 'audio');
+      const hasProgress = entry.deadlines.length > 0;
+      const hasStatusChanges = (entry.statusChanges || []).length > 0;
+      
+      if (hasProgress || hasStatusChanges) {
+        const dots: { key: string; color: string }[] = [];
+        
+        // Add progress dot if there's progress
+        if (hasProgress) {
+          const hasReadingDeadlines = entry.deadlines.some(d => d.format === 'physical' || d.format === 'ebook');
+          const hasListeningDeadlines = entry.deadlines.some(d => d.format === 'audio');
 
-      let color = '#8E8E93';
-      if (hasReadingDeadlines && hasListeningDeadlines) {
-        color = '#AF52DE'; // Both reading and listening deadlines
-      } else if (hasReadingDeadlines) {
-        color = '#007AFF'; // Reading deadlines only
-      } else if (hasListeningDeadlines) {
-        color = '#FF9500'; // Listening deadlines only
+          let dotColor = '#8E8E93';
+          if (hasReadingDeadlines && hasListeningDeadlines) {
+            dotColor = '#AF52DE'; // Both reading and listening deadlines
+          } else if (hasReadingDeadlines) {
+            dotColor = '#007AFF'; // Reading deadlines only
+          } else if (hasListeningDeadlines) {
+            dotColor = '#FF9500'; // Listening deadlines only
+          }
+          
+          dots.push({ key: 'progress', color: dotColor });
+        }
+        
+        // Add status dots for status changes (limit to 3 to avoid crowding)
+        if (hasStatusChanges) {
+          (entry.statusChanges || []).slice(0, 3).forEach((change) => {
+            dots.push({ 
+              key: `status_${change.status_id}`, 
+              color: getStatusColor(change.status) 
+            });
+          });
+        }
+        
+        markedDates[entry.date] = {
+          dots,
+          selected: false,
+          selectedColor: '#007AFF',
+          selectedTextColor: 'white',
+        };
       }
+    });
 
-      markedDates[entry.date] = {
-        marked: true,
-        dotColor: color,
-        selectedColor: color,
-        selectedTextColor: 'white',
-      };
+    // Add deadline markers for entries that have deadlineInfo
+    query.data.entries.forEach((entry: DailyDeadlineEntry) => {
+      if (entry.deadlineInfo) {
+        if (!markedDates[entry.date]) {
+          markedDates[entry.date] = {
+            dots: [],
+            selected: false,
+            selectedColor: '#007AFF',
+            selectedTextColor: 'white',
+          };
+        }
+        
+        // Add deadline marker dot
+        markedDates[entry.date].dots.push({
+          key: 'deadline',
+          color: '#DC2626' // Red for deadline dates
+        });
+      }
     });
 
     return markedDates;
-  }, [query.data?.entries]);
+  }, [query.data?.entries, dateRange]);
 
   return {
     ...query,
