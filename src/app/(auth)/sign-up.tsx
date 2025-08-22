@@ -69,7 +69,7 @@ export default function SignUpScreen() {
                 err.errors.forEach((error) => {
                     const fieldName = mapClerkErrorToFormField(error);
                     setError(fieldName as keyof SignUpFields | 'root', {
-                        message: error.longMessage,
+                        message: error.longMessage || error.message || 'An error occurred',
                     });
                 });
             } else {

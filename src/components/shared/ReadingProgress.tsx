@@ -24,7 +24,6 @@ const ReadingProgress = ({
     const { getDeadlineCalculations } = useDeadlines();
     const calculations = getDeadlineCalculations(deadline);
     const {
-        unitsPerDay,
         urgencyLevel,
         currentProgress,
         totalQuantity,

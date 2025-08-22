@@ -188,7 +188,7 @@ const NewDeadLine = () => {
         router.push('/');
     };
 
-    const onDateChange = (event: any, selectedDate?: Date) => {
+    const onDateChange = (_event: any, selectedDate?: Date) => {
         setShowDatePicker(false);
         if (selectedDate) {
             setValue('deadline', selectedDate);

@@ -261,14 +261,14 @@ const EditDeadline = () => {
         router.replace(`/deadline/${id}/view`);
     };
 
-    const onDateChange = (event: any, selectedDate?: Date) => {
+    const onDateChange = (_event: any, selectedDate?: Date) => {
         setShowDatePicker(false);
         if (selectedDate) {
             setValue('deadline', selectedDate);
         }
     };
 
-    const handleFormatChange = (format: 'physical' | 'ebook' | 'audio') => {
+    const handleFormatChange = (_format: 'physical' | 'ebook' | 'audio') => {
         // Format should not be changeable in edit mode
         // This function is kept for compatibility but does nothing
         return;

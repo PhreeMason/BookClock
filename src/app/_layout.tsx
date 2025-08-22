@@ -33,7 +33,10 @@ export default function RootLayout() {
         <ThemeProvider>
             <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                 <QueryClientProvider client={queryClient}>
-                    <ClerkProvider tokenCache={tokenCache} publishableKey={CLERK_PUBLISHABLE_KEY}>
+                    <ClerkProvider 
+                        {...(tokenCache ? { tokenCache } : {})}
+                        {...(CLERK_PUBLISHABLE_KEY ? { publishableKey: CLERK_PUBLISHABLE_KEY } : {})}
+                    >
                         <Stack>
                             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
                             <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />

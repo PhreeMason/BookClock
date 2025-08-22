@@ -68,11 +68,11 @@ export default function Page() {
                     const fieldName = mapClerkErrorToFormField(error);
                     if (fieldName === 'email' || fieldName === 'password') {
                         setError(fieldName, {
-                            message: error.message || error.longMessage,
+                            message: error.message || error.longMessage || 'An error occurred',
                         });
                     } else {
                         setError('root', {
-                            message: error.message || error.longMessage,
+                            message: error.message || error.longMessage || 'An error occurred',
                         });
                     }
                 });
