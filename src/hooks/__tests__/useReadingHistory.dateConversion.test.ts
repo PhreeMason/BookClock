@@ -1,5 +1,5 @@
-import dayjs from 'dayjs';
 import { utcToLocalDate } from '@/lib/dateUtils';
+import dayjs from 'dayjs';
 
 // Test the critical getLocalDateString function that was causing the bug
 describe('useReadingHistory date conversion', () => {
@@ -24,7 +24,7 @@ describe('useReadingHistory date conversion', () => {
         }
       ];
 
-      testCases.forEach(({ name, utc, expectedLocal }) => {
+      testCases.forEach(({ utc, expectedLocal }) => {
         const result = utcToLocalDate(utc);
         
         // The result should match what Day.js produces locally

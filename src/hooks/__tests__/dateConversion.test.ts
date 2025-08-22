@@ -61,7 +61,7 @@ describe('Date Conversion Tests', () => {
       },
     ];
 
-    testCases.forEach(({ utcTimestamp, expectedDate, description }) => {
+    testCases.forEach(({ utcTimestamp, expectedDate }) => {
       const result = getLocalDateString(utcTimestamp);
       expect(result).toBe(expectedDate);
     });

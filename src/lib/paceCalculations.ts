@@ -41,7 +41,7 @@ export const getRecentReadingDays = (
   cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER);
   const cutoffTime = cutoffDate.getTime();
   
-  let dailyProgress: { [date: string]: number } = {};
+  const dailyProgress: { [date: string]: number } = {};
 
   // Filter to only physical and ebook deadlines (no audio mixing)
   const readingDeadlines = deadlines.filter(d => d.format === 'physical' || d.format === 'ebook');
@@ -50,7 +50,7 @@ export const getRecentReadingDays = (
     // Sort progress updates by date
     if (!book.progress || !Array.isArray(book.progress)) return;
     
-    let progress = book.progress.slice().sort(
+    const progress = book.progress.slice().sort(
       (a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
     );
 
@@ -74,22 +74,22 @@ export const getRecentReadingDays = (
 
     // Calculate differences between consecutive progress entries
     for (let i = 1; i < progress.length; i++) {
-      let prev = progress[i - 1];
-      let curr = progress[i];
+      const prev = progress[i - 1];
+      const curr = progress[i];
 
-      let endDate = new Date(curr.created_at).getTime();
+      const endDate = new Date(curr.created_at).getTime();
       
       // Skip if the end date is before the cutoff
       if (endDate < cutoffTime) continue;
       
-      let progressDiff = curr.current_progress - prev.current_progress;
+      const progressDiff = curr.current_progress - prev.current_progress;
 
       // Both physical and ebook are already in pages (no conversion needed)
 
       // Only assign the progress to the end date (when progress was recorded)
-      let endDateObj = new Date(endDate);
+      const endDateObj = new Date(endDate);
       if (endDateObj.getTime() >= cutoffTime) {
-        let dateStr = endDateObj.toISOString().slice(0, 10);
+        const dateStr = endDateObj.toISOString().slice(0, 10);
         dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + progressDiff;
       }
     }
@@ -298,7 +298,7 @@ export const getRecentListeningDays = (
   cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER);
   const cutoffTime = cutoffDate.getTime();
   
-  let dailyProgress: { [date: string]: number } = {};
+  const dailyProgress: { [date: string]: number } = {};
 
   // Filter to only audio deadlines
   const audioDeadlines = deadlines.filter(d => d.format === 'audio');
@@ -307,7 +307,7 @@ export const getRecentListeningDays = (
     // Sort progress updates by date
     if (!book.progress || !Array.isArray(book.progress)) return;
     
-    let progress = book.progress.slice().sort(
+    const progress = book.progress.slice().sort(
       (a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
     );
 
@@ -329,21 +329,21 @@ export const getRecentListeningDays = (
 
     // Calculate differences between consecutive progress entries
     for (let i = 1; i < progress.length; i++) {
-      let prev = progress[i - 1];
-      let curr = progress[i];
+      const prev = progress[i - 1];
+      const curr = progress[i];
 
-      let endDate = new Date(curr.created_at).getTime();
+      const endDate = new Date(curr.created_at).getTime();
       
       // Skip if the end date is before the cutoff
       if (endDate < cutoffTime) continue;
       
-      let progressDiff = curr.current_progress - prev.current_progress;
+      const progressDiff = curr.current_progress - prev.current_progress;
 
       // Only positive progress (minutes listened)
       if (progressDiff > 0) {
-        let endDateObj = new Date(endDate);
+        const endDateObj = new Date(endDate);
         if (endDateObj.getTime() >= cutoffTime) {
-          let dateStr = endDateObj.toISOString().slice(0, 10);
+          const dateStr = endDateObj.toISOString().slice(0, 10);
           dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + progressDiff;
         }
       }

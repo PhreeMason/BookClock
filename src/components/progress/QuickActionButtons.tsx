@@ -3,12 +3,10 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedButton } from '../themed';
 
 interface QuickActionButtonsProps {
-    unitsPerDay: number;
     onQuickUpdate: (increment: number) => void;
 }
 
 const QuickActionButtons: React.FC<QuickActionButtonsProps> = ({
-    unitsPerDay,
     onQuickUpdate
 }) => {
 

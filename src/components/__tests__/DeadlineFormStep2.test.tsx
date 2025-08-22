@@ -47,7 +47,7 @@ jest.mock('../forms/PrioritySelector', () => ({
 // Mock DateTimePicker
 jest.mock('@react-native-community/datetimepicker', () => {
   const { View, Text } = require('react-native');
-  return jest.fn(({ value, mode, display, onChange, minimumDate }) => {
+  return jest.fn(({ value }) => {
     return (
       <View testID="date-picker">
         <Text>DatePicker: {value.toDateString()}</Text>
@@ -59,7 +59,7 @@ jest.mock('@react-native-community/datetimepicker', () => {
 // Mock react-hook-form
 jest.mock('react-hook-form', () => ({
   useForm: jest.fn(),
-  Controller: jest.fn(({ control, name, render }) => {
+  Controller: jest.fn(({ render }) => {
     return render({
       field: { value: new Date('2024-12-31') },
       fieldState: { error: null },

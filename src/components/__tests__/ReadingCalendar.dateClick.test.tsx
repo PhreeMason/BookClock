@@ -412,6 +412,7 @@ describe('ReadingCalendar Date Click Tests', () => {
 
   test('clicking empty date should now show details modal with empty content', async () => {
     const mockData = {
+      statusChanges: [],
       entries: [
         {
           date: '2025-06-21',

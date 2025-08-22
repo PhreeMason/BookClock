@@ -115,7 +115,6 @@ const ReadingProgress = ({
                 />
 
                 <QuickActionButtons
-                    unitsPerDay={unitsPerDay}
                     onQuickUpdate={handleQuickUpdate}
                 />
 

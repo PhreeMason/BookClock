@@ -1,18 +1,18 @@
-import React, { useRef, useState, useEffect } from 'react';
-import {
-  Modal,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-} from 'react-native';
-import PagerView from 'react-native-pager-view';
 import { ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { useTheme } from '@/theme';
 import { DailyDeadlineEntry, FormatFilter } from '@/hooks/useReadingHistory';
 import { formatDisplayDate } from '@/lib/dateUtils';
+import { useTheme } from '@/theme';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import PagerView from 'react-native-pager-view';
 
 interface ReadingDayDetailsProps {
   isVisible: boolean;
@@ -285,7 +285,7 @@ const DayContent: React.FC<DayContentProps> = React.memo(({ dayData, selectedCat
           </View>
 
           <View style={styles.statusChangesList}>
-            {(dayData.statusChanges || []).map((change, index) => (
+            {(dayData.statusChanges || []).map((change) => (
               <View key={change.status_id} style={styles.statusChangeItem}>
                 <View style={styles.statusChangeHeader}>
                   <View style={[
@@ -350,46 +350,6 @@ const getStatusDisplayName = (status: string) => {
     case 'rejected': return 'Rejected';
     case 'withdrew': return 'Withdrew';
     default: return status;
-  }
-};
-
-// Helper functions for deadline display
-const getFormatIcon = (format: string) => {
-  switch (format) {
-    case 'physical':
-      return 'book.closed';
-    case 'ebook':
-      return 'ipad';
-    case 'audio':
-      return 'headphones';
-    default:
-      return 'book.closed';
-  }
-};
-
-const getFormatColor = (format: string) => {
-  switch (format) {
-    case 'physical':
-      return '#007AFF'; // Blue
-    case 'ebook':
-      return '#007AFF'; // Blue  
-    case 'audio':
-      return '#FF9500'; // Orange
-    default:
-      return '#007AFF';
-  }
-};
-
-const formatQuantity = (quantity: number, format: string) => {
-  if (format === 'audio') {
-    const hours = Math.floor(quantity / 60);
-    const minutes = quantity % 60;
-    if (hours > 0) {
-      return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
-    }
-    return `${minutes}m`;
-  } else {
-    return `${quantity} pages`;
   }
 };
 

@@ -440,7 +440,7 @@ describe('deadlineUtils', () => {
     });
 
     it('should handle zero units per day', () => {
-      const mockCalculations = (deadline: ReadingDeadlineWithProgress) => ({
+      const mockCalculations = () => ({
         unitsPerDay: 0
       });
 

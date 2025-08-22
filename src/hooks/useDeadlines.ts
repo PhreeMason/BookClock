@@ -120,12 +120,7 @@ export const useUpdateDeadline = () => {
             const { data: deadlineData, error: deadlineError } = await supabase
                 .from('reading_deadlines')
                 .update({
-                    author: deadlineDetails.author,
-                    book_title: deadlineDetails.book_title,
-                    deadline_date: deadlineDetails.deadline_date,
-                    total_quantity: deadlineDetails.total_quantity,
-                    source: deadlineDetails.source,
-                    flexibility: deadlineDetails.flexibility,
+                    ...deadlineDetails,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', deadlineDetails.id)

@@ -1,8 +1,8 @@
+import { utcToLocalDate } from '@/lib/dateUtils';
 import { useSupabase } from '@/lib/supabase';
 import { useUser } from '@clerk/clerk-expo';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { utcToLocalDate } from '@/lib/dateUtils';
 
 // Helper function to get status colors
 const getStatusColor = (status: string) => {
@@ -388,7 +388,6 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
     if (!query.data?.entries) return {};
 
     const markedDates: { [date: string]: any } = {};
-    const startDate = getDateRangeStart(dateRange);
 
     query.data.entries.forEach((entry: DailyDeadlineEntry) => {
       const hasProgress = entry.deadlines.length > 0;

@@ -1,7 +1,7 @@
-import React from 'react';
-import { render } from '@testing-library/react-native';
-import ReadingDayDetails from '../features/calendar/ReadingDayDetails';
 import { DailyDeadlineEntry } from '@/hooks/useReadingHistory';
+import { render } from '@testing-library/react-native';
+import React from 'react';
+import ReadingDayDetails from '../features/calendar/ReadingDayDetails';
 
 // Mock PagerView to track initialPage prop
 
@@ -70,6 +70,7 @@ describe('ReadingDayDetails Initial Page Bug Tests', () => {
   const createMockData = (dates: string[]): DailyDeadlineEntry[] => {
     return dates.map((date, index) => ({
       date,
+      statusChanges: [],
       deadlines: [
         {
           id: `book-${index}`,

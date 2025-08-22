@@ -39,7 +39,7 @@ describe('useDeletebook', () => {
     // Setup default mock chain for chained .eq() calls
     mockFrom.mockImplementation((table: string) => ({
       delete: () => ({
-        eq: (field: string, value: string) => {
+        eq: () => {
           if (table === 'reading_deadline_progress') {
             // Single .eq() call for progress table
             return Promise.resolve({ error: null });
@@ -47,7 +47,7 @@ describe('useDeletebook', () => {
           if (table === 'reading_deadlines') {
             // Chained .eq() calls for deadlines table
             return {
-              eq: (field2: string, value2: string) => Promise.resolve({ error: null }),
+              eq: () => Promise.resolve({ error: null }),
             };
           }
           return Promise.resolve({ error: null });
@@ -99,7 +99,7 @@ describe('useDeletebook', () => {
       // Setup error for progress deletion
       mockFrom.mockImplementation((table: string) => ({
         delete: () => ({
-          eq: (field: string, value: string) => {
+          eq: () => {
             if (table === 'reading_deadline_progress') {
               return Promise.resolve({ 
                 error: { message: 'Failed to delete progress' },
@@ -127,13 +127,13 @@ describe('useDeletebook', () => {
       // Progress deletion succeeds, deadline deletion fails
       mockFrom.mockImplementation((table: string) => ({
         delete: () => ({
-          eq: (field: string, value: string) => {
+          eq: () => {
             if (table === 'reading_deadline_progress') {
               return Promise.resolve({ error: null });
             }
             if (table === 'reading_deadlines') {
               return {
-                eq: (field2: string, value2: string) => Promise.resolve({ 
+                eq: () => Promise.resolve({ 
                   error: { message: 'Failed to delete deadline' },
                 }),
               };

@@ -1,7 +1,7 @@
-import { render, fireEvent } from '@testing-library/react-native';
+import { ReadingDeadlineWithProgress } from '@/types/deadline';
+import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 import SwipeableCharts from '../features/stats/SwipeableCharts';
-import { ReadingDeadlineWithProgress } from '@/types/deadline';
 
 // Mock the child components
 jest.mock('../charts/ProgressAreaChart', () => {
@@ -47,7 +47,7 @@ jest.mock('react-native-pager-view', () => {
         testID: testID || 'pager-view',
         horizontal: true,
         pagingEnabled: true,
-        onScroll: (event: any) => {
+        onScroll: () => {
           // Simulate page selection
           if (onPageSelected) {
             onPageSelected({ nativeEvent: { position: 0 } });

@@ -118,18 +118,6 @@ npm run test:watch
 
 ### 🎯 **Core Feature Improvements** (High Priority)
 
-**1. Pace Calculator Overhaul**
-   - Always use pace calculator with ≥3 days of reading data
-   - If no recent reading, use last 7 logged days average
-   - Remove default 25 pages/day pace
-   - Show user's current pace in UI
-
-**2. Visual Status Indicators**
-   - Calendar markers:
-     - Red square for due dates
-     - Blue for completed
-     - Gray for set aside
-
 **3. Daily Reading Chart Updates**
    - Rename "Daily Reading" to clearer title
    - Always show chart (don't hide when empty)

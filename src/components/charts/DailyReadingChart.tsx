@@ -36,8 +36,9 @@ const getBookReadingDays = (
         new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
     );
 
-  if (progress.length === 0) return [];
-
+  if (progress.length < 1) {
+        return []
+  }
   // Only count first progress if it's very small (likely represents actual reading that day)
   const firstProgress = progress[0];
   const firstDate = new Date(firstProgress.created_at);

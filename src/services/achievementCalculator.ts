@@ -72,7 +72,7 @@ const calculateReadingStreaks = async (userId: string): Promise<{ currentStreak:
  * Data Source: Supabase query to reading_deadlines where user_id matches and latest status is 'reading'
  * Hooks/Context: None needed - direct DB query
  */
-export const calculateAmbitiousReader = async (recordId: string, config: any): Promise<number> => {
+export const calculateAmbitiousReader = async (recordId: string): Promise<number> => {
     const supabase = useSupabase();
     
     // Get user ID from the record (could be deadline ID or user ID)
@@ -114,7 +114,7 @@ export const calculateAmbitiousReader = async (recordId: string, config: any): P
  * Data Source: Supabase query to reading_deadlines for distinct format types with progress
  * Hooks/Context: None needed - direct DB query
  */
-export const calculateFormatExplorer = async (recordId: string, config: any): Promise<number> => {
+export const calculateFormatExplorer = async (recordId: string): Promise<number> => {
     const supabase = useSupabase();
     
     // Get user ID
@@ -156,7 +156,7 @@ export const calculateFormatExplorer = async (recordId: string, config: any): Pr
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateConsistencyChampion = async (recordId: string, config: any): Promise<number> => {
+export const calculateConsistencyChampion = async (recordId: string): Promise<number> => {
     // Get user ID
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
@@ -179,7 +179,7 @@ export const calculateConsistencyChampion = async (recordId: string, config: any
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateDedicatedReader = async (recordId: string, config: any): Promise<number> => {
+export const calculateDedicatedReader = async (recordId: string): Promise<number> => {
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
         const supabase = useSupabase();
@@ -201,7 +201,7 @@ export const calculateDedicatedReader = async (recordId: string, config: any): P
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateReadingHabitMaster = async (recordId: string, config: any): Promise<number> => {
+export const calculateReadingHabitMaster = async (recordId: string): Promise<number> => {
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
         const supabase = useSupabase();
@@ -223,7 +223,7 @@ export const calculateReadingHabitMaster = async (recordId: string, config: any)
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateReadingChampion = async (recordId: string, config: any): Promise<number> => {
+export const calculateReadingChampion = async (recordId: string): Promise<number> => {
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
         const supabase = useSupabase();
@@ -245,7 +245,7 @@ export const calculateReadingChampion = async (recordId: string, config: any): P
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateCenturyReader = async (recordId: string, config: any): Promise<number> => {
+export const calculateCenturyReader = async (recordId: string): Promise<number> => {
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
         const supabase = useSupabase();
@@ -267,7 +267,7 @@ export const calculateCenturyReader = async (recordId: string, config: any): Pro
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateHalfYearScholar = async (recordId: string, config: any): Promise<number> => {
+export const calculateHalfYearScholar = async (recordId: string): Promise<number> => {
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
         const supabase = useSupabase();
@@ -289,7 +289,7 @@ export const calculateHalfYearScholar = async (recordId: string, config: any): P
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateYearLongScholar = async (recordId: string, config: any): Promise<number> => {
+export const calculateYearLongScholar = async (recordId: string): Promise<number> => {
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
         const supabase = useSupabase();
@@ -311,7 +311,7 @@ export const calculateYearLongScholar = async (recordId: string, config: any): P
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateReadingHero = async (recordId: string, config: any): Promise<number> => {
+export const calculateReadingHero = async (recordId: string): Promise<number> => {
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
         const supabase = useSupabase();
@@ -333,7 +333,7 @@ export const calculateReadingHero = async (recordId: string, config: any): Promi
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateReadingMyth = async (recordId: string, config: any): Promise<number> => {
+export const calculateReadingMyth = async (recordId: string): Promise<number> => {
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
         const supabase = useSupabase();
@@ -355,7 +355,7 @@ export const calculateReadingMyth = async (recordId: string, config: any): Promi
  * Data Source: Uses shared streak calculation function
  * Hooks/Context: None needed - uses calculateReadingStreaks helper
  */
-export const calculateReadingLegend = async (recordId: string, config: any): Promise<number> => {
+export const calculateReadingLegend = async (recordId: string): Promise<number> => {
     let userId = recordId;
     if (recordId.startsWith('rd_')) {
         const supabase = useSupabase();
@@ -378,7 +378,7 @@ export const calculateReadingLegend = async (recordId: string, config: any): Pro
  * Hooks/Context: None needed - direct DB query with format-specific page calculations
  * Page Conversion: physical=1:1, ebook=(progress/100)*300, audio=progress/1.5
  */
-export const calculateSpeedReader = async (recordId: string, config: any): Promise<number> => {
+export const calculateSpeedReader = async (recordId: string): Promise<number> => {
     const supabase = useSupabase();
     
     // Get user ID
@@ -452,7 +452,7 @@ export const calculateSpeedReader = async (recordId: string, config: any): Promi
  * Hooks/Context: None needed - direct DB query filtering for audio format
  * Time Calculation: Sum daily progress deltas for audio books
  */
-export const calculateMarathonListener = async (recordId: string, config: any): Promise<number> => {
+export const calculateMarathonListener = async (recordId: string): Promise<number> => {
     const supabase = useSupabase();
     
     // Get user ID
@@ -513,7 +513,7 @@ export const calculateMarathonListener = async (recordId: string, config: any): 
  * Data Source: Supabase query to reading_deadlines where source='library' and has progress
  * Hooks/Context: None needed - direct DB query with source filtering
  */
-export const calculateLibraryWarrior = async (recordId: string, config: any): Promise<number> => {
+export const calculateLibraryWarrior = async (recordId: string): Promise<number> => {
     const supabase = useSupabase();
     
     // Get user ID
@@ -553,7 +553,7 @@ export const calculateLibraryWarrior = async (recordId: string, config: any): Pr
  * Hooks/Context: None needed - direct DB query with date comparisons
  * Logic: Check reading_deadline_status for 'complete' status and compare created_at with deadline_date
  */
-export const calculateEarlyFinisher = async (recordId: string, config: any): Promise<number> => {
+export const calculateEarlyFinisher = async (recordId: string): Promise<number> => {
     const supabase = useSupabase();
     
     // Get user ID
@@ -596,6 +596,6 @@ export const calculateEarlyFinisher = async (recordId: string, config: any): Pro
 };
 
 // Remove Page Turner - it will be hidden in the UI
-// export const calculatePageTurner = async (recordId: string, config: any): Promise<number> => {
+// export const calculatePageTurner = async (recordId: string): Promise<number> => {
 //     return 0; // Hidden achievement
 // };

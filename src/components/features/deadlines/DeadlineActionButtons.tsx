@@ -191,6 +191,7 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
                   text: 'Yes, Update',
                   onPress: () => {
                     // Navigate to edit form page 2 (deadline page)
+                    // @ts-ignore
                     router.push(`/deadline/${deadline.id}/edit?page=2`);
                   }
                 }
