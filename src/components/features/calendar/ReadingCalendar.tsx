@@ -276,18 +276,10 @@ const ReadingCalendar: React.FC<ReadingCalendarProps> = ({
               </View>
               <View style={styles.summaryItem}>
                 <ThemedText style={styles.summaryValue}>
-                  {Math.round(data.summary.totalProgressMade)}
+                  {data.summary.totalDeadlines}
                 </ThemedText>
                 <ThemedText color="textMuted" style={styles.summaryLabel}>
-                  Progress Made
-                </ThemedText>
-              </View>
-              <View style={styles.summaryItem}>
-                <ThemedText style={styles.summaryValue}>
-                  {data.summary.activeDeadlines}
-                </ThemedText>
-                <ThemedText color="textMuted" style={styles.summaryLabel}>
-                  Active Deadlines
+                  Total Deadlines
                 </ThemedText>
               </View>
             </View>

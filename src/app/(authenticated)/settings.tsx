@@ -1,5 +1,4 @@
 import { SignOutButton } from '@/components/auth/SignOutButton';
-import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher';
 import { UserAvatar } from '@/components/shared/UserAvatar';
 import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -17,7 +16,7 @@ export default function SettingsScreen() {
     const textMutedColor = theme.textMuted;
 
     const handleBackPress = () => {
-        router.back();
+        router.push('/');
     };
 
     const handleStatsPress = () => {
@@ -26,6 +25,10 @@ export default function SettingsScreen() {
 
     const handleAchievementsPress = () => {
         router.push('/achievements');
+    };
+
+    const handleThemePress = () => {
+        router.push('/theme');
     };
 
     return (
@@ -110,7 +113,7 @@ export default function SettingsScreen() {
 
                         <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
-                        <TouchableOpacity style={styles.settingItem}>
+                        <TouchableOpacity style={styles.settingItem} onPress={handleThemePress}>
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="moon.fill" size={20} color={iconColor} />
                                 <ThemedText style={styles.settingText}>Appearance</ThemedText>
@@ -119,8 +122,6 @@ export default function SettingsScreen() {
                         </TouchableOpacity>
                     </ThemedView>
                 </View>
-                {/* Theme Switcher */}
-                <ThemeSwitcher />
                 {/* Sign Out Section */}
                 <View style={styles.signOutSection}>
                     <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>

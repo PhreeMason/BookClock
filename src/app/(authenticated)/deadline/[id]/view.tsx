@@ -2,7 +2,7 @@ import BookDetailsSection from '@/components/features/deadlines/BookDetailsSecti
 import DeadlineActionButtons from '@/components/features/deadlines/DeadlineActionButtons';
 import DeadlineHeroSection from '@/components/features/deadlines/DeadlineHeroSection';
 import DeadlineViewHeader from '@/components/features/deadlines/DeadlineViewHeader';
-import SwipeableCharts from '@/components/features/stats/SwipeableCharts';
+import DailyReadingChart from '@/components/charts/DailyReadingChart';
 import ReadingProgress from '@/components/shared/ReadingProgress';
 import { ThemedButton, ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
@@ -88,7 +88,7 @@ const DeadlineView = () => {
 
                 <ReadingProgress deadline={deadline} />
 
-                <SwipeableCharts deadline={deadline} />
+                <DailyReadingChart deadline={deadline} />
 
 
                 <BookDetailsSection deadline={deadline} />

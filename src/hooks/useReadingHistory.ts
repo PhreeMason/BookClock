@@ -63,9 +63,7 @@ export interface DeadlineHistoryData {
   entries: DailyDeadlineEntry[];
   summary: {
     totalDays: number;
-    totalProgressMade: number;
-    averageProgressPerDay: number;
-    activeDeadlines: number;
+    totalDeadlines: number;
     ArchivedDeadlines: number;
   };
 }
@@ -353,7 +351,6 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
 
       // Calculate summary stats
       const totalDays = entries.length;
-      const totalProgressMade = entries.reduce((sum, entry) => sum + entry.totalProgressMade, 0);
       
       // Count active vs completed deadlines
       const activeDeadlines = deadlines?.filter(d => {
@@ -369,9 +366,7 @@ export const useDeadlineHistory = (options: UseReadingHistoryOptions = {}) => {
         entries,
         summary: {
           totalDays,
-          totalProgressMade,
-          averageProgressPerDay: totalDays > 0 ? totalProgressMade / totalDays : 0,
-          activeDeadlines,
+          totalDeadlines: deadlines?.length || 0,
           ArchivedDeadlines,
         },
       };

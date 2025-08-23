@@ -1,34 +1,37 @@
-import ArchivedDeadlines from '@/components/features/deadlines/ArchivedDeadlines';
-import { ThemedText, ThemedView } from '@/components/themed';
+import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher';
+import { ThemedView, ThemedText } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTheme } from '@/theme';
 import { router } from 'expo-router';
 import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-export default function ArchivedDeadlinesScreen() {
+export default function ThemeScreen() {
     const { theme } = useTheme();
     const borderColor = theme.border;
     const iconColor = theme.primary;
 
     const handleBackPress = () => {
-        // back to settings page
-        router.push('/settings');
+        router.back();
     };
 
     return (
         <ThemedView backgroundColor="background" style={styles.container}>
+            {/* Header */}
             <View style={[styles.header, { borderBottomColor: borderColor }]}>
                 <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
                     <IconSymbol name="chevron.left" size={Platform.OS === 'ios' ? 24 : 40} color={iconColor} />
                 </TouchableOpacity>
                 <ThemedText type="semiBold" style={styles.headerTitle}>
-                    Archived Deadlines
+                    Appearance
                 </ThemedText>
                 <View style={styles.headerSpacer} />
             </View>
 
-            <ArchivedDeadlines />
+            {/* Content */}
+            <View style={styles.content}>
+                <ThemeSwitcher />
+            </View>
         </ThemedView>
     );
 }
@@ -55,5 +58,10 @@ const styles = StyleSheet.create({
     },
     headerSpacer: {
         width: 40,
+    },
+    content: {
+        flex: 1,
+        paddingHorizontal: 20,
+        paddingTop: 20,
     },
 });

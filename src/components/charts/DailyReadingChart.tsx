@@ -4,7 +4,7 @@ import { useTheme } from "@/theme";
 import { ReadingDeadlineWithProgress } from "@/types/deadline";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { BarChart } from "react-native-gifted-charts";
+import { BarChart, LineChart } from "react-native-gifted-charts";
 
 interface DailyReadingChartProps {
   deadline: ReadingDeadlineWithProgress;
@@ -19,9 +19,8 @@ interface ReadingDay {
 const getBookReadingDays = (
   deadline: ReadingDeadlineWithProgress
 ): ReadingDay[] => {
-  const DAYS_TO_CONSIDER = 7;
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER);
+  // Use the deadline's created date as the beginning
+  const cutoffDate = new Date(deadline.created_at!);
   const cutoffTime = cutoffDate.getTime();
 
   const dailyProgress: { [date: string]: number } = {};
@@ -103,13 +102,13 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   const getChartTitle = (format: string) => {
     switch (format) {
       case "audio":
-        return "Daily Listening Progress (Last 7 Days)";
+        return "Daily Listening Progress";
       case "ebook":
-        return "Daily Reading Progress (Last 7 Days)";
+        return "Daily Reading Progress";
       case "physical":
-        return "Daily Reading Progress (Last 7 Days)";
+        return "Daily Reading Progress";
       default:
-        return "Daily Reading Progress (Last 7 Days)";
+        return "Daily Reading Progress";
     }
   };
 
@@ -143,7 +142,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
           <ThemedText
             style={[styles.emptyStateText, { color: theme.textMuted }]}
           >
-            No reading activity in the last 7 days
+            No reading activity recorded
           </ThemedText>
           <ThemedText
             style={[styles.emptyStateSubtext, { color: theme.textMuted }]}
@@ -180,7 +179,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   // Display daily minimum directly (no conversion needed)
   const displayDailyMinimum = dailyMinimum;
 
-  // Prepare data for the chart
+  // Prepare data for the bar chart
   const chartData = recentDays.map((day, index) => ({
     value: Math.round(day.progressRead),
     label: new Date(day.date).toLocaleDateString("en-US", {
@@ -195,13 +194,45 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
       fontSize: 9,
       fontWeight: "400",
     },
+    topLabelComponent: () => (
+      <ThemedText style={{
+        color: theme.text,
+        fontSize: 10,
+        fontWeight: '600',
+        textAlign: 'center',
+        backgroundColor: 'transparent',
+      }}>
+        {Math.round(day.progressRead)}
+      </ThemedText>
+    ),
   }));
+
+  // Prepare data for the line chart (cumulative progress)
+  let cumulativeProgress = 0;
+  const lineChartData = recentDays.map((day, index) => {
+    cumulativeProgress += day.progressRead;
+    return {
+      value: Math.round(cumulativeProgress),
+      label: new Date(day.date).toLocaleDateString("en-US", {
+        month: "numeric",
+        day: "numeric",
+      }),
+      labelTextStyle: {
+        color: theme.text,
+        fontSize: 9,
+        fontWeight: "400",
+      },
+    };
+  });
 
   const maxValue = Math.max(
     ...chartData.map((d) => d.value),
     displayDailyMinimum
   );
   const yAxisMax = Math.ceil(maxValue * 1.2); // Add 20% padding
+
+  const lineMaxValue = Math.max(...lineChartData.map((d) => d.value));
+  const lineYAxisMax = Math.ceil(lineMaxValue * 1.1); // Add 10% padding
 
   return (
     <ThemedView style={styles.container}>
@@ -210,13 +241,55 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
       </ThemedText>
       
       <View style={styles.chartContainer}>
-        <View testID="bar-chart">
+        {/* Line Chart - Cumulative Progress */}
+        <View style={styles.lineChartSection} testID="line-chart">
+          <ThemedText style={[styles.chartSubtitle, { color: theme.textMuted }]}>
+            Cumulative Progress
+          </ThemedText>
+          <LineChart
+            data={lineChartData}
+            width={300}
+            height={120}
+            spacing={chartData.length > 1 ? 280 / (chartData.length - 1) : 280}
+            hideRules
+            hideDataPoints={false}
+            dataPointsColor={theme.accent}
+            dataPointsRadius={3}
+            color={theme.accent}
+            thickness={2}
+            curved
+            xAxisThickness={1}
+            yAxisThickness={1}
+            xAxisColor={theme.border}
+            yAxisColor={theme.border}
+            yAxisTextStyle={{
+              color: theme.textMuted,
+              fontSize: 10,
+            }}
+            xAxisLabelTextStyle={{
+              color: theme.textMuted,
+              fontSize: 9,
+              textAlign: "center",
+            }}
+            noOfSections={3}
+            maxValue={lineYAxisMax > 0 ? lineYAxisMax : 10}
+            yAxisLabelSuffix={` ${unitLabel}`}
+            isAnimated
+            animationDuration={1000}
+          />
+        </View>
+        
+        {/* Bar Chart - Daily Progress */}
+        <View style={styles.barChartSection} testID="bar-chart">
+          <ThemedText style={[styles.chartSubtitle, { color: theme.textMuted }]}>
+            Daily Progress
+          </ThemedText>
           <BarChart
             data={chartData}
             width={300}
             height={180}
-            barWidth={28}
-            spacing={19}
+            barWidth={Math.max(20, Math.min(35, 280 / chartData.length))}
+            spacing={Math.max(2, Math.min(15, 280 / chartData.length / 3))}
             roundedTop
             hideRules
             xAxisThickness={2}
@@ -255,6 +328,14 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
       </View>
 
       <View style={styles.legendContainer}>
+        <View style={styles.legendItem}>
+          <View
+            style={[styles.legendDot, { backgroundColor: theme.accent }]}
+          />
+          <ThemedText style={[styles.legendText, { color: theme.textMuted }]}>
+            Cumulative Progress
+          </ThemedText>
+        </View>
         <View style={styles.legendItem}>
           <View
             style={[styles.legendBar, { backgroundColor: theme.primary }]}
@@ -297,10 +378,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
+  lineChartSection: {
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  barChartSection: {
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  chartSubtitle: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginBottom: 8,
+    textAlign: "center",
+  },
   legendContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 20,
+    flexWrap: "wrap",
+    gap: 16,
     marginBottom: 8,
   },
   legendItem: {
@@ -316,6 +412,11 @@ const styles = StyleSheet.create({
   legendLine: {
     width: 12,
     height: 2,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   legendText: {
     fontSize: 12,

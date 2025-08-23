@@ -114,10 +114,6 @@ npm run test:watch
 
 ## 📋 MVP Polish Plan - Organized & Triaged
 
-### 🚨 **Critical Bugs** (Fix First)
-
-### 🎯 **Core Feature Improvements** (High Priority)
-
 **3. Daily Reading Chart Updates**
    - Rename "Daily Reading" to clearer title
    - Always show chart (don't hide when empty)
@@ -126,19 +122,8 @@ npm run test:watch
 
 ### 🔧 **UI/UX Polish** (Medium Priority)
 
-**1. Remove/Hide Elements**
-   - Remove "Progress Over Time" section
-   - Remove overall reading progress pie chart/card
-   - Remove "progress made" from deadline progress calendar
-   - Hide edit profile button
-
 **2. Settings Reorganization**
-   - Move theme picker to new "Appearance" screen linked from settings
    - Add username display
-
-**3. Calendar Enhancements**
-   - Heat map click to show date details
-   - Change active deadlines counter to total deadlines for past 90 days
 
 **4. Format Distribution**
    - Add toggle: Lifetime vs Active Deadline distribution
@@ -150,19 +135,13 @@ npm run test:watch
 ### 📝 **Implementation Order**
 
 **Phase 1: Critical Fixes (1-2 days)**
-1. Fix UTC/timezone issues
-2. Fix countdown behavior for completed/set aside
 3. Fix pace calculation edge cases
 
 **Phase 2: Core Features (2-3 days)**
 1. Implement new pace calculation logic
 2. Add visual status borders
-3. Update calendar with status markers
-4. Enhance daily reading chart
 
 **Phase 3: UI Polish (1-2 days)**
-1. Remove deprecated components
-2. Reorganize settings
 3. Add interactive elements (press/hold, click)
 4. Add format distribution toggle
 
