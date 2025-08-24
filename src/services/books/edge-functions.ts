@@ -1,7 +1,7 @@
 import { useSupabase } from "@/lib/supabase";
-import { BookInsert, BookMetadata } from "@/types/book";
+import { SearchBooksResponse, FullBookData } from "@/types/bookSearch";
 
-export const searchBookList = async (query: string, supabase: ReturnType<typeof useSupabase>): Promise<{ bookList: BookMetadata[] }> => {
+export const searchBookList = async (query: string, supabase: ReturnType<typeof useSupabase>): Promise<SearchBooksResponse> => {
     if (!query.trim()) return { bookList: [] };
     const { data, error } = await supabase.functions.invoke('search-books-v2', {
         body: { query },
@@ -11,7 +11,7 @@ export const searchBookList = async (query: string, supabase: ReturnType<typeof 
     return data;
 };
 
-export const fetchBookData = async (api_id: string, supabase: ReturnType<typeof useSupabase>): Promise<BookInsert> => {
+export const fetchBookData = async (api_id: string, supabase: ReturnType<typeof useSupabase>): Promise<FullBookData> => {
     const { data, error } = await supabase.functions.invoke('book-data', {
         body: { api_id },
     });

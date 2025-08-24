@@ -102,8 +102,9 @@ const NewDeadLine = () => {
             total_quantity: finalTotalQuantity,
             format: selectedFormat,
             source: data.source,
-            flexibility: selectedPriority
-        }
+            flexibility: selectedPriority,
+            book_id: data.book_id || null,
+        } as any
 
         // Calculate current progress accounting for format
         const finalCurrentProgress = calculateCurrentProgressFromForm(
@@ -116,13 +117,17 @@ const NewDeadLine = () => {
             id: '',
             current_progress: finalCurrentProgress,
             reading_deadline_id: '' // This will be set after the deadline is created
-        };
+        } as any;
 
         addDeadline(
             {
                 deadlineDetails,
-                progressDetails
-            },
+                progressDetails,
+                bookData: data.api_id ? {
+                    api_id: data.api_id,
+                    ...(data.book_id ? { book_id: data.book_id } : {}),
+                } : undefined
+            } as any,
             // Success callback
             () => {
                 setIsSubmitting(false);
@@ -239,6 +244,7 @@ const NewDeadLine = () => {
                             control={control}
                             selectedFormat={selectedFormat}
                             onFormatChange={handleFormatChange}
+                            setValue={setValue}
                         />
                     ) : (
                         <DeadlineFormStep2

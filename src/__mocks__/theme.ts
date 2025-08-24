@@ -52,7 +52,7 @@ jest.mock('@/theme', () => ({
 }));
 
 // Legacy mock for old useThemeColor hook (for gradual migration)
-export const mockUseThemeColor = jest.fn((props: any, colorName: string) => {
+export const mockUseThemeColor = jest.fn((_props: any, colorName: string) => {
   const colorMap: Record<string, string> = {
     text: mockTheme.text,
     textMuted: mockTheme.textMuted,

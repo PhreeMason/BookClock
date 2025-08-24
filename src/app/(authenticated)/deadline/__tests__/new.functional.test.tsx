@@ -342,7 +342,7 @@ describe('NewDeadline Functional Tests', () => {
   describe('Error Handling', () => {
     it('should handle submission errors gracefully', async () => {
       // Mock addDeadline to call the error callback
-      mockAddDeadline.mockImplementation((params, onSuccess, onError) => {
+      mockAddDeadline.mockImplementation((_params, _onSuccess, onError) => {
         if (onError) {
           onError(new Error('Submission failed'));
         }

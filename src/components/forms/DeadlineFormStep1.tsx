@@ -1,10 +1,13 @@
+import BookSearchInput from '@/components/shared/BookSearchInput';
 import CustomDropdown from '@/components/shared/CustomDropdown';
 import CustomInput from '@/components/shared/CustomInput';
 import { ThemedText } from '@/components/themed';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { DeadlineFormData } from '@/lib/deadlineFormSchema';
-import React from 'react';
-import { Control } from 'react-hook-form';
-import { View } from 'react-native';
+import { useTheme } from '@/theme';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Control, useWatch } from 'react-hook-form';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { FormatSelector } from './FormatSelector';
 
 interface DeadlineFormStep1Props {
@@ -12,14 +15,58 @@ interface DeadlineFormStep1Props {
     selectedFormat: 'physical' | 'ebook' | 'audio';
     onFormatChange: (format: 'physical' | 'ebook' | 'audio') => void;
     isEditMode?: boolean;
+    setValue: (name: keyof DeadlineFormData, value: any) => void;
 }
 
 export const DeadlineFormStep1 = ({
     control,
     selectedFormat,
     onFormatChange,
-    isEditMode = false
+    isEditMode = false,
+    setValue
 }: DeadlineFormStep1Props) => {
+    const { theme } = useTheme();
+    const [showBookSearch, setShowBookSearch] = useState(false);
+    const [selectedBook, setSelectedBook] = useState<any>(null);
+    
+    // Watch for changes to detect if book is manually cleared
+    const watchedTitle = useWatch({ control, name: 'bookTitle' });
+    const watchedBookId = useWatch({ control, name: 'book_id' });
+    
+    // Clear book selection if user manually clears the title and we have a linked book
+    useEffect(() => {
+        if (!watchedTitle && selectedBook && watchedBookId) {
+            setSelectedBook(null);
+            setValue('book_id', undefined);
+            setValue('api_id', undefined);
+        }
+    }, [watchedTitle, selectedBook, watchedBookId, setValue]);
+
+    const handleBookSelection = useCallback((book: any) => {
+        if (book) {
+            setSelectedBook(book);
+            setValue('bookTitle', book.title);
+            setValue('bookAuthor', book.author || '');
+            setValue('book_id', book.id);
+            setValue('api_id', book.api_id);
+            
+            // Only auto-populate quantity/time if user hasn't entered values yet
+            const currentTotalQuantity = control._getWatch('totalQuantity');
+            
+            if (selectedFormat !== 'audio' && book.total_pages) {
+                // Only update if user hasn't entered pages yet
+                if (!currentTotalQuantity || currentTotalQuantity === 0) {
+                    setValue('totalQuantity', book.total_pages);
+                }
+            }
+        } else {
+            setSelectedBook(null);
+            setValue('book_id', undefined);
+            setValue('api_id', undefined);
+        }
+        setShowBookSearch(false);
+    }, [setValue, selectedFormat, control]);
+
     const getTotalQuantityLabel = () => {
         switch (selectedFormat) {
             case 'audio':
@@ -44,6 +91,41 @@ export const DeadlineFormStep1 = ({
                 Add a book with a deadline to track your reading progress.
             </ThemedText>
 
+            {/* Book Search Section */}
+            <View>
+                <View style={styles.sectionHeader}>
+                    <ThemedText type="semiBold" style={{marginBottom: 8}}>Find Book (Optional)</ThemedText>
+                    <TouchableOpacity
+                        onPress={() => setShowBookSearch(!showBookSearch)}
+                        style={[styles.toggleButton, { borderColor: theme.primary }]}
+                        testID="toggle-book-search"
+                    >
+                        <IconSymbol 
+                            name={showBookSearch ? "chevron.up" : "chevron.down"} 
+                            size={16} 
+                            color={theme.primary} 
+                        />
+                        <ThemedText color="primary" style={styles.toggleText}>
+                            {showBookSearch ? 'Hide search' : 'Search library'}
+                        </ThemedText>
+                    </TouchableOpacity>
+                </View>
+                
+                {showBookSearch && (
+                    <View style={{marginTop: 8}}>
+                        <BookSearchInput
+                            onBookSelected={handleBookSelection}
+                            selectedBook={selectedBook}
+                            placeholder="Search for a book to auto-fill details..."
+                            testID="book-search-input-form"
+                        />
+                        <ThemedText color="textMuted" style={{marginTop: 6, lineHeight: 18, fontSize: 14}}>
+                            Search our library to automatically fill in book details and get accurate page counts
+                        </ThemedText>
+                    </View>
+                )}
+            </View>
+
             <View>
                 <ThemedText type="semiBold" style={{marginBottom: 8}}>Book Title *</ThemedText>
                 <CustomInput
@@ -52,6 +134,11 @@ export const DeadlineFormStep1 = ({
                     testID='input-bookTitle'
                     placeholder="Enter the book title"
                 />
+                {selectedBook && (
+                    <ThemedText color="primary" style={styles.autoFilledIndicator}>
+                        ✓ Auto-filled from linked book
+                    </ThemedText>
+                )}
             </View>
 
             <View>
@@ -62,6 +149,11 @@ export const DeadlineFormStep1 = ({
                     testID='input-bookAuthor'
                     placeholder="Author name (optional)"
                 />
+                {selectedBook && selectedBook.author && (
+                    <ThemedText color="primary" style={styles.autoFilledIndicator}>
+                        ✓ Auto-filled from linked book
+                    </ThemedText>
+                )}
             </View>
 
             <View>
@@ -124,7 +216,41 @@ export const DeadlineFormStep1 = ({
                 <ThemedText color="textMuted" style={{marginTop: 6, lineHeight: 18}}>
                     We&apos;ll use this to calculate your daily reading pace
                 </ThemedText>
+                {selectedBook && (
+                    (selectedFormat === 'audio' && selectedBook.total_duration) ||
+                    (selectedFormat !== 'audio' && selectedBook.total_pages)
+                ) && (
+                    <ThemedText color="primary" style={styles.autoFilledIndicator}>
+                        ✓ Available from linked book (only fills if empty)
+                    </ThemedText>
+                )}
             </View>
         </View>
     );
-}; 
+};
+
+const styles = StyleSheet.create({
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    toggleButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderWidth: 1,
+        borderRadius: 16,
+        gap: 6,
+    },
+    toggleText: {
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    autoFilledIndicator: {
+        fontSize: 12,
+        fontWeight: '500',
+        marginTop: 4,
+    },
+}); 

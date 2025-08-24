@@ -23,7 +23,7 @@ jest.mock('@/contexts/DeadlineProvider', () => ({
 
 // Mock the form components
 jest.mock('@/components/forms', () => ({
-  DeadlineFormStep1: jest.fn(({ control, selectedFormat, onFormatChange, isEditMode }) => {
+  DeadlineFormStep1: jest.fn(({ onFormatChange }) => {
     const { View, Text, TouchableOpacity } = require('react-native');
     return (
       <View testID="form-step-1">
@@ -39,7 +39,7 @@ jest.mock('@/components/forms', () => ({
       </View>
     );
   }),
-  DeadlineFormStep2: jest.fn(({ control, selectedFormat, selectedPriority, onPriorityChange, showDatePicker, onDatePickerToggle, onDateChange, deadline, paceEstimate, watchedValues }) => {
+  DeadlineFormStep2: jest.fn(({ onPriorityChange, onDatePickerToggle, deadline, paceEstimate }) => {
     const { View, Text, TouchableOpacity } = require('react-native');
     return (
       <View testID="form-step-2">
@@ -104,7 +104,7 @@ jest.mock('@/lib/deadlineCalculations', () => ({
     if (format === 'audio') return minutes || 0;
     return quantity || 0;
   }),
-  getPaceEstimate: jest.fn((format, deadline, remaining) => {
+  getPaceEstimate: jest.fn((format, _deadline, remaining) => {
     return `${format} pace estimate: ${remaining} remaining`;
   }),
   getReadingEstimate: jest.fn((format, remaining) => {
@@ -295,7 +295,7 @@ describe('NewDeadLine', () => {
     const { getByText } = render(<NewDeadLine />);
     
     // Set up handleSubmit mock for this test
-    mockHandleSubmit.mockImplementation((onSubmit) => {
+    mockHandleSubmit.mockImplementation((_onSubmit) => {
       return () => {
         // Simulate form submission
       };
@@ -372,7 +372,7 @@ describe('NewDeadLine', () => {
     mockWatch.mockReturnValue(mockFormData);
     
     // Mock handleSubmit to directly call addDeadline with the expected data
-    mockHandleSubmit.mockImplementation((onSubmit) => {
+    mockHandleSubmit.mockImplementation((_onSubmit) => {
       return () => {
         // Simulate the component's onSubmit function behavior
         const deadlineDetails = {
@@ -455,7 +455,7 @@ describe('NewDeadLine', () => {
     mockWatch.mockReturnValue(mockFormData);
     
     // Mock handleSubmit to directly call addDeadline with the expected data
-    mockHandleSubmit.mockImplementation((onSubmit) => {
+    mockHandleSubmit.mockImplementation((_onSubmit) => {
       return () => {
         // Simulate the component's onSubmit function behavior for audio format
         const deadlineDetails = {
@@ -538,7 +538,7 @@ describe('NewDeadLine', () => {
     mockWatch.mockReturnValue(mockFormData);
     
     // Mock handleSubmit to directly call addDeadline with the expected data
-    mockHandleSubmit.mockImplementation((onSubmit) => {
+    mockHandleSubmit.mockImplementation((_onSubmit) => {
       return () => {
         // Simulate the component's onSubmit function behavior for ebook format
         const deadlineDetails = {
@@ -621,13 +621,13 @@ describe('NewDeadLine', () => {
     mockWatch.mockReturnValue(mockFormData);
     
     // Mock addDeadline to immediately call the success callback
-    mockAddDeadline.mockImplementation((params, onSuccess, onError) => {
+    mockAddDeadline.mockImplementation((_params, onSuccess, _onError) => {
       // Call success callback immediately
       onSuccess();
     });
     
     // Mock handleSubmit to call addDeadline
-    mockHandleSubmit.mockImplementation((onSubmit) => {
+    mockHandleSubmit.mockImplementation((_onSubmit) => {
       return () => {
         const deadlineDetails = {
           id: '',
@@ -714,7 +714,7 @@ describe('NewDeadLine', () => {
     mockWatch.mockReturnValue(mockFormData);
     
     // Mock handleSubmit to call the error callback
-    mockHandleSubmit.mockImplementation((onSubmit) => {
+    mockHandleSubmit.mockImplementation((_onSubmit) => {
       return () => {
         const deadlineDetails = {
           id: '',
@@ -903,7 +903,7 @@ describe('NewDeadLine', () => {
     
     // Mock addDeadline to not call the success callback immediately
     // This will keep the component in the submitting state
-    mockAddDeadline.mockImplementation((params, onSuccess, onError) => {
+    mockAddDeadline.mockImplementation((_params, _onSuccess, _onError) => {
       // Don't call onSuccess immediately to simulate ongoing submission
       // The component will stay in isSubmitting=true state
     });

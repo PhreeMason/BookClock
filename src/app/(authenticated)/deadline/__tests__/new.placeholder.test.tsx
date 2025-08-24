@@ -159,7 +159,7 @@ describe('NewDeadline - Placeholder Value Bugs', () => {
             flexibility: 'flexible'
         });
         
-        mockTrigger.mockResolvedValue(true);
+        // Form trigger mock doesn't need return value
     });
 
     it('should show placeholder text instead of "0" for physical book total quantity', async () => {
@@ -277,7 +277,7 @@ describe('Form Default Values Issue', () => {
             flexibility: 'flexible'
         });
         
-        mockTrigger.mockResolvedValue(true);
+        // Form trigger mock doesn't need return value
     });
 
     it('should demonstrate the root cause - form defaults to 0 instead of undefined', () => {

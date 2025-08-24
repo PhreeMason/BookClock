@@ -159,6 +159,7 @@ describe('ReadingCalendar Date Click Tests', () => {
               flexibility: 'strict',
             },
           ],
+          statusChanges: [],
           totalProgressMade: 2385,
         },
         {
@@ -167,7 +168,6 @@ describe('ReadingCalendar Date Click Tests', () => {
             {
               id: 'rd_c7a2f6a0c8434e75',
               book_title: 'Singing',
-              author: undefined,
               format: 'audio' as const,
               progress_made: 1200,
               total_progress: 1200,
@@ -177,12 +177,13 @@ describe('ReadingCalendar Date Click Tests', () => {
               flexibility: 'strict',
             },
           ],
+          statusChanges: [],
           totalProgressMade: 1200,
         },
       ],
       summary: {
         totalDays: 2,
-        totalProgressMade: 3585,
+        totalDeadlines: 5,
         averageProgressPerDay: 1792.5,
         activeDeadlines: 4,
         ArchivedDeadlines: 0,
@@ -294,7 +295,6 @@ describe('ReadingCalendar Date Click Tests', () => {
             {
               id: 'rd_c7a2f6a0c8434e75',
               book_title: 'Singing',
-              author: undefined,
               format: 'audio' as const,
               progress_made: 78, // Progress made on June 25 (1278 - 1226 + 26)
               total_progress: 1278,
@@ -304,6 +304,7 @@ describe('ReadingCalendar Date Click Tests', () => {
               flexibility: 'strict',
             },
           ],
+          statusChanges: [],
           totalProgressMade: 102,
         },
         {
@@ -322,12 +323,13 @@ describe('ReadingCalendar Date Click Tests', () => {
               flexibility: 'strict',
             },
           ],
+          statusChanges: [],
           totalProgressMade: 938,
         },
       ],
       summary: {
         totalDays: 2,
-        totalProgressMade: 1040,
+        totalDeadlines: 5,
         averageProgressPerDay: 520,
         activeDeadlines: 2,
         ArchivedDeadlines: 0,
@@ -417,14 +419,14 @@ describe('ReadingCalendar Date Click Tests', () => {
         {
           date: '2025-06-21',
           deadlines: [],
+          statusChanges: [],
           totalProgressMade: 0,
         },
       ],
       summary: {
         totalDays: 1,
-        totalProgressMade: 0,
-        averageProgressPerDay: 0,
         activeDeadlines: 0,
+        totalDeadlines: 0,
         ArchivedDeadlines: 0,
       },
     };

@@ -209,7 +209,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
 
   // Prepare data for the line chart (cumulative progress)
   let cumulativeProgress = 0;
-  const lineChartData = recentDays.map((day, index) => {
+  const lineChartData = recentDays.map((day) => {
     cumulativeProgress += day.progressRead;
     return {
       value: Math.round(cumulativeProgress),

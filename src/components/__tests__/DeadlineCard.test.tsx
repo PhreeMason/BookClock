@@ -11,7 +11,20 @@ jest.mock('@/contexts/DeadlineProvider', () => ({
   DeadlineProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+// Mock the book hooks
+jest.mock('@/hooks/useBooks', () => ({
+  useFetchBookById: jest.fn(),
+}));
+
 const mockUseDeadlines = useDeadlines as jest.MockedFunction<typeof useDeadlines>;
+
+// Setup the book hook mock
+const { useFetchBookById } = require('@/hooks/useBooks');
+useFetchBookById.mockImplementation(() => ({
+  data: null,
+  isLoading: false,
+  error: null
+}));
 
 // Mock data for testing
 const createMockDeadline = (
@@ -24,6 +37,7 @@ const createMockDeadline = (
   progress: any[] = []
 ): ReadingDeadlineWithProgress => ({
   id,
+  book_id: null,
   book_title: bookTitle,
   author,
   format,
@@ -112,6 +126,40 @@ describe('DeadlineCard', () => {
       render(<DeadlineCard deadline={deadline} />);
 
       expect(screen.getByText('Test Book')).toBeTruthy();
+    });
+
+    it('should use book cover as background when available', () => {
+      const deadline = createMockDeadline('1', 'Test Book with Cover', 'Test Author', '2024-01-20T00:00:00Z');
+      // Give this deadline a book_id
+      deadline.book_id = 'book-123';
+      
+      // Mock the book data with a cover image
+      useFetchBookById.mockReturnValue({
+        data: {
+          id: 'book-123',
+          cover_image_url: 'https://example.com/book-cover.jpg',
+          title: 'Test Book with Cover',
+          api_id: 'api-123'
+        },
+        isLoading: false,
+        error: null
+      });
+
+      mockUseDeadlines.mockReturnValue({
+        getDeadlineCalculations: jest.fn().mockReturnValue({
+          daysLeft: 5,
+          unitsPerDay: 60,
+          urgencyLevel: 'good' as const,
+          statusMessage: 'On track'
+        }),
+        formatUnitsPerDay: jest.fn().mockReturnValue('60 pages/day needed')
+      } as any);
+
+      render(<DeadlineCard deadline={deadline} />);
+      
+      // The component should render successfully with book cover
+      expect(screen.getByText('Test Book with Cover')).toBeTruthy();
+      expect(useFetchBookById).toHaveBeenCalledWith('book-123');
     });
 
     it('should render days left correctly', () => {

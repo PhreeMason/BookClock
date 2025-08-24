@@ -66,6 +66,7 @@ jest.mock('react-native-pager-view', () => {
 describe('SwipeableCharts', () => {
   const mockDeadline: ReadingDeadlineWithProgress = {
     id: 'test-book-1',
+    book_id: null,
     book_title: 'Test Book',
     author: 'Test Author',
     format: 'physical',

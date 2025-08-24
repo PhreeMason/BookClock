@@ -107,6 +107,7 @@ describe('ReadingDayDetails', () => {
                 flexibility: sampleData[2].flexibility,
             },
         ],
+        statusChanges: [],
         totalProgressMade: 33,
     };
 
@@ -229,8 +230,15 @@ describe('ReadingDayDetails', () => {
             ...mockDayData,
             deadlines: [
                 {
-                    ...mockDayData.deadlines[0],
-                    author: undefined,
+                    id: mockDayData.deadlines[0].id,
+                    book_title: mockDayData.deadlines[0].book_title,
+                    format: mockDayData.deadlines[0].format,
+                    progress_made: mockDayData.deadlines[0].progress_made,
+                    total_progress: mockDayData.deadlines[0].total_progress,
+                    total_quantity: mockDayData.deadlines[0].total_quantity,
+                    deadline_date: mockDayData.deadlines[0].deadline_date,
+                    source: mockDayData.deadlines[0].source,
+                    flexibility: mockDayData.deadlines[0].flexibility,
                 },
             ],
         };
@@ -247,6 +255,7 @@ describe('ReadingDayDetails', () => {
         const emptyDayData: DailyDeadlineEntry = {
             date: '2024-01-03',
             deadlines: [],
+            statusChanges: [],
             totalProgressMade: 0,
         };
 

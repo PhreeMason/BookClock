@@ -4,6 +4,7 @@ import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { ImageBackground, Pressable, StyleSheet, View } from 'react-native';
+import { useFetchBookById } from '@/hooks/useBooks';
 
 const urgencyBorderColorMap = {
   'complete': '#3B82F6',
@@ -30,6 +31,9 @@ interface DeadlineCardProps {
 export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCardProps) {
   const { getDeadlineCalculations, formatUnitsPerDay } = useDeadlines();
   const router = useRouter();
+  
+  // Fetch book data if deadline has a book_id
+  const { data: bookData } = useFetchBookById(deadline.book_id);
 
   //  🎧 vs 📱 vs 📖
   const formatEmojiMap = {
@@ -119,25 +123,28 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
     }
   };
 
+  // Determine which background image to use
+  const getBackgroundImageUrl = () => {
+    // If we have book data and it has a cover image, use that
+    if (bookData?.cover_image_url) {
+      return bookData.cover_image_url;
+    }
+    // Otherwise, fall back to the default background
+    return backgroundImageUrl['default'];
+  };
+
   return (
     <Pressable onPress={handlePress} style={({ pressed }) => [
       { opacity: pressed ? 0.8 : 1 }
     ]}>
       <View style={[styles.card, { borderColor }]}>
-        {true ? (
-          <ImageBackground
-            source={{ uri: backgroundImageUrl['default'] }}
-            style={styles.backgroundImage}
-            blurRadius={50}
-          >
-            {renderBookContent()}
-          </ImageBackground>
-        ) : (
-          <View style={styles.placeholderBackground}>
-            <ThemedText style={styles.placeholderText}>📚</ThemedText>
-            {renderBookContent()}
-          </View>
-        )}
+        <ImageBackground
+          source={{ uri: getBackgroundImageUrl() }}
+          style={styles.backgroundImage}
+          blurRadius={bookData?.cover_image_url ? 20 : 50} // Less blur for book covers
+        >
+          {renderBookContent()}
+        </ImageBackground>
       </View>
     </Pressable>
   );

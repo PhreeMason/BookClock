@@ -17,6 +17,7 @@ jest.mock('react-native-toast-message', () => ({
 
 const mockDeadline: ReadingDeadlineWithProgress = {
   id: '1',
+  book_id: null,
   book_title: 'Test Book',
   author: 'Test Author',
   format: 'physical' as const,

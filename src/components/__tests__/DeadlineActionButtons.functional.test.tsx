@@ -39,6 +39,7 @@ let mockAlert: jest.SpyInstance;
 // Mock data
 const mockDeadline: ReadingDeadlineWithProgress = {
   id: 'test-deadline-id',
+  book_id: null,
   book_title: 'The Great Gatsby',
   author: 'F. Scott Fitzgerald',
   format: 'physical',

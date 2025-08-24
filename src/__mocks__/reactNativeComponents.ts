@@ -32,7 +32,7 @@ jest.mock('react-native-calendars', () => ({
 }));
 
 // React Native Gifted Charts Mock
-export const mockLineChart = jest.fn(({ testID, data, areaChart, ...props }: any) => {
+export const mockLineChart = jest.fn(({ testID, data, areaChart }: any) => {
   const { View, Text } = require('react-native');
   return React.createElement(
     View,
@@ -97,7 +97,7 @@ export const mockPagerView = jest.fn(({ children, onPageSelected, initialPage = 
       horizontal: true,
       pagingEnabled: true,
     },
-    React.Children.map(children, (child, index) =>
+    React.Children.map(children, (child: any, index: number) =>
       React.createElement(
         View,
         { key: index, testID: `page-${index}` },

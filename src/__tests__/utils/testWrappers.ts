@@ -14,17 +14,12 @@ export const createTestQueryClient = () => {
     defaultOptions: {
       queries: {
         retry: false,
-        cacheTime: 0,
+        gcTime: 0,
         staleTime: 0,
       },
       mutations: {
         retry: false,
       },
-    },
-    logger: {
-      log: () => {},
-      warn: () => {},
-      error: () => {},
     },
   });
 };
@@ -73,7 +68,7 @@ export const renderWithQuery = (
   const { queryClient = createTestQueryClient(), ...renderOptions } = options || {};
   
   const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
-    React.createElement(QueryWrapper, { queryClient }, children);
+    React.createElement(QueryWrapper, { queryClient, children });
 
   return {
     ...render(ui, { wrapper: Wrapper, ...renderOptions }),
@@ -91,7 +86,7 @@ export const renderWithProviders = (
   const { queryClient = createTestQueryClient(), ...renderOptions } = options || {};
   
   const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
-    React.createElement(AppWrapper, { queryClient }, children);
+    React.createElement(AppWrapper, { queryClient, children });
 
   return {
     ...render(ui, { wrapper: Wrapper, ...renderOptions }),
@@ -103,25 +98,31 @@ export const renderWithProviders = (
 export const createHookWrapper = (queryClient?: QueryClient) => {
   const client = queryClient || createTestQueryClient();
   
-  return ({ children }: { children: React.ReactNode }) =>
-    React.createElement(QueryWrapper, { queryClient: client }, children);
+  const WrapperComponent = ({ children }: { children: React.ReactNode }) =>
+    React.createElement(QueryWrapper, { queryClient: client, children });
+  
+  return WrapperComponent;
 };
 
 // Hook testing wrapper with all providers
 export const createFullHookWrapper = (queryClient?: QueryClient) => {
   const client = queryClient || createTestQueryClient();
   
-  return ({ children }: { children: React.ReactNode }) =>
-    React.createElement(AppWrapper, { queryClient: client }, children);
+  const WrapperComponent = ({ children }: { children: React.ReactNode }) =>
+    React.createElement(AppWrapper, { queryClient: client, children });
+  
+  return WrapperComponent;
 };
 
 // Utility to wait for query operations to complete
 export const waitForQueryToSettle = async (queryClient: QueryClient) => {
-  await queryClient.getQueryCache().findAll().forEach(query => {
+  const promises = queryClient.getQueryCache().findAll().map(query => {
     if (query.state.fetchStatus === 'fetching') {
       return query.promise;
     }
+    return Promise.resolve();
   });
+  await Promise.all(promises);
 };
 
 // Utility to clear all queries and mutations
@@ -169,7 +170,7 @@ export class TestErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, _errorInfo: React.ErrorInfo) {
     this.props.onError?.(error);
   }
 
@@ -195,8 +196,7 @@ export const renderWithErrorBoundary = (
   const WrappedComponent = () =>
     React.createElement(
       QueryWrapper,
-      { queryClient },
-      React.createElement(TestErrorBoundary, { onError }, ui)
+      { queryClient, children: React.createElement(TestErrorBoundary, { onError }, ui) }
     );
 
   return {

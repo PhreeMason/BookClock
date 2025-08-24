@@ -142,7 +142,7 @@ describe('EditDeadline - Audiobook Time Conversion Bug', () => {
             flexibility: 'flexible'
         });
         
-        mockTrigger.mockResolvedValue(true);
+        // Form trigger mock doesn't need return value
     });
 
     it('should correctly convert 23-hour audiobook total time to hours and minutes fields', async () => {

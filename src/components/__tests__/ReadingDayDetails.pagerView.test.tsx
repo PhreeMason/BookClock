@@ -71,6 +71,7 @@ describe('ReadingDayDetails PagerView Tests', () => {
         flexibility: 'flexible',
       },
     ],
+    statusChanges: [],
     totalProgressMade: 50,
   };
 
@@ -91,6 +92,7 @@ describe('ReadingDayDetails PagerView Tests', () => {
           flexibility: 'strict',
         },
       ],
+      statusChanges: [],
       totalProgressMade: 120,
     },
     {
@@ -109,11 +111,13 @@ describe('ReadingDayDetails PagerView Tests', () => {
           flexibility: 'flexible',
         },
       ],
+      statusChanges: [],
       totalProgressMade: 75,
     },
     {
       date: '2025-07-02',
       deadlines: mockDayData.deadlines,
+      statusChanges: [],
       totalProgressMade: mockDayData.totalProgressMade,
     },
   ];

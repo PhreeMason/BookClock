@@ -5,7 +5,7 @@ import DailyReadingChart from '../charts/DailyReadingChart';
 
 // Mock the gifted charts
 jest.mock('react-native-gifted-charts', () => ({
-  BarChart: jest.fn(({ testID, data, ...props }: any) => {
+  BarChart: jest.fn(({ testID, data }: any) => {
     const React = require('react');
     const { View, Text } = require('react-native');
     return React.createElement(
@@ -18,7 +18,7 @@ jest.mock('react-native-gifted-charts', () => ({
 
 // Mock the pace calculations
 jest.mock('@/lib/paceCalculations', () => ({
-  calculateRequiredPace: jest.fn((total, current, days, format) => {
+  calculateRequiredPace: jest.fn((total, current, days, _format) => {
     // Mock calculation: simple remaining/days
     const remaining = total - current;
     return Math.ceil(remaining / days);
@@ -28,6 +28,7 @@ jest.mock('@/lib/paceCalculations', () => ({
 describe('DailyReadingChart', () => {
   const mockPhysicalBook: ReadingDeadlineWithProgress = {
     id: 'test-book-1',
+    book_id: null,
     book_title: 'Test Physical Book',
     author: 'Test Author',
     format: 'physical',

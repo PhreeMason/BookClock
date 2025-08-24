@@ -69,7 +69,7 @@ const FormTestWrapper = ({
   defaultValues?: Partial<DeadlineFormData>;
 }) => {
   const [selectedFormat, setSelectedFormat] = React.useState<'physical' | 'ebook' | 'audio'>('physical');
-  const [selectedSource, setSelectedSource] = React.useState<'arc' | 'library' | 'personal'>('arc');
+  const [_selectedSource, _setSelectedSource] = React.useState<'arc' | 'library' | 'personal'>('arc');
 
   const { control, watch } = useForm<DeadlineFormData>({
     resolver: zodResolver(deadlineFormSchema),
@@ -99,9 +99,8 @@ const FormTestWrapper = ({
       <DeadlineFormStep1
         control={control}
         selectedFormat={selectedFormat}
-        selectedSource={selectedSource}
         onFormatChange={setSelectedFormat}
-        onSourceChange={setSelectedSource}
+        setValue={jest.fn()}
       />
     </View>
   );

@@ -23,7 +23,7 @@ jest.mock('@/components/shared/CustomInput', () => {
 
 // Mock the PrioritySelector component
 jest.mock('../forms/PrioritySelector', () => ({
-  PrioritySelector: jest.fn(({ selectedPriority, onSelectPriority }) => {
+  PrioritySelector: jest.fn(({ onSelectPriority }) => {
     const { View, TouchableOpacity, Text } = require('react-native');
     return (
       <View testID="priority-selector">

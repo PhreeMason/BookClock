@@ -14,10 +14,12 @@ export const useAddDeadline = () => {
         mutationFn: async (
             {
                 deadlineDetails,
-                progressDetails
+                progressDetails,
+                bookData
             }: {
                 deadlineDetails: Omit<ReadingDeadlineInsert, 'user_id'>,
-                progressDetails: ReadingDeadlineProgressInsert
+                progressDetails: ReadingDeadlineProgressInsert,
+                bookData?: { api_id: string; book_id?: string }
             }) => {
             if (!userId) {
                 throw new Error("User not authenticated");
@@ -40,8 +42,53 @@ export const useAddDeadline = () => {
             progressDetails.id = finalProgressId;
             progressDetails.reading_deadline_id = finalDeadlineId;
 
+            // Handle book linking if bookData is provided
+            let finalBookId = deadlineDetails.book_id;
+            if (bookData?.api_id && !bookData.book_id) {
+                // Book was selected but may not exist in our database yet
+                // Check if book exists first
+                const { data: existingBook } = await supabase
+                    .from('books')
+                    .select('id')
+                    .eq('api_id', bookData.api_id)
+                    .single();
+                
+                if (existingBook) {
+                    finalBookId = existingBook.id;
+                } else {
+                    // Need to fetch and insert book data
+                    try {
+                        const bookResponse = await supabase.functions.invoke('book-data', {
+                            body: { api_id: bookData.api_id },
+                        });
+                        
+                        if (bookResponse.data && !bookResponse.error) {
+                            const { data: bookId, error: bookIdError } = await supabase.rpc('generate_prefixed_id', { prefix: 'book' });
+                            const finalNewBookId = bookIdError ? `book_${crypto.randomUUID()}` : bookId;
+                            
+                            const { error: insertBookError } = await supabase
+                                .from('books')
+                                .insert({
+                                    ...bookResponse.data,
+                                    id: finalNewBookId,
+                                });
+                            
+                            if (!insertBookError) {
+                                finalBookId = finalNewBookId;
+                            }
+                        }
+                    } catch (bookError) {
+                        console.warn('Failed to fetch/insert book data:', bookError);
+                        // Continue without book linking if it fails
+                    }
+                }
+            } else if (bookData?.book_id) {
+                finalBookId = bookData.book_id;
+            }
+
             const { data, error } = await supabase.from('reading_deadlines').insert({
                 ...deadlineDetails,
+                book_id: finalBookId || null,
                 user_id: userId,
             })
                 .select()
@@ -107,10 +154,12 @@ export const useUpdateDeadline = () => {
         mutationFn: async (
             {
                 deadlineDetails,
-                progressDetails
+                progressDetails,
+                bookData: _bookData
             }: {
                 deadlineDetails: ReadingDeadlineInsert,
-                progressDetails: ReadingDeadlineProgressInsert
+                progressDetails: ReadingDeadlineProgressInsert,
+                bookData?: { api_id: string; book_id?: string }
             }) => {
             if (!userId) {
                 throw new Error("User not authenticated");

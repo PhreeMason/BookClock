@@ -9,6 +9,7 @@ import '@/__mocks__/reactNativeComponents';
 describe('ProgressAreaChart', () => {
   const mockPhysicalBook: ReadingDeadlineWithProgress = {
     id: 'test-book-1',
+    book_id: null,
     book_title: 'Test Physical Book',
     author: 'Test Author',
     format: 'physical',

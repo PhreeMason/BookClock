@@ -15,9 +15,10 @@ const mockCalculateDaysLeftUtil = calculateDaysLeftUtil as jest.MockedFunction<t
 const createMockDeadline = (
   id: string, 
   deadline_date: string, 
-  status?: { status: 'reading' | 'complete' | 'set_aside'; created_at: string; id: number; reading_deadline_id: string | null }[]
+  status?: { status: 'reading' | 'complete' | 'set_aside' | 'requested' | 'approved' | 'rejected' | 'withdrew' | null; created_at: string; id: number; reading_deadline_id: string | null }[]
 ): ReadingDeadlineWithProgress => ({
   id,
+  book_id: null,
   user_id: 'user1',
   book_title: `Book ${id}`,
   author: 'Test Author',
@@ -29,7 +30,7 @@ const createMockDeadline = (
   created_at: '2024-03-01T00:00:00.000Z',
   updated_at: '2024-03-01T00:00:00.000Z',
   progress: [],
-  status
+  ...(status ? { status } : {})
 });
 
 describe('deadlineUtils date handling', () => {

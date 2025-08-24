@@ -24,6 +24,7 @@ interface DeadlineContextType {
   addDeadline: (params: {
     deadlineDetails: Omit<ReadingDeadlineInsert, 'user_id'>;
     progressDetails: ReadingDeadlineProgressInsert;
+    bookData?: { api_id: string; book_id?: string };
   }, onSuccess?: () => void, onError?: (error: Error) => void) => void;
   updateDeadline: (params: {
     deadlineDetails: ReadingDeadlineInsert;
@@ -210,6 +211,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
   const addDeadline = (params: {
     deadlineDetails: Omit<ReadingDeadlineInsert, 'user_id'>;
     progressDetails: ReadingDeadlineProgressInsert;
+    bookData?: { api_id: string; book_id?: string };
   }, onSuccess?: () => void, onError?: (error: Error) => void) => {
     addDeadlineMutation(params, {
       onSuccess: () => {
@@ -225,6 +227,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
   const updateDeadline = (params: {
     deadlineDetails: ReadingDeadlineInsert;
     progressDetails: ReadingDeadlineProgressInsert;
+    bookData?: { api_id: string; book_id?: string };
   }, onSuccess?: () => void, onError?: (error: Error) => void) => {
     updateDeadlineMutation(params, {
       onSuccess: () => {

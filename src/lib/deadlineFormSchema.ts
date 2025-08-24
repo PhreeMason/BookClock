@@ -23,6 +23,9 @@ export const deadlineFormSchema = z.object({
     flexibility: z.enum(['flexible', 'strict'], {
         errorMap: () => ({ message: 'Please select deadline flexibility' })
     }),
+    // Optional book linking fields
+    book_id: z.string().optional(), // Links to books table
+    api_id: z.string().optional(),  // External API ID for book fetching
 });
 
 export type DeadlineFormData = z.infer<typeof deadlineFormSchema>; 

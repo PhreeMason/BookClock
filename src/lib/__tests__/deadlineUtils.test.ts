@@ -19,6 +19,7 @@ const createMockDeadline = (
   progress: any[] = []
 ): ReadingDeadlineWithProgress => ({
   id,
+  book_id: null,
   book_title: 'Test Book',
   author: 'Test Author',
   format,

@@ -21,7 +21,7 @@ jest.mock('@/components/shared/CustomInput', () => {
 
 // Mock the FormatSelector component
 jest.mock('../forms/FormatSelector', () => ({
-  FormatSelector: jest.fn(({ selectedFormat, onSelectFormat }) => {
+  FormatSelector: jest.fn(({ onSelectFormat }) => {
     const { View, TouchableOpacity, Text } = require('react-native');
     return (
       <View testID="format-selector">
@@ -50,7 +50,7 @@ jest.mock('../forms/FormatSelector', () => ({
 
 // Mock the SourceSelector component
 jest.mock('../forms/SourceSelector', () => ({
-  SourceSelector: jest.fn(({ selectedSource, onSelectSource }) => {
+  SourceSelector: jest.fn(({ onSelectSource }) => {
     const { View, TouchableOpacity, Text } = require('react-native');
     return (
       <View testID="source-selector">
@@ -84,9 +84,7 @@ jest.mock('react-hook-form', () => ({
 
 const TestComponent = ({ 
   selectedFormat = 'physical' as 'physical' | 'ebook' | 'audio',
-  selectedSource = 'arc' as 'arc' | 'library' | 'personal',
   onFormatChange = jest.fn(),
-  onSourceChange = jest.fn()
 }) => {
   const mockControl = {
     register: jest.fn(),
@@ -101,16 +99,14 @@ const TestComponent = ({
     <DeadlineFormStep1
       control={mockControl}
       selectedFormat={selectedFormat}
-      selectedSource={selectedSource}
       onFormatChange={onFormatChange}
-      onSourceChange={onSourceChange}
+      setValue={jest.fn()}
     />
   );
 };
 
 describe('DeadlineFormStep1', () => {
   const mockOnFormatChange = jest.fn();
-  const mockOnSourceChange = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -120,7 +116,6 @@ describe('DeadlineFormStep1', () => {
     const { getByText } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -131,7 +126,6 @@ describe('DeadlineFormStep1', () => {
     const { getByTestId } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -142,7 +136,6 @@ describe('DeadlineFormStep1', () => {
     const { getByTestId } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -153,7 +146,6 @@ describe('DeadlineFormStep1', () => {
     const { getByTestId } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -164,7 +156,6 @@ describe('DeadlineFormStep1', () => {
     const { getByTestId } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -175,7 +166,6 @@ describe('DeadlineFormStep1', () => {
     const { getByTestId } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -187,7 +177,6 @@ describe('DeadlineFormStep1', () => {
       <TestComponent
         selectedFormat="physical"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -199,7 +188,6 @@ describe('DeadlineFormStep1', () => {
       <TestComponent
         selectedFormat="ebook"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -211,7 +199,6 @@ describe('DeadlineFormStep1', () => {
       <TestComponent
         selectedFormat="audio"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -223,7 +210,6 @@ describe('DeadlineFormStep1', () => {
       <TestComponent
         selectedFormat="physical"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -236,7 +222,6 @@ describe('DeadlineFormStep1', () => {
       <TestComponent
         selectedFormat="ebook"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -249,7 +234,6 @@ describe('DeadlineFormStep1', () => {
       <TestComponent
         selectedFormat="audio"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -262,7 +246,6 @@ describe('DeadlineFormStep1', () => {
       <TestComponent
         selectedFormat="audio"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -274,7 +257,6 @@ describe('DeadlineFormStep1', () => {
       <TestComponent
         selectedFormat="physical"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -285,7 +267,6 @@ describe('DeadlineFormStep1', () => {
     const { getByText } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -296,7 +277,6 @@ describe('DeadlineFormStep1', () => {
     const { getByText } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -307,7 +287,6 @@ describe('DeadlineFormStep1', () => {
     const { getByText } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -323,7 +302,6 @@ describe('DeadlineFormStep1', () => {
       <TestComponent
         selectedFormat="ebook"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -334,9 +312,7 @@ describe('DeadlineFormStep1', () => {
   it('passes correct props to SourceSelector', () => {
     const { getByTestId } = render(
       <TestComponent
-        selectedSource="library"
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     
@@ -348,7 +324,6 @@ describe('DeadlineFormStep1', () => {
     const { queryByTestId } = render(
       <TestComponent
         onFormatChange={mockOnFormatChange}
-        onSourceChange={mockOnSourceChange}
       />
     );
     

@@ -76,8 +76,10 @@ const EditDeadline = () => {
             setValue('bookTitle', deadline.book_title);
             setValue('bookAuthor', deadline.author || '');
             setValue('format', deadline.format);
+            setValue('source', deadline.source || 'arc');
             setValue('deadline', new Date(deadline.deadline_date));
             setValue('flexibility', deadline.flexibility);
+            setValue('book_id', deadline.book_id || undefined);
             
             setSelectedFormat(deadline.format);
             setSelectedPriority(deadline.flexibility as 'flexible' | 'strict');
@@ -165,11 +167,15 @@ const EditDeadline = () => {
             format: selectedFormat,
             source: data.source,
             flexibility: selectedPriority,
+            book_id: data.book_id || deadline.book_id || null,
             user_id: deadline.user_id,
             created_at: deadline.created_at,
             updated_at: new Date().toISOString()
         }
-
+        console.log(JSON.stringify({
+            data
+        }, null, 2));
+        console.log('Updating deadline with details:', JSON.stringify(deadlineDetails, null, 2));
         // Calculate current progress accounting for format
         const finalCurrentProgress = calculateCurrentProgressFromForm(
             selectedFormat,
@@ -310,6 +316,7 @@ const EditDeadline = () => {
                             control={control}
                             selectedFormat={selectedFormat}
                             onFormatChange={handleFormatChange}
+                            setValue={setValue}
                             isEditMode={true}
                         />
                     ) : (

@@ -93,7 +93,7 @@ describe('useDeadlineHistory', () => {
         expect(result.current.data).toBeDefined();
         expect(result.current.data?.entries.length).toBeGreaterThan(0); // Should have some activity days
         expect(result.current.data?.summary.totalDays).toBeGreaterThan(0);
-        expect(result.current.data?.summary.activeDeadlines).toBeGreaterThanOrEqual(0);
+        expect(result.current.data?.summary.totalDeadlines).toBeGreaterThanOrEqual(0);
         expect(result.current.data?.summary.ArchivedDeadlines).toBeGreaterThanOrEqual(0);
     });
 
@@ -277,6 +277,6 @@ describe('useDeadlineHistory', () => {
         });
 
         expect(result.current.data?.summary.ArchivedDeadlines).toBe(1);
-        expect(result.current.data?.summary.activeDeadlines).toBe(0);
+        expect(result.current.data?.summary.totalDeadlines).toBe(0);
     });
 });

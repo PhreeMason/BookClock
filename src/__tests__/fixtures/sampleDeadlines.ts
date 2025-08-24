@@ -3,6 +3,7 @@ import { ReadingDeadlineWithProgress } from '@/types/deadline';
 export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
   {
     id: "rd_3334d0efe76545e9",
+    book_id: null,
     book_title: "Letters to a Young Poet",
     author: "Rainer Maria Rilke",
     format: "physical",
@@ -32,6 +33,7 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
   },
   {
     id: "rd_1546b109fce34579",
+    book_id: null,
     book_title: "The lean start up",
     author: "Eric Ries",
     format: "audio",
@@ -82,6 +84,7 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
   },
   {
     id: "rd_e3aab91b52044931",
+    book_id: null,
     book_title: "Freeing the natural voice",
     author: "Kristin Linklater",
     format: "physical",
@@ -111,6 +114,7 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
   },
   {
     id: "rd_84d0ec8cb5b94bea",
+    book_id: null,
     book_title: "The Way of Kings",
     author: "Brandon Sanderson",
     format: "audio",
@@ -147,6 +151,7 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
   },
   {
     id: "rd_c7a2f6a0c8434e75",
+    book_id: null,
     book_title: "Singing",
     author: null,
     format: "audio",
@@ -197,6 +202,7 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
   },
   {
     id: "rd_39c7e304c851434a",
+    book_id: null,
     book_title: "Onyx Storm",
     author: "Rebecca Yarros",
     format: "audio",
@@ -219,6 +225,7 @@ export const sampleDeadlines: ReadingDeadlineWithProgress[] = [
   },
   {
     id: "rd_983950d544304c7c",
+    book_id: null,
     book_title: "Dungeon Crawler Carl This Inevitable Ruin",
     author: "Matt Dinniman",
     format: "audio",

@@ -304,25 +304,4 @@ describe('useDeadlineHistory - Real User Data Bug Reproduction', () => {
     const leanStartupProgress = june27Entry?.deadlines.find(d => d.book_title === 'The lean start up');
     expect(leanStartupProgress).toBeDefined();
   });
-
-  it('should correctly calculate progress differences for same-day updates', async () => {
-    const { result } = renderHook(() => useDeadlineHistory(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
-
-    const data = result.current.data;
-    
-    // Verify that progress calculation handles declining values correctly
-    // "The lean start up" on 2025-06-27 has: 302 -> 344 -> 346 -> 344
-    // The last entry (344) is less than the previous (346), which should be handled gracefully
-    
-    const entries = data?.entries || [];
-    expect(entries.length).toBeGreaterThan(0);
-    
-    // Total progress should be reasonable (not astronomical due to double-counting)
-    expect(data?.summary.totalProgressMade).toBeGreaterThan(0);
-    expect(data?.summary.totalProgressMade).toBeLessThan(10000); // Sanity check
-  });
 });

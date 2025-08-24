@@ -82,6 +82,7 @@ describe('ReadingDayDetails Navigation Tests', () => {
             flexibility: 'flexible' as const,
           },
         ],
+        statusChanges: [],
         totalProgressMade: index % 2 === 0 ? 0 : 50,
       }));
     } else {
@@ -104,6 +105,7 @@ describe('ReadingDayDetails Navigation Tests', () => {
               flexibility: 'flexible' as const,
             },
           ],
+          statusChanges: [],
           totalProgressMade: 50,
         }));
     }
