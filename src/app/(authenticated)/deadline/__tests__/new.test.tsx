@@ -23,11 +23,10 @@ jest.mock('@/contexts/DeadlineProvider', () => ({
 
 // Mock the form components
 jest.mock('@/components/forms', () => ({
-  DeadlineFormStep1: jest.fn(({ control, selectedFormat, selectedSource, onFormatChange, onSourceChange, readingEstimate }) => {
+  DeadlineFormStep1: jest.fn(({ control, selectedFormat, onFormatChange, isEditMode }) => {
     const { View, Text, TouchableOpacity } = require('react-native');
     return (
       <View testID="form-step-1">
-        <Text testID="reading-estimate">{readingEstimate}</Text>
         <TouchableOpacity testID="format-physical" onPress={() => onFormatChange('physical')}>
           <Text>Physical</Text>
         </TouchableOpacity>
@@ -36,15 +35,6 @@ jest.mock('@/components/forms', () => ({
         </TouchableOpacity>
         <TouchableOpacity testID="format-audio" onPress={() => onFormatChange('audio')}>
           <Text>Audio</Text>
-        </TouchableOpacity>
-        <TouchableOpacity testID="source-arc" onPress={() => onSourceChange('arc')}>
-          <Text>ARC</Text>
-        </TouchableOpacity>
-        <TouchableOpacity testID="source-library" onPress={() => onSourceChange('library')}>
-          <Text>Library</Text>
-        </TouchableOpacity>
-        <TouchableOpacity testID="source-personal" onPress={() => onSourceChange('personal')}>
-          <Text>Personal</Text>
         </TouchableOpacity>
       </View>
     );
@@ -343,16 +333,6 @@ describe('NewDeadLine', () => {
     expect(mockSetValue).toHaveBeenCalledWith('format', 'audio');
   });
 
-  it('handles source change correctly', async () => {
-    const { getByTestId } = render(<NewDeadLine />);
-    
-    const libraryButton = getByTestId('source-library');
-    await act(async () => {
-      fireEvent.press(libraryButton);
-    });
-    
-    expect(mockSetValue).toHaveBeenCalledWith('source', 'library');
-  });
 
   it('handles priority change correctly', async () => {
     const { getByText, getByTestId } = render(<NewDeadLine />);

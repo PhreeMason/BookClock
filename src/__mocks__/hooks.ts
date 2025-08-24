@@ -3,11 +3,12 @@
  * This file contains mock implementations for commonly used hooks across test files
  */
 
-import { ReadingDeadlineWithProgress } from '@/types/deadline';
+// Import type from relative path since Jest may not resolve @/ alias properly
+type ReadingDeadlineWithProgress = any;
 
 // useDeadlines hook mocks
 export const mockUseGetDeadlines = jest.fn(() => ({
-  data: [],
+  data: [] as ReadingDeadlineWithProgress[],
   error: null,
   isLoading: false,
   isError: false,
@@ -101,68 +102,6 @@ export const mockUsebookHistory = jest.fn(() => ({
   refetch: jest.fn(),
 }));
 
-// Note: Commenting out until usebookHistory hook is implemented
-// jest.mock('@/hooks/usebookHistory', () => ({
-//   usebookHistory: mockUsebookHistory,
-// }));
-
-// useDailyReadingSession hook mock
-export const mockUseDailyReadingSession = jest.fn(() => ({
-  sessions: [],
-  isLoading: false,
-  error: null,
-  addSession: jest.fn(),
-  updateSession: jest.fn(),
-  deleteSession: jest.fn(),
-  getTodaysSessions: jest.fn(() => []),
-  getTotalReadingTime: jest.fn(() => 0),
-}));
-
-jest.mock('@/hooks/useDailyReadingSession', () => ({
-  useDailyReadingSession: mockUseDailyReadingSession,
-}));
-
-// useAchievementSystem hook mock
-export const mockUseAchievementSystem = jest.fn(() => ({
-  isReady: false,
-  isInitializing: false,
-  hasError: false,
-  error: null,
-  achievements: [],
-  progress: [],
-  checkAchievements: jest.fn(),
-  getUserAchievements: jest.fn(() => []),
-}));
-
-jest.mock('@/hooks/useAchievementSystem', () => ({
-  useAchievementSystem: mockUseAchievementSystem,
-  useInitializeAchievementSystem: jest.fn(() => ({
-    initialize: jest.fn(),
-    status: { isInitialized: false, isInitializing: false, error: null },
-    error: null,
-    retry: jest.fn(),
-  })),
-  useAchievementSystemServices: jest.fn(() => ({
-    eventService: null,
-    registry: null,
-    eventPublisher: null,
-    dataProvider: null,
-    isInitialized: false,
-  })),
-  useTriggerAchievementCheck: jest.fn(() => ({
-    mutate: jest.fn(),
-    mutateAsync: jest.fn(),
-    isLoading: false,
-    isSuccess: false,
-    isError: false,
-  })),
-  useIsAchievementSystemReady: jest.fn(() => ({
-    isReady: false,
-    userId: undefined,
-    isInitialized: false,
-  })),
-}));
-
 // Helper functions to configure hook responses
 export const configurebooksHook = (deadlines: ReadingDeadlineWithProgress[], options = {}) => {
   mockUseGetDeadlines.mockReturnValue({
@@ -179,7 +118,7 @@ export const configurebooksHook = (deadlines: ReadingDeadlineWithProgress[], opt
 
 export const configurebooksLoading = () => {
   mockUseGetDeadlines.mockReturnValue({
-    data: undefined,
+    data: [] as ReadingDeadlineWithProgress[],
     error: null,
     isLoading: true,
     isError: false,
@@ -191,8 +130,8 @@ export const configurebooksLoading = () => {
 
 export const configurebooksError = (error: Error) => {
   mockUseGetDeadlines.mockReturnValue({
-    data: undefined,
-    error,
+    data: [] as ReadingDeadlineWithProgress[],
+    error: error as any,
     isLoading: false,
     isError: true,
     isSuccess: false,
@@ -203,7 +142,7 @@ export const configurebooksError = (error: Error) => {
 
 export const configureMutationSuccess = (mockMutation: jest.Mock) => {
   mockMutation.mockReturnValue({
-    mutate: jest.fn((data, { onSuccess }) => {
+    mutate: jest.fn((_, { onSuccess }) => {
       if (onSuccess) onSuccess();
     }),
     mutateAsync: jest.fn(() => Promise.resolve()),
@@ -217,7 +156,7 @@ export const configureMutationSuccess = (mockMutation: jest.Mock) => {
 
 export const configureMutationError = (mockMutation: jest.Mock, error: Error) => {
   mockMutation.mockReturnValue({
-    mutate: jest.fn((data, { onError }) => {
+    mutate: jest.fn((_, { onError }) => {
       if (onError) onError(error);
     }),
     mutateAsync: jest.fn(() => Promise.reject(error)),
@@ -241,7 +180,7 @@ export const resetHookMocks = () => {
   
   // Reset to default returns
   mockUseGetDeadlines.mockReturnValue({
-    data: [],
+    data: [] as ReadingDeadlineWithProgress[],
     error: null,
     isLoading: false,
     isError: false,
@@ -276,41 +215,6 @@ export const resetHookMocks = () => {
     getReadingDayByDate: jest.fn(),
     getTotalPagesRead: jest.fn(() => 0),
     getReadingStreak: jest.fn(() => 0),
-  });
-  
-  // Note: Commented out until usebookHistory hook is implemented
-  // mockUsebookHistory.mockClear();
-  // mockUsebookHistory.mockReturnValue({
-  //   completedDeadlines: [],
-  //   setAsidebooks: [],
-  //   allHistoricalDeadlines: [],
-  //   isLoading: false,
-  //   error: null,
-  //   refetch: jest.fn(),
-  // });
-  
-  mockUseDailyReadingSession.mockClear();
-  mockUseDailyReadingSession.mockReturnValue({
-    sessions: [],
-    isLoading: false,
-    error: null,
-    addSession: jest.fn(),
-    updateSession: jest.fn(),
-    deleteSession: jest.fn(),
-    getTodaysSessions: jest.fn(() => []),
-    getTotalReadingTime: jest.fn(() => 0),
-  });
-  
-  mockUseAchievementSystem.mockClear();
-  mockUseAchievementSystem.mockReturnValue({
-    isReady: false,
-    isInitializing: false,
-    hasError: false,
-    error: null,
-    achievements: [],
-    progress: [],
-    checkAchievements: jest.fn(),
-    getUserAchievements: jest.fn(() => []),
   });
 };
 

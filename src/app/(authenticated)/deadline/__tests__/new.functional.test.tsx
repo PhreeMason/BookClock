@@ -39,6 +39,38 @@ jest.mock('@/contexts/DeadlineProvider', () => ({
   }),
 }));
 
+// Mock react-hook-form
+const mockTrigger = jest.fn();
+const mockSetValue = jest.fn();
+const mockWatch = jest.fn();
+const mockHandleSubmit = jest.fn();
+
+jest.mock('react-hook-form', () => ({
+  useForm: jest.fn(() => ({
+    control: {},
+    handleSubmit: mockHandleSubmit,
+    watch: mockWatch,
+    setValue: mockSetValue,
+    trigger: mockTrigger,
+    formState: {
+      errors: {},
+      isValid: true,
+      isSubmitting: false,
+    },
+  })),
+  Controller: ({ render, name }: any) => {
+    let mockValue;
+    if (name === 'deadline') {
+      mockValue = new Date();
+    } else {
+      mockValue = '';
+    }
+    const mockField = { value: mockValue, onChange: jest.fn() };
+    const mockFieldState = { error: null };
+    return render({ field: mockField, fieldState: mockFieldState });
+  },
+}));
+
 // Mock theme hook
 // Mock Alert
 jest.spyOn(Alert, 'alert');
@@ -48,6 +80,25 @@ describe('NewDeadline Functional Tests', () => {
     jest.clearAllMocks();
     mockRouter.push.mockClear();
     mockAddDeadline.mockClear();
+    
+    // Setup default mock values for form watch
+    mockWatch.mockReturnValue({
+      bookTitle: 'Test Book',
+      bookAuthor: 'Test Author',
+      format: 'physical',
+      source: 'arc',
+      deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      totalQuantity: 300,
+      totalMinutes: 0,
+      currentMinutes: 0,
+      currentProgress: 0,
+      flexibility: 'flexible'
+    });
+    
+    mockTrigger.mockResolvedValue(true);
+    mockHandleSubmit.mockImplementation((callback) => {
+      return () => callback(mockWatch());
+    });
     mockToastShow.mockClear();
   });
 

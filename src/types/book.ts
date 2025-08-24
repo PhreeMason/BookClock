@@ -1,7 +1,7 @@
 import {
     TablesInsert
 } from '@/types/supabase';
-
+export type BookInsert = TablesInsert<'books'>;
 export type StatusEnum = "tbr" | "current" | "completed" | "dnf" | 'pause';
 
 export type UserBookInsert = TablesInsert<'user_books'>

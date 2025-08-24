@@ -39,6 +39,33 @@ jest.mock('react-native-safe-area-context', () => ({
     SafeAreaView: ({ children }: any) => children,
 }));
 
+// Mock react-hook-form
+const mockTrigger = jest.fn();
+const mockSetValue = jest.fn();
+const mockWatch = jest.fn();
+const mockHandleSubmit = jest.fn();
+
+jest.mock('react-hook-form', () => ({
+  useForm: jest.fn(() => ({
+    control: {},
+    handleSubmit: mockHandleSubmit,
+    watch: mockWatch,
+    setValue: mockSetValue,
+    trigger: mockTrigger,
+    formState: {
+      errors: {},
+      isValid: true,
+      isSubmitting: false,
+    },
+  })),
+  Controller: ({ render }: any) => {
+    const mockField = { value: new Date(), onChange: jest.fn() };
+    const mockFieldState = { error: null };
+    return render({ field: mockField, fieldState: mockFieldState });
+  },
+  useWatch: jest.fn(),
+}));
+
 // Mock the form components to capture the actual control values
 jest.mock('@/components/forms', () => ({
     DeadlineFormStep1: ({ control, selectedFormat, onFormatChange }: any) => {
@@ -117,6 +144,22 @@ jest.mock('@/components/forms/FormatSelector', () => ({
 describe('NewDeadline - Placeholder Value Bugs', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        
+        // Setup default mock values for form watch
+        mockWatch.mockReturnValue({
+            bookTitle: '',
+            bookAuthor: '',
+            format: 'physical',
+            source: 'arc',
+            deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            totalQuantity: undefined, // Start with undefined for placeholder tests
+            totalMinutes: undefined,
+            currentMinutes: undefined,
+            currentProgress: undefined,
+            flexibility: 'flexible'
+        });
+        
+        mockTrigger.mockResolvedValue(true);
     });
 
     it('should show placeholder text instead of "0" for physical book total quantity', async () => {
@@ -217,6 +260,26 @@ describe('NewDeadline - Placeholder Value Bugs', () => {
 });
 
 describe('Form Default Values Issue', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        
+        // Setup default mock values for form watch
+        mockWatch.mockReturnValue({
+            bookTitle: '',
+            bookAuthor: '',
+            format: 'physical',
+            source: 'arc',
+            deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            totalQuantity: undefined,
+            totalMinutes: undefined,
+            currentMinutes: undefined,
+            currentProgress: undefined,
+            flexibility: 'flexible'
+        });
+        
+        mockTrigger.mockResolvedValue(true);
+    });
+
     it('should demonstrate the root cause - form defaults to 0 instead of undefined', () => {
         render(<NewDeadline />);
 

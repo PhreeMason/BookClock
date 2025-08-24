@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -619,6 +619,7 @@ export type Database = {
       reading_deadlines: {
         Row: {
           author: string | null
+          book_id: string | null
           book_title: string
           created_at: string | null
           deadline_date: string
@@ -632,6 +633,7 @@ export type Database = {
         }
         Insert: {
           author?: string | null
+          book_id?: string | null
           book_title: string
           created_at?: string | null
           deadline_date: string
@@ -645,6 +647,7 @@ export type Database = {
         }
         Update: {
           author?: string | null
+          book_id?: string | null
           book_title?: string
           created_at?: string | null
           deadline_date?: string
@@ -657,6 +660,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reading_deadlines_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reading_deadlines_user_id_fkey"
             columns: ["user_id"]
@@ -858,8 +868,8 @@ export type Database = {
       pull_changes: {
         Args: {
           last_pulled_at: number
-          schema_version: number
           migration: Json
+          schema_version: number
           user_id: string
         }
         Returns: Json
