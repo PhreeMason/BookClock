@@ -1,5 +1,5 @@
 import { useSupabase } from '@/lib/supabase';
-import * as achievementCalculators from '@/services/achievementCalculator';
+import * as achievementCalculators from '@/services/achievements/achievementCalculator';
 import { ACHIEVEMENT_CONFIGS } from '@/services/achievements/achievementConfigs';
 import { Database } from '@/types/supabase';
 import { useAuth } from '@clerk/clerk-expo';
