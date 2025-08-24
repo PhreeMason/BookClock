@@ -30,7 +30,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const NewDeadLine = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [selectedFormat, setSelectedFormat] = useState<'physical' | 'ebook' | 'audio'>('physical');
-    const [selectedSource, setSelectedSource] = useState<'arc' | 'library' | 'personal'>('arc');
+    // Source is now handled directly by form control
     const [selectedPriority, setSelectedPriority] = useState<'flexible' | 'strict'>('flexible');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [paceEstimate, setPaceEstimate] = useState<string>('');
@@ -101,7 +101,7 @@ const NewDeadLine = () => {
             deadline_date: data.deadline.toISOString(),
             total_quantity: finalTotalQuantity,
             format: selectedFormat,
-            source: selectedSource,
+            source: data.source,
             flexibility: selectedPriority
         }
 
@@ -130,10 +130,10 @@ const NewDeadLine = () => {
                     type: 'success',
                     text1: 'Deadline added successfully!',
                     autoHide: true,
-                    visibilityTime: 2000,
+                    visibilityTime: 1000,
                     position: 'top',
                     onHide: () => {
-                        router.back();
+                        router.replace('/');
                     }
                 });
             },
@@ -200,10 +200,7 @@ const NewDeadLine = () => {
         setValue('format', format);
     };
 
-    const handleSourceChange = (source: 'arc' | 'library' | 'personal') => {
-        setSelectedSource(source);
-        setValue('source', source);
-    };
+    // Source change handler removed - now handled by CustomDropdown
 
     const handlePriorityChange = (priority: 'flexible' | 'strict') => {
         setSelectedPriority(priority);
@@ -241,9 +238,7 @@ const NewDeadLine = () => {
                         <DeadlineFormStep1
                             control={control}
                             selectedFormat={selectedFormat}
-                            selectedSource={selectedSource}
                             onFormatChange={handleFormatChange}
-                            onSourceChange={handleSourceChange}
                         />
                     ) : (
                         <DeadlineFormStep2

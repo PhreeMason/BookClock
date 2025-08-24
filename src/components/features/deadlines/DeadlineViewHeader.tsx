@@ -1,47 +1,57 @@
-import { ThemedButton, ThemedText, ThemedView } from '@/components/themed';
+import { ThemedText } from '@/components/themed';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useTheme } from '@/theme';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 interface DeadlineViewHeaderProps {
-  title?: string;
-  onBack: () => void;
-  onEdit: () => void;
+    title?: string;
+    onBack: () => void;
+    onEdit: () => void;
 }
 
 const DeadlineViewHeader: React.FC<DeadlineViewHeaderProps> = ({
-  title = "Book Details",
-  onBack,
-  onEdit,
+    title = "Book Details",
+    onBack,
+    onEdit,
 }) => {
-  return (
-    <ThemedView backgroundColor="surfaceHover" style={styles.header}>
-      <ThemedButton
-        title="← Back"
-        variant="ghost"
-        onPress={onBack}
-      />
-      <ThemedText type="subtitle">
-        {title}
-      </ThemedText>
-      <ThemedButton
-        title="Edit"
-        variant="ghost"
-        onPress={onEdit}
-      />
-    </ThemedView>
-  );
+    const { theme } = useTheme();
+    const borderColor = theme.border;
+    const iconColor = theme.primary;
+    return (
+        <View style={[styles.header, { borderBottomColor: borderColor }]}>
+            <TouchableOpacity onPress={onBack}>
+                <IconSymbol name="chevron.left" size={Platform.OS === 'ios' ? 24 : 40} color={iconColor} />
+            </TouchableOpacity>
+            <ThemedText type="semiBold" style={styles.headerTitle}>
+                {title}
+            </ThemedText>
+            <TouchableOpacity onPress={onEdit}>
+                <ThemedText type="link" style={styles.headerTitle}>
+                    Edit
+                </ThemedText>
+            </TouchableOpacity>
+        </View>
+    );
 };
 
 const styles = StyleSheet.create({
-  header: {
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
-  },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingBottom: 15,
+        borderBottomWidth: 1,
+        justifyContent: 'space-between',
+    },
+    headerSpacer: {
+        width: 40,
+    },
+    headerTitle: {
+        fontSize: 18,
+        flex: 1,
+        textAlign: 'center',
+    },
 });
 
 export default DeadlineViewHeader;

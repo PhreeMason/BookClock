@@ -1,3 +1,4 @@
+import CustomDropdown from '@/components/shared/CustomDropdown';
 import CustomInput from '@/components/shared/CustomInput';
 import { ThemedText } from '@/components/themed';
 import { DeadlineFormData } from '@/lib/deadlineFormSchema';
@@ -5,23 +6,18 @@ import React from 'react';
 import { Control } from 'react-hook-form';
 import { View } from 'react-native';
 import { FormatSelector } from './FormatSelector';
-import { SourceSelector } from './SourceSelector';
 
 interface DeadlineFormStep1Props {
     control: Control<DeadlineFormData>;
     selectedFormat: 'physical' | 'ebook' | 'audio';
-    selectedSource: 'arc' | 'library' | 'personal';
     onFormatChange: (format: 'physical' | 'ebook' | 'audio') => void;
-    onSourceChange: (source: 'arc' | 'library' | 'personal') => void;
     isEditMode?: boolean;
 }
 
 export const DeadlineFormStep1 = ({
     control,
     selectedFormat,
-    selectedSource,
     onFormatChange,
-    onSourceChange,
     isEditMode = false
 }: DeadlineFormStep1Props) => {
     const getTotalQuantityLabel = () => {
@@ -85,9 +81,18 @@ export const DeadlineFormStep1 = ({
 
             <View>
                 <ThemedText type="semiBold" style={{marginBottom: 8}}>Where is this book from?</ThemedText>
-                <SourceSelector
-                    selectedSource={selectedSource}
-                    onSelectSource={onSourceChange}
+                <CustomDropdown
+                    control={control}
+                    name="source"
+                    placeholder="Select a source"
+                    options={[
+                        { label: 'ARC', value: 'arc' },
+                        { label: 'Library', value: 'library' },
+                        { label: 'Personal', value: 'personal' }
+                    ]}
+                    allowCustom={true}
+                    customPlaceholder="Enter custom source"
+                    testID="dropdown-source"
                 />
             </View>
 

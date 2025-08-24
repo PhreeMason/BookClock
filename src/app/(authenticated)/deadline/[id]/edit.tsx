@@ -34,7 +34,6 @@ const EditDeadline = () => {
     const initialStep = page === '2' ? 2 : 1; // Start on page 2 if specified, otherwise page 1
     const [currentStep, setCurrentStep] = useState(initialStep);
     const [selectedFormat, setSelectedFormat] = useState<'physical' | 'ebook' | 'audio'>('physical');
-    const [selectedSource, setSelectedSource] = useState<'arc' | 'library' | 'personal'>('arc');
     const [selectedPriority, setSelectedPriority] = useState<'flexible' | 'strict'>('flexible');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [paceEstimate, setPaceEstimate] = useState<string>('');
@@ -77,12 +76,10 @@ const EditDeadline = () => {
             setValue('bookTitle', deadline.book_title);
             setValue('bookAuthor', deadline.author || '');
             setValue('format', deadline.format);
-            setValue('source', deadline.source as 'arc' | 'library' | 'personal');
             setValue('deadline', new Date(deadline.deadline_date));
             setValue('flexibility', deadline.flexibility);
             
             setSelectedFormat(deadline.format);
-            setSelectedSource(deadline.source as 'arc' | 'library' | 'personal');
             setSelectedPriority(deadline.flexibility as 'flexible' | 'strict');
 
             // Get the latest progress entry
@@ -166,7 +163,7 @@ const EditDeadline = () => {
             deadline_date: data.deadline.toISOString(),
             total_quantity: finalTotalQuantity,
             format: selectedFormat,
-            source: selectedSource,
+            source: data.source,
             flexibility: selectedPriority,
             user_id: deadline.user_id,
             created_at: deadline.created_at,
@@ -206,7 +203,8 @@ const EditDeadline = () => {
                     visibilityTime: 2000,
                     position: 'top',
                     onHide: () => {
-                        router.replace(`/deadline/${id}/view`);
+                        // router.replace(`/deadline/${id}/view`);
+                        router.dismiss();
                     }
                 });
             },
@@ -258,7 +256,8 @@ const EditDeadline = () => {
     };
 
     const goBackToView = () => {
-        router.replace(`/deadline/${id}/view`);
+        // router.replace(`/deadline/${id}/view`);
+        router.dismiss();
     };
 
     const onDateChange = (_event: any, selectedDate?: Date) => {
@@ -272,11 +271,6 @@ const EditDeadline = () => {
         // Format should not be changeable in edit mode
         // This function is kept for compatibility but does nothing
         return;
-    };
-
-    const handleSourceChange = (source: 'arc' | 'library' | 'personal') => {
-        setSelectedSource(source);
-        setValue('source', source);
     };
 
     const handlePriorityChange = (priority: 'flexible' | 'strict') => {
@@ -315,9 +309,7 @@ const EditDeadline = () => {
                         <DeadlineFormStep1
                             control={control}
                             selectedFormat={selectedFormat}
-                            selectedSource={selectedSource}
                             onFormatChange={handleFormatChange}
-                            onSourceChange={handleSourceChange}
                             isEditMode={true}
                         />
                     ) : (

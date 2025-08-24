@@ -1,8 +1,8 @@
+import DailyReadingChart from '@/components/charts/DailyReadingChart';
 import BookDetailsSection from '@/components/features/deadlines/BookDetailsSection';
 import DeadlineActionButtons from '@/components/features/deadlines/DeadlineActionButtons';
 import DeadlineHeroSection from '@/components/features/deadlines/DeadlineHeroSection';
 import DeadlineViewHeader from '@/components/features/deadlines/DeadlineViewHeader';
-import DailyReadingChart from '@/components/charts/DailyReadingChart';
 import ReadingProgress from '@/components/shared/ReadingProgress';
 import { ThemedButton, ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
@@ -64,16 +64,16 @@ const DeadlineView = () => {
 
     const handleBack = () => {
         // Check if this is an archived deadline
-        const latestStatus = deadline.status && deadline.status.length > 0 
-            ? deadline.status[deadline.status.length - 1].status 
-            : 'reading';
-        const isArchived = latestStatus === 'complete' || latestStatus === 'set_aside';
-        
-        if (isArchived) {
-            router.push('/archive');
-        } else {
-            router.push('/');
-        }
+        // const latestStatus = deadline.status && deadline.status.length > 0 
+        //     ? deadline.status[deadline.status.length - 1].status 
+        //     : 'reading';
+        // const isArchived = latestStatus === 'complete' || latestStatus === 'set_aside';
+        router.back();
+        // if (isArchived) {
+        //     router.push('/archive');
+        // } else {
+        //     router.push('/');
+        // }
     };
 
     return (

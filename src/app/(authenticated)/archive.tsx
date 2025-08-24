@@ -13,7 +13,8 @@ export default function ArchivedDeadlinesScreen() {
 
     const handleBackPress = () => {
         // back to settings page
-        router.push('/settings');
+        // router.push('/settings');
+        router.back();
     };
 
     return (

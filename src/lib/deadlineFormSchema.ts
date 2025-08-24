@@ -6,9 +6,7 @@ export const deadlineFormSchema = z.object({
     format: z.enum(['physical', 'ebook', 'audio'], {
         errorMap: () => ({ message: 'Please select a format' })
     }),
-    source: z.enum(['library', 'arc', 'personal'], {
-        errorMap: () => ({ message: 'Please select a source' })
-    }),
+    source: z.string().min(1, 'Please select or enter a source'),
     deadline: z.date({
         required_error: 'Deadline is required'
     }),
