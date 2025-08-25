@@ -441,7 +441,92 @@ const useUpdateDeadlineStatus = (status: 'complete' | 'set_aside' | 'reading') =
     })
 }
 
-export const useCompleteDeadline = () => useUpdateDeadlineStatus('complete');
+export const useCompleteDeadline = () => {
+    const supabase = useSupabase();
+    const user = useUser();
+    const userId = user?.user?.id;
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationKey: ['completeDeadline'],
+        mutationFn: async (deadlineId: string) => {
+            if (!userId) {
+                throw new Error("User not authenticated");
+            }
+            
+            // First, get the deadline details to check current progress
+            const { data: deadline, error: deadlineError } = await supabase
+                .from('reading_deadlines')
+                .select(`
+                    *,
+                    progress:reading_deadline_progress(*)
+                `)
+                .eq('id', deadlineId)
+                .eq('user_id', userId)
+                .single();
+
+            if (deadlineError) {
+                console.error('Error fetching deadline for completion:', deadlineError);
+                throw new Error(deadlineError.message);
+            }
+
+            // Calculate current progress (latest progress entry)
+            const latestProgress = deadline.progress?.length > 0 
+                ? Math.max(...deadline.progress.map(p => p.current_progress))
+                : 0;
+
+            // If current progress is not at max, update it to max first
+            if (latestProgress < deadline.total_quantity) {
+                // Generate progress ID using RPC with crypto fallback
+                const { data: progressId, error: progressIdError } = await supabase.rpc('generate_prefixed_id', { prefix: 'rdp' });
+                const finalProgressId = progressIdError ? `rdp_${crypto.randomUUID()}` : progressId;
+                if (progressIdError) {
+                    console.warn('RPC ID generation failed, using crypto fallback for progress ID:', progressIdError);
+                }
+                
+                // Create new progress entry at max progress
+                const { error: progressError } = await supabase
+                    .from('reading_deadline_progress')
+                    .insert({
+                        id: finalProgressId,
+                        reading_deadline_id: deadlineId,
+                        current_progress: deadline.total_quantity,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    });
+
+                if (progressError) {
+                    console.error('Error updating progress to max:', progressError);
+                    throw new Error(progressError.message);
+                }
+            }
+            
+            // Now mark as complete
+            const { data, error } = await supabase
+                .from('reading_deadline_status')
+                .insert({
+                    reading_deadline_id: deadlineId,
+                    status: 'complete',
+                    created_at: new Date().toISOString()
+                })
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Error completing deadline:', error);
+                throw new Error(error.message);
+            }
+            
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['deadlines', userId] });
+        },
+        onError: (error) => {
+            console.error('Error completing deadline:', error);
+        },
+    })
+};
 
 export const useSetAsideDeadline = () => useUpdateDeadlineStatus('set_aside');
 

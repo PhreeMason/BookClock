@@ -8,16 +8,10 @@ import Toast from 'react-native-toast-message';
 
 interface DeadlineActionButtonsProps {
   deadline: ReadingDeadlineWithProgress;
-  onComplete?: () => void;
-  onSetAside?: () => void;
-  onDelete?: () => void;
 }
 
 const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
   deadline,
-  onComplete,
-  onSetAside,
-  onDelete,
 }) => {
   const { deleteDeadline, completeDeadline, setAsideDeadline, reactivateDeadline } = useDeadlines();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -38,81 +32,85 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
     router.push(`/deadline/${deadline.id}/reading-session`);
   };
   const handleComplete = () => {
-    if (onComplete) {
-      onComplete();
-    } else {
-      setIsCompleting(true);
-      completeDeadline(
-        deadline.id,
-        // Success callback
-        () => {
-          setIsCompleting(false);
-          Toast.show({
-            type: 'success',
-            text1: 'Deadline completed!',
-            text2: `Congratulations on finishing "${deadline.book_title}"!`,
-            autoHide: true,
-            visibilityTime: 3000,
-            position: 'top'
-          });
+    // Show confirmation dialog before completing
+    Alert.alert(
+      'Complete Book',
+      `Are you sure you want to mark "${deadline.book_title}" as complete?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
         },
-        // Error callback
-        (error) => {
-          setIsCompleting(false);
-          Toast.show({
-            type: 'error',
-            text1: 'Failed to complete deadline',
-            text2: error.message || 'Please try again',
-            autoHide: true,
-            visibilityTime: 3000,
-            position: 'top'
-          });
-        }
-      );
-    }
+        {
+          text: 'Complete',
+          style: 'default',
+          onPress: () => {
+            setIsCompleting(true);
+            completeDeadline(
+              deadline.id,
+              // Success callback
+              () => {
+                setIsCompleting(false);
+                Toast.show({
+                  type: 'success',
+                  text1: 'Deadline completed!',
+                  text2: `Congratulations on finishing "${deadline.book_title}"!`,
+                  autoHide: true,
+                  visibilityTime: 3000,
+                  position: 'top'
+                });
+              },
+              // Error callback
+              (error) => {
+                setIsCompleting(false);
+                Toast.show({
+                  type: 'error',
+                  text1: 'Failed to complete deadline',
+                  text2: error.message || 'Please try again',
+                  autoHide: true,
+                  visibilityTime: 3000,
+                  position: 'top'
+                });
+              }
+            );
+          },
+        },
+      ]
+    );
   };
 
   const handleSetAside = () => {
-    if (onSetAside) {
-      onSetAside();
-    } else {
-      setIsSettingAside(true);
-      setAsideDeadline(
-        deadline.id,
-        // Success callback
-        () => {
-          setIsSettingAside(false);
-          Toast.show({
-            type: 'success',
-            text1: 'Book set aside',
-            text2: `"${deadline.book_title}" has been set aside for later`,
-            autoHide: true,
-            visibilityTime: 2000,
-            position: 'top',
-          });
-        },
-        // Error callback
-        (error) => {
-          setIsSettingAside(false);
-          Toast.show({
-            type: 'error',
-            text1: 'Failed to set aside deadline',
-            text2: error.message || 'Please try again',
-            autoHide: true,
-            visibilityTime: 3000,
-            position: 'top'
-          });
-        }
-      );
-    }
+    setIsSettingAside(true);
+    setAsideDeadline(
+      deadline.id,
+      // Success callback
+      () => {
+        setIsSettingAside(false);
+        Toast.show({
+          type: 'success',
+          text1: 'Book set aside',
+          text2: `"${deadline.book_title}" has been set aside for later`,
+          autoHide: true,
+          visibilityTime: 2000,
+          position: 'top',
+        });
+      },
+      // Error callback
+      (error) => {
+        setIsSettingAside(false);
+        Toast.show({
+          type: 'error',
+          text1: 'Failed to set aside deadline',
+          text2: error.message || 'Please try again',
+          autoHide: true,
+          visibilityTime: 3000,
+          position: 'top'
+        });
+      }
+    );
   };
 
   const handleDelete = () => {
-    if (onDelete) {
-      onDelete();
-      return;
-    }
-
     // Show confirmation dialog
     Alert.alert(
       'Delete Deadline',
