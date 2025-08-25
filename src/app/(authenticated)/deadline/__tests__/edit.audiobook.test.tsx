@@ -114,6 +114,9 @@ const mockDeadline = {
             id: 'progress-1',
             current_progress: 315, // 5h 15m listened
             reading_deadline_id: 'test-deadline-id',
+            created_at: '2024-01-01T00:00:00.000Z',
+            updated_at: '2024-01-01T00:00:00.000Z',
+            time_spent_reading: null
         }
     ]
 };

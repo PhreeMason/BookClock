@@ -83,7 +83,8 @@ describe('SwipeableCharts', () => {
         created_at: '2025-06-25T00:00:00Z',
         updated_at: '2025-06-25T00:00:00Z',
         current_progress: 50,
-        reading_deadline_id: 'test-book-1'
+        reading_deadline_id: 'test-book-1',
+        time_spent_reading: null
       }
     ]
   };

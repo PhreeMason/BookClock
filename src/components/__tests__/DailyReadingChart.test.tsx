@@ -45,14 +45,16 @@ describe('DailyReadingChart', () => {
         created_at: '2025-07-21T00:00:00Z',
         updated_at: '2025-07-21T00:00:00Z',
         current_progress: 50,
-        reading_deadline_id: 'test-book-1'
+        reading_deadline_id: 'test-book-1',
+        time_spent_reading: null
       },
       {
         id: 'progress-2',
         created_at: '2025-07-22T00:00:00Z',
         updated_at: '2025-07-22T00:00:00Z',
         current_progress: 75,
-        reading_deadline_id: 'test-book-1'
+        reading_deadline_id: 'test-book-1',
+        time_spent_reading: null
       }
     ]
   };
@@ -69,14 +71,16 @@ describe('DailyReadingChart', () => {
         created_at: '2025-07-21T00:00:00Z',
         updated_at: '2025-07-21T00:00:00Z',
         current_progress: 120,
-        reading_deadline_id: 'test-audio-book'
+        reading_deadline_id: 'test-audio-book',
+        time_spent_reading: null
       },
       {
         id: 'progress-audio-2',
         created_at: '2025-07-22T00:00:00Z',
         updated_at: '2025-07-22T00:00:00Z',
         current_progress: 180,
-        reading_deadline_id: 'test-audio-book'
+        reading_deadline_id: 'test-audio-book',
+        time_spent_reading: null
       }
     ]
   };
@@ -93,7 +97,8 @@ describe('DailyReadingChart', () => {
         created_at: '2025-07-21T00:00:00Z',
         updated_at: '2025-07-21T00:00:00Z',
         current_progress: 25,
-        reading_deadline_id: 'test-ebook'
+        reading_deadline_id: 'test-ebook',
+        time_spent_reading: null
       }
     ]
   };
@@ -169,14 +174,16 @@ describe('DailyReadingChart', () => {
             created_at: '2025-07-22T08:00:00Z',
             updated_at: '2025-07-22T08:00:00Z',
             current_progress: 50,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           {
             id: 'progress-2',
             created_at: '2025-07-22T20:00:00Z',
             updated_at: '2025-07-22T20:00:00Z',
             current_progress: 80,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -247,7 +254,8 @@ describe('DailyReadingChart', () => {
             created_at: '2025-01-01T00:00:00Z', // Very old date
             updated_at: '2025-01-01T00:00:00Z',
             current_progress: 100,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -270,14 +278,16 @@ describe('DailyReadingChart', () => {
             created_at: '2025-07-22T00:00:00Z',
             updated_at: '2025-07-22T00:00:00Z',
             current_progress: 300, // Large initial progress (should be ignored)
-            reading_deadline_id: 'test-audio-book'
+            reading_deadline_id: 'test-audio-book',
+            time_spent_reading: null
           },
           {
             id: 'normal-progress',
             created_at: '2025-07-16T00:00:00Z',
             updated_at: '2025-07-16T00:00:00Z',
             current_progress: 320, // Only 20 minutes of actual reading
-            reading_deadline_id: 'test-audio-book'
+            reading_deadline_id: 'test-audio-book',
+            time_spent_reading: null
           }
         ]
       };
@@ -299,14 +309,16 @@ describe('DailyReadingChart', () => {
             created_at: '2025-07-22T08:00:00Z',
             updated_at: '2025-07-22T08:00:00Z',
             current_progress: 100,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           {
             id: 'progress-2',
             created_at: '2025-07-22T20:00:00Z',
             updated_at: '2025-07-22T20:00:00Z',
             current_progress: 90, // User went backwards (correction)
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };

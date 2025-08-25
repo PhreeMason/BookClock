@@ -67,7 +67,8 @@ const createMockProgress = (currentProgress: number, createdAt?: string) => ({
   reading_deadline_id: '1',
   current_progress: currentProgress,
   created_at: createdAt || '2024-01-01T00:00:00Z',
-  updated_at: createdAt || '2024-01-01T00:00:00Z'
+  updated_at: createdAt || '2024-01-01T00:00:00Z',
+  time_spent_reading: null
 });
 
 // Helper to create dates relative to a specific date

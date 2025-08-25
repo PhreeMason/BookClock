@@ -26,21 +26,24 @@ describe('ProgressAreaChart', () => {
         created_at: '2025-06-20T00:00:00Z',
         updated_at: '2025-06-20T00:00:00Z',
         current_progress: 50,
-        reading_deadline_id: 'test-book-1'
+        reading_deadline_id: 'test-book-1',
+        time_spent_reading: null
       },
       {
         id: 'progress-2',
         created_at: '2025-06-25T00:00:00Z',
         updated_at: '2025-06-25T00:00:00Z',
         current_progress: 100,
-        reading_deadline_id: 'test-book-1'
+        reading_deadline_id: 'test-book-1',
+        time_spent_reading: null
       },
       {
         id: 'progress-3',
         created_at: '2025-06-26T00:00:00Z',
         updated_at: '2025-06-26T00:00:00Z',
         current_progress: 150,
-        reading_deadline_id: 'test-book-1'
+        reading_deadline_id: 'test-book-1',
+        time_spent_reading: null
       }
     ]
   };
@@ -57,14 +60,16 @@ describe('ProgressAreaChart', () => {
         created_at: '2025-06-20T00:00:00Z',
         updated_at: '2025-06-20T00:00:00Z',
         current_progress: 120,
-        reading_deadline_id: 'test-audio-book'
+        reading_deadline_id: 'test-audio-book',
+        time_spent_reading: null
       },
       {
         id: 'progress-audio-2',
         created_at: '2025-06-25T00:00:00Z',
         updated_at: '2025-06-25T00:00:00Z',
         current_progress: 250,
-        reading_deadline_id: 'test-audio-book'
+        reading_deadline_id: 'test-audio-book',
+        time_spent_reading: null
       }
     ]
   };
@@ -81,14 +86,16 @@ describe('ProgressAreaChart', () => {
         created_at: '2025-06-20T00:00:00Z',
         updated_at: '2025-06-20T00:00:00Z',
         current_progress: 25,
-        reading_deadline_id: 'test-ebook'
+        reading_deadline_id: 'test-ebook',
+        time_spent_reading: null
       },
       {
         id: 'progress-ebook-2',
         created_at: '2025-06-25T00:00:00Z',
         updated_at: '2025-06-25T00:00:00Z',
         current_progress: 60,
-        reading_deadline_id: 'test-ebook'
+        reading_deadline_id: 'test-ebook',
+        time_spent_reading: null
       }
     ]
   };
@@ -161,21 +168,24 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-26T00:00:00Z',
             updated_at: '2025-06-26T00:00:00Z',
             current_progress: 150,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           {
             id: 'progress-1',
             created_at: '2025-06-20T00:00:00Z',
             updated_at: '2025-06-20T00:00:00Z',
             current_progress: 50,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           {
             id: 'progress-2',
             created_at: '2025-06-25T00:00:00Z',
             updated_at: '2025-06-25T00:00:00Z',
             current_progress: 100,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -262,7 +272,8 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-26T00:00:00Z',
             updated_at: '2025-06-26T00:00:00Z',
             current_progress: 75,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -284,7 +295,8 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-26T00:00:00Z',
             updated_at: '2025-06-26T00:00:00Z',
             current_progress: 350, // Beyond 300 page goal
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -306,7 +318,8 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-26T00:00:00Z',
             updated_at: '2025-06-26T00:00:00Z',
             current_progress: 0,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -325,7 +338,8 @@ describe('ProgressAreaChart', () => {
         created_at: new Date(2025, 5, index + 1).toISOString(),
         updated_at: new Date(2025, 5, index + 1).toISOString(),
         current_progress: index * 5,
-        reading_deadline_id: 'test-book-1'
+        reading_deadline_id: 'test-book-1',
+        time_spent_reading: null
       }));
 
       const bookWithManyProgressEntries = {
@@ -350,7 +364,8 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-26T00:00:00Z',
             updated_at: '2025-06-26T00:00:00Z',
             current_progress: null as any, // Malformed data
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -372,7 +387,8 @@ describe('ProgressAreaChart', () => {
             created_at: null as any, // Missing timestamp
             updated_at: '2025-06-26T00:00:00Z',
             current_progress: 50,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -394,7 +410,8 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-26T00:00:00Z',
             updated_at: '2025-06-26T00:00:00Z',
             current_progress: -10, // Negative progress
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -417,7 +434,8 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-26T00:00:00Z',
             updated_at: '2025-06-26T00:00:00Z',
             current_progress: 50,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -461,28 +479,32 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-07-01T10:00:00Z',
             updated_at: '2025-07-01T10:00:00Z',
             current_progress: 821,
-            reading_deadline_id: 'test-audio-book'
+            reading_deadline_id: 'test-audio-book',
+            time_spent_reading: null
           },
           {
             id: 'progress-2',
             created_at: '2025-07-01T14:00:00Z',
             updated_at: '2025-07-01T14:00:00Z',
             current_progress: 846,
-            reading_deadline_id: 'test-audio-book'
+            reading_deadline_id: 'test-audio-book',
+            time_spent_reading: null
           },
           {
             id: 'progress-3',
             created_at: '2025-07-01T18:00:00Z',
             updated_at: '2025-07-01T18:00:00Z',
             current_progress: 847,
-            reading_deadline_id: 'test-audio-book'
+            reading_deadline_id: 'test-audio-book',
+            time_spent_reading: null
           },
           {
             id: 'progress-4',
             created_at: '2025-07-01T22:00:00Z',
             updated_at: '2025-07-01T22:00:00Z',
             current_progress: 845,
-            reading_deadline_id: 'test-audio-book'
+            reading_deadline_id: 'test-audio-book',
+            time_spent_reading: null
           }
         ]
       };
@@ -504,21 +526,24 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-20T08:00:00Z',
             updated_at: '2025-06-20T08:00:00Z',
             current_progress: 50,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           {
             id: 'progress-2',
             created_at: '2025-06-20T12:00:00Z',
             updated_at: '2025-06-20T12:00:00Z',
             current_progress: 75,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           {
             id: 'progress-3',
             created_at: '2025-06-20T20:00:00Z',
             updated_at: '2025-06-20T20:00:00Z',
             current_progress: 100,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -544,14 +569,16 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-20T08:00:00Z',
             updated_at: '2025-06-20T08:00:00Z',
             current_progress: 25,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           {
             id: 'day1-progress-2',
             created_at: '2025-06-20T16:00:00Z',
             updated_at: '2025-06-20T16:00:00Z',
             current_progress: 50,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           // Day 2: Single update
           {
@@ -559,7 +586,8 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-21T10:00:00Z',
             updated_at: '2025-06-21T10:00:00Z',
             current_progress: 75,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           // Day 3: Multiple updates
           {
@@ -567,14 +595,16 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-22T09:00:00Z',
             updated_at: '2025-06-22T09:00:00Z',
             current_progress: 100,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           {
             id: 'day3-progress-2',
             created_at: '2025-06-22T21:00:00Z',
             updated_at: '2025-06-22T21:00:00Z',
             current_progress: 125,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -597,14 +627,16 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-20T10:00:00Z',
             updated_at: '2025-06-20T10:00:00Z',
             current_progress: 50,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           },
           {
             id: 'phys-2',
             created_at: '2025-06-20T15:00:00Z',
             updated_at: '2025-06-20T15:00:00Z',
             current_progress: 100,
-            reading_deadline_id: 'test-book-1'
+            reading_deadline_id: 'test-book-1',
+            time_spent_reading: null
           }
         ]
       };
@@ -623,14 +655,16 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-20T10:00:00Z',
             updated_at: '2025-06-20T10:00:00Z',
             current_progress: 120,
-            reading_deadline_id: 'test-audio-book'
+            reading_deadline_id: 'test-audio-book',
+            time_spent_reading: null
           },
           {
             id: 'audio-2',
             created_at: '2025-06-20T15:00:00Z',
             updated_at: '2025-06-20T15:00:00Z',
             current_progress: 240,
-            reading_deadline_id: 'test-audio-book'
+            reading_deadline_id: 'test-audio-book',
+            time_spent_reading: null
           }
         ]
       };
@@ -647,14 +681,16 @@ describe('ProgressAreaChart', () => {
             created_at: '2025-06-20T10:00:00Z',
             updated_at: '2025-06-20T10:00:00Z',
             current_progress: 25,
-            reading_deadline_id: 'test-ebook'
+            reading_deadline_id: 'test-ebook',
+            time_spent_reading: null
           },
           {
             id: 'ebook-2',
             created_at: '2025-06-20T15:00:00Z',
             updated_at: '2025-06-20T15:00:00Z',
             current_progress: 50,
-            reading_deadline_id: 'test-ebook'
+            reading_deadline_id: 'test-ebook',
+            time_spent_reading: null
           }
         ]
       };

@@ -57,6 +57,7 @@ const mockDeadline: ReadingDeadlineWithProgress = {
       current_progress: 50,
       created_at: '2024-01-05T00:00:00Z',
       updated_at: '2024-01-05T00:00:00Z',
+      time_spent_reading: null,
     },
   ],
 };
