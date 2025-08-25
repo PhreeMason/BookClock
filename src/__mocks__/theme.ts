@@ -51,26 +51,6 @@ jest.mock('@/theme', () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-// Legacy mock for old useThemeColor hook (for gradual migration)
-export const mockUseThemeColor = jest.fn((_props: any, colorName: string) => {
-  const colorMap: Record<string, string> = {
-    text: mockTheme.text,
-    textMuted: mockTheme.textMuted,
-    background: mockTheme.background,
-    card: mockTheme.surface,
-    border: mockTheme.border,
-    primary: mockTheme.primary,
-    secondary: mockTheme.secondary,
-    accent: mockTheme.accent,
-    danger: mockTheme.danger,
-    success: mockTheme.success,
-    warning: mockTheme.warning,
-    icon: mockTheme.primary,
-  };
-  
-  return colorMap[colorName] || '#000000';
-});
-
 // Mock themed components
 export const MockThemedText = jest.fn(({ children, testID, ...props }: any) => {
   const React = require('react');

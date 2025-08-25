@@ -1,4 +1,4 @@
-import { ThemedButton, ThemedKeyboardAvoidingView, ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
+import { ThemedButton, ThemedKeyboardAvoidingView, ThemedKeyboardAwareScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
@@ -228,7 +228,7 @@ const NewDeadLine = () => {
 
                 <FormProgressBar currentStep={currentStep} totalSteps={totalSteps} />
                 <StepIndicators currentStep={currentStep} totalSteps={totalSteps} />
-                <ThemedScrollView
+                <ThemedKeyboardAwareScrollView
                     style={styles.content}
                     contentContainerStyle={{ paddingBottom: 48 }}
                     keyboardShouldPersistTaps="handled"
@@ -260,7 +260,7 @@ const NewDeadLine = () => {
                             watchedValues={watchedValues}
                         />
                     )}
-                </ThemedScrollView>
+                </ThemedKeyboardAwareScrollView>
 
                 <ThemedView style={styles.navButtons}>
                     {currentStep > 1 && (
