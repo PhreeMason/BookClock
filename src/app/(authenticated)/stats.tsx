@@ -1,26 +1,27 @@
 import DailyListeningProgressChart from '@/components/charts/DailyListeningProgressChart';
 import DailyPagesChart from '@/components/charts/DailyPagesChart';
 import DailyReadingProgressChart from '@/components/charts/DailyReadingProgressChart';
-import FormatDistributionChart from '@/components/features/stats/FormatDistributionChart';
+import TotalProgressRingChart from '@/components/charts/TotalProgressRingChart';
 import ReadingCalendar from '@/components/features/calendar/ReadingCalendar';
+import FormatDistributionChart from '@/components/features/stats/FormatDistributionChart';
 import ReadingListeningToggle, { FormatCategory } from '@/components/features/stats/ReadingListeningToggle';
 import ReadingStatsCards from '@/components/features/stats/ReadingStatsCards';
-import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
-import TotalProgressRingChart from '@/components/charts/TotalProgressRingChart';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import WeeklyReadingHeatmap from '@/components/features/stats/WeeklyReadingHeatmap';
+import AppHeader from '@/components/shared/AppHeader';
+import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { usePace } from '@/contexts/PaceProvider';
 import { formatListeningPaceDisplay, formatPaceDisplay } from '@/lib/paceCalculations';
 import { useTheme } from '@/theme';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function StatsScreen() {
     const { theme } = useTheme();
     const { userPaceData, userListeningPaceData } = usePace();
     const [selectedCategory, setSelectedCategory] = useState<FormatCategory>('combined');
-    const borderColor = theme.border;
     const iconColor = theme.primary;
     const successColor = theme.success;
     const warningColor = theme.warning;
@@ -34,12 +35,12 @@ export default function StatsScreen() {
         ? formatPaceDisplay(userPaceData.averagePace, 'physical')
         : 'No pace data yet';
 
-    const paceMethod = userPaceData.calculationMethod === 'recent_data' 
-        ? 'Based on recent reading activity' 
+    const paceMethod = userPaceData.calculationMethod === 'recent_data'
+        ? 'Based on recent reading activity'
         : 'Default estimate';
 
-    const reliabilityText = userPaceData.isReliable 
-        ? 'Reliable (≥3 reading days)' 
+    const reliabilityText = userPaceData.isReliable
+        ? 'Reliable (≥3 reading days)'
         : 'Estimate (insufficient data)';
 
     const reliabilityColor = userPaceData.isReliable ? successColor : warningColor;
@@ -49,196 +50,170 @@ export default function StatsScreen() {
         ? formatListeningPaceDisplay(userListeningPaceData.averagePace)
         : 'No listening data yet';
 
-    const listeningPaceMethod = userListeningPaceData.calculationMethod === 'recent_data' 
-        ? 'Based on recent listening activity' 
+    const listeningPaceMethod = userListeningPaceData.calculationMethod === 'recent_data'
+        ? 'Based on recent listening activity'
         : 'Default estimate';
 
-    const listeningReliabilityText = userListeningPaceData.isReliable 
-        ? 'Reliable (≥3 listening days)' 
+    const listeningReliabilityText = userListeningPaceData.isReliable
+        ? 'Reliable (≥3 listening days)'
         : 'Estimate (insufficient data)';
 
     const listeningReliabilityColor = userListeningPaceData.isReliable ? successColor : warningColor;
 
     return (
-        <ThemedView backgroundColor="background" style={styles.container}>
-            {/* Header */}
-            <View style={[styles.header, { borderBottomColor: borderColor }]}>
-                <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-                    <IconSymbol name="chevron.left" size={Platform.OS === 'ios' ? 24 : 40} color={iconColor} />
-                </TouchableOpacity>
-                <ThemedText type="semiBold" style={styles.headerTitle}>
-                    Reading Stats
-                </ThemedText>
-                <View style={styles.headerSpacer} />
-            </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+            <ThemedView backgroundColor="background" style={styles.container}>
+                <AppHeader title="Reading Stats" onBack={handleBackPress} />
 
-            <ThemedScrollView backgroundColor="background" style={styles.content}>
-                {/* 1. Overall Progress Overview */}
-                <TotalProgressRingChart />
+                <ThemedScrollView backgroundColor="background" style={styles.content}>
+                    {/* 1. Overall Progress Overview */}
+                    <TotalProgressRingChart />
 
-                {/* 2. Key Stats Cards - Quick overview metrics */}
-                <ReadingStatsCards />
+                    {/* 2. Key Stats Cards - Quick overview metrics */}
+                    <ReadingStatsCards />
 
-                {/* 3. Category Selection */}
-                <ReadingListeningToggle 
-                    selectedCategory={selectedCategory}
-                    onCategoryChange={setSelectedCategory}
-                />
+                    {/* 3. Category Selection */}
+                    <ReadingListeningToggle
+                        selectedCategory={selectedCategory}
+                        onCategoryChange={setSelectedCategory}
+                    />
 
-                {/* 4. Daily Progress Tracking - Format Specific */}
-                {selectedCategory === 'reading' && <DailyReadingProgressChart />}
-                {selectedCategory === 'listening' && <DailyListeningProgressChart />}
-                {selectedCategory === 'combined' && <DailyPagesChart />}
+                    {/* 4. Daily Progress Tracking - Format Specific */}
+                    {selectedCategory === 'reading' && <DailyReadingProgressChart />}
+                    {selectedCategory === 'listening' && <DailyListeningProgressChart />}
+                    {selectedCategory === 'combined' && <DailyPagesChart />}
 
-                {/* 5. Activity Patterns */}
-                <WeeklyReadingHeatmap />
+                    {/* 5. Activity Patterns */}
+                    <WeeklyReadingHeatmap />
 
-                {/* 6. Reading Calendar - Daily reading history */}
-                <ReadingCalendar selectedCategory={selectedCategory} dateRange="90d" />
+                    {/* 6. Reading Calendar - Daily reading history */}
+                    <ReadingCalendar selectedCategory={selectedCategory} dateRange="90d" />
 
-                {/* 7. Format Distribution - Reading habits */}
-                <FormatDistributionChart />
+                    {/* 7. Format Distribution - Reading habits */}
+                    <FormatDistributionChart />
 
-                {/* 8. Reading & Listening Pace Analysis */}
-                <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <IconSymbol name="speedometer" size={24} color={iconColor} />
-                        <ThemedText type="semiBold" style={styles.sectionTitle}>
-                            Reading & Listening Pace
-                        </ThemedText>
-                    </View>
-                    
-                    <View style={styles.paceRow}>
-                        {/* Reading Pace */}
-                        <View style={styles.paceColumn}>
-                            <View style={styles.paceHeader}>
-                                <IconSymbol name="book.fill" size={20} color={theme.primary} />
-                                <ThemedText type="semiBold" style={styles.paceColumnTitle}>
-                                    Reading
-                                </ThemedText>
-                            </View>
-                            <ThemedText style={styles.paceValue}>
-                                {paceDisplay}
+                    {/* 8. Reading & Listening Pace Analysis */}
+                    <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <IconSymbol name="speedometer" size={24} color={iconColor} />
+                            <ThemedText type="semiBold" style={styles.sectionTitle}>
+                                Reading & Listening Pace
                             </ThemedText>
-                            <ThemedText color="textMuted" style={styles.paceDescription}>
-                                {paceMethod}
-                            </ThemedText>
-                            <View style={styles.reliabilityContainer}>
-                                <IconSymbol 
-                                    name={userPaceData.isReliable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"} 
-                                    size={14} 
-                                    color={reliabilityColor} 
-                                />
-                                <ThemedText style={[styles.reliabilityTextSmall, { color: reliabilityColor }]}>
-                                    {reliabilityText}
-                                </ThemedText>
-                            </View>
-                            {userPaceData.isReliable && (
-                                <ThemedText color="textMuted" style={styles.dataPointsTextSmall}>
-                                    {userPaceData.readingDaysCount} reading days
-                                </ThemedText>
-                            )}
                         </View>
 
-                        {/* Listening Pace */}
-                        <View style={[styles.paceColumn, styles.paceColumnRight]}>
-                            <View style={styles.paceHeader}>
-                                <IconSymbol name="headphones" size={20} color={theme.accent} />
-                                <ThemedText type="semiBold" style={styles.paceColumnTitle}>
-                                    Listening
+                        <View style={styles.paceRow}>
+                            {/* Reading Pace */}
+                            <View style={styles.paceColumn}>
+                                <View style={styles.paceHeader}>
+                                    <IconSymbol name="book.fill" size={20} color={theme.primary} />
+                                    <ThemedText type="semiBold" style={styles.paceColumnTitle}>
+                                        Reading
+                                    </ThemedText>
+                                </View>
+                                <ThemedText style={styles.paceValue}>
+                                    {paceDisplay}
                                 </ThemedText>
+                                <ThemedText color="textMuted" style={styles.paceDescription}>
+                                    {paceMethod}
+                                </ThemedText>
+                                <View style={styles.reliabilityContainer}>
+                                    <IconSymbol
+                                        name={userPaceData.isReliable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"}
+                                        size={14}
+                                        color={reliabilityColor}
+                                    />
+                                    <ThemedText style={[styles.reliabilityTextSmall, { color: reliabilityColor }]}>
+                                        {reliabilityText}
+                                    </ThemedText>
+                                </View>
+                                {userPaceData.isReliable && (
+                                    <ThemedText color="textMuted" style={styles.dataPointsTextSmall}>
+                                        {userPaceData.readingDaysCount} reading days
+                                    </ThemedText>
+                                )}
                             </View>
-                            <ThemedText style={styles.paceValue}>
-                                {listeningPaceDisplay}
-                            </ThemedText>
-                            <ThemedText color="textMuted" style={styles.paceDescription}>
-                                {listeningPaceMethod}
-                            </ThemedText>
-                            <View style={styles.reliabilityContainer}>
-                                <IconSymbol 
-                                    name={userListeningPaceData.isReliable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"} 
-                                    size={14} 
-                                    color={listeningReliabilityColor} 
-                                />
-                                <ThemedText style={[styles.reliabilityTextSmall, { color: listeningReliabilityColor }]}>
-                                    {listeningReliabilityText}
-                                </ThemedText>
-                            </View>
-                            {userListeningPaceData.isReliable && (
-                                <ThemedText color="textMuted" style={styles.dataPointsTextSmall}>
-                                    {userListeningPaceData.listeningDaysCount} listening days
-                                </ThemedText>
-                            )}
-                        </View>
-                    </View>
-                </ThemedView>
 
-                {/* 10. How Pace is Calculated - Educational info */}
-                <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <IconSymbol name="info.circle.fill" size={24} color={iconColor} />
-                        <ThemedText type="semiBold" style={styles.sectionTitle}>
-                            How Pace is Calculated
-                        </ThemedText>
-                    </View>
-                    
-                    <View style={styles.infoContainer}>
-                        <ThemedText color="textMuted" style={styles.infoText}>
-                            Your reading pace is calculated using a two-tier system:
-                        </ThemedText>
-                        
-                        <View style={styles.infoItem}>
-                            <IconSymbol name="1.circle.fill" size={20} color={successColor} />
-                            <View style={styles.infoTextContainer}>
-                                <ThemedText style={styles.infoItemTitle}>Reliable Calculation</ThemedText>
-                                <ThemedText color="textMuted" style={styles.infoItemText}>
-                                    When you have ≥3 reading days in the last 7 days, we use your actual reading activity.
+                            {/* Listening Pace */}
+                            <View style={[styles.paceColumn, styles.paceColumnRight]}>
+                                <View style={styles.paceHeader}>
+                                    <IconSymbol name="headphones" size={20} color={theme.accent} />
+                                    <ThemedText type="semiBold" style={styles.paceColumnTitle}>
+                                        Listening
+                                    </ThemedText>
+                                </View>
+                                <ThemedText style={styles.paceValue}>
+                                    {listeningPaceDisplay}
                                 </ThemedText>
+                                <ThemedText color="textMuted" style={styles.paceDescription}>
+                                    {listeningPaceMethod}
+                                </ThemedText>
+                                <View style={styles.reliabilityContainer}>
+                                    <IconSymbol
+                                        name={userListeningPaceData.isReliable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"}
+                                        size={14}
+                                        color={listeningReliabilityColor}
+                                    />
+                                    <ThemedText style={[styles.reliabilityTextSmall, { color: listeningReliabilityColor }]}>
+                                        {listeningReliabilityText}
+                                    </ThemedText>
+                                </View>
+                                {userListeningPaceData.isReliable && (
+                                    <ThemedText color="textMuted" style={styles.dataPointsTextSmall}>
+                                        {userListeningPaceData.listeningDaysCount} listening days
+                                    </ThemedText>
+                                )}
                             </View>
                         </View>
-                        
-                        <View style={styles.infoItem}>
-                            <IconSymbol name="2.circle.fill" size={20} color={warningColor} />
-                            <View style={styles.infoTextContainer}>
-                                <ThemedText style={styles.infoItemTitle}>Default Estimate</ThemedText>
-                                <ThemedText color="textMuted" style={styles.infoItemText}>
-                                    When insufficient data is available, we use a default estimate of 25 pages/day.
-                                </ThemedText>
-                            </View>
+                    </ThemedView>
+
+                    {/* 10. How Pace is Calculated - Educational info */}
+                    <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <IconSymbol name="info.circle.fill" size={24} color={iconColor} />
+                            <ThemedText type="semiBold" style={styles.sectionTitle}>
+                                How Pace is Calculated
+                            </ThemedText>
                         </View>
-                        
-                        <ThemedText color="textMuted" style={styles.infoNote}>
-                            Reading pace is based only on physical books and ebooks (measured in pages). Audiobook listening pace is tracked separately.
-                        </ThemedText>
-                    </View>
-                </ThemedView>
-            </ThemedScrollView>
-        </ThemedView>
+
+                        <View style={styles.infoContainer}>
+                            <ThemedText color="textMuted" style={styles.infoText}>
+                                Your reading pace is calculated using a two-tier system:
+                            </ThemedText>
+
+                            <View style={styles.infoItem}>
+                                <IconSymbol name="1.circle.fill" size={20} color={successColor} />
+                                <View style={styles.infoTextContainer}>
+                                    <ThemedText style={styles.infoItemTitle}>Reliable Calculation</ThemedText>
+                                    <ThemedText color="textMuted" style={styles.infoItemText}>
+                                        When you have ≥3 reading days in the last 7 days, we use your actual reading activity.
+                                    </ThemedText>
+                                </View>
+                            </View>
+
+                            <View style={styles.infoItem}>
+                                <IconSymbol name="2.circle.fill" size={20} color={warningColor} />
+                                <View style={styles.infoTextContainer}>
+                                    <ThemedText style={styles.infoItemTitle}>Default Estimate</ThemedText>
+                                    <ThemedText color="textMuted" style={styles.infoItemText}>
+                                        When insufficient data is available, we use a default estimate of 25 pages/day.
+                                    </ThemedText>
+                                </View>
+                            </View>
+
+                            <ThemedText color="textMuted" style={styles.infoNote}>
+                                Reading pace is based only on physical books and ebooks (measured in pages). Audiobook listening pace is tracked separately.
+                            </ThemedText>
+                        </View>
+                    </ThemedView>
+                </ThemedScrollView>
+            </ThemedView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingTop: 60,
-        paddingBottom: 15,
-        borderBottomWidth: 1,
-    },
-    backButton: {
-        marginRight: 8,
-    },
-    headerTitle: {
-        fontSize: 18,
-        flex: 1,
-        textAlign: 'center',
-    },
-    headerSpacer: {
-        width: 40,
     },
     content: {
         flex: 1,

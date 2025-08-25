@@ -1,4 +1,5 @@
 import { SignOutButton } from '@/components/auth/SignOutButton';
+import AppHeader from '@/components/shared/AppHeader';
 import { UserAvatar } from '@/components/shared/UserAvatar';
 import { ThemedScrollView, ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -6,7 +7,8 @@ import { useTheme } from '@/theme';
 import { useUser } from '@clerk/clerk-expo';
 import { router } from 'expo-router';
 import React from 'react';
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
     const { user } = useUser();
@@ -23,138 +25,109 @@ export default function SettingsScreen() {
         router.push('/stats');
     };
 
-    const handleAchievementsPress = () => {
-        router.push('/achievements');
-    };
 
     const handleThemePress = () => {
         router.push('/theme');
     };
 
     return (
-        <ThemedView backgroundColor="background" style={styles.container}>
-            {/* Header */}
-            <View style={[styles.header, { borderBottomColor: borderColor }]}>
-                <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-                    <IconSymbol name="chevron.left" size={Platform.OS === 'ios' ? 24 : 40} color={iconColor} />
-                </TouchableOpacity>
-                <ThemedText type="semiBold" style={styles.headerTitle}>
-                    Settings
-                </ThemedText>
-                <View style={styles.headerSpacer} />
-            </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+            <ThemedView backgroundColor="background" style={styles.container}>
+                <AppHeader title="Settings" onBack={handleBackPress} />
 
-            <ThemedScrollView backgroundColor="background" style={styles.content}>
-                {/* User Profile Section */}
-                <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
-                    <View style={styles.profileHeader}>
-                        <UserAvatar size={80} />
-                        <View style={styles.profileInfo}>
-                            <ThemedText type="semiBold" style={styles.userName}>
-                                {user?.fullName || user?.firstName || 'User'}
-                            </ThemedText>
-                            <ThemedText color="textMuted" style={styles.userEmail}>
-                                {user?.primaryEmailAddress?.emailAddress}
-                            </ThemedText>
-                        </View>
-                    </View>
-                </ThemedView>
-
-                {/* Settings Options */}
-                <View style={styles.settingsSection}>
+                <ThemedScrollView backgroundColor="background" style={styles.content}>
+                    {/* User Profile Section */}
                     <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
-                        <TouchableOpacity style={styles.settingItem}>
-                            <View style={styles.settingLeft}>
-                                <IconSymbol name="person.fill" size={20} color={iconColor} />
-                                <ThemedText style={styles.settingText}>Edit Profile</ThemedText>
+                        <View style={styles.profileHeader}>
+                            <UserAvatar size={80} />
+                            <View style={styles.profileInfo}>
+                                <ThemedText type="semiBold" style={styles.userName}>
+                                    {user?.fullName || user?.firstName || 'User'}
+                                </ThemedText>
+                                <ThemedText color="textMuted" style={styles.userEmail}>
+                                    {user?.primaryEmailAddress?.emailAddress}
+                                </ThemedText>
                             </View>
-                            <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
-                        </TouchableOpacity>
+                        </View>
+                    </ThemedView>
 
-                        <View style={[styles.divider, { backgroundColor: borderColor }]} />
+                    {/* Settings Options */}
+                    <View style={styles.settingsSection}>
+                        <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
+                            <TouchableOpacity style={styles.settingItem}>
+                                <View style={styles.settingLeft}>
+                                    <IconSymbol name="person.fill" size={20} color={iconColor} />
+                                    <ThemedText style={styles.settingText}>Edit Profile</ThemedText>
+                                </View>
+                                <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
+                            </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.settingItem} onPress={handleStatsPress}>
-                            <View style={styles.settingLeft}>
-                                <IconSymbol name="chart.bar.fill" size={20} color={iconColor} />
-                                <ThemedText style={styles.settingText}>Reading Stats</ThemedText>
-                            </View>
-                            <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
-                        </TouchableOpacity>
+                            <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
-                        <View style={[styles.divider, { backgroundColor: borderColor }]} />
+                            <TouchableOpacity style={styles.settingItem} onPress={handleStatsPress}>
+                                <View style={styles.settingLeft}>
+                                    <IconSymbol name="chart.bar.fill" size={20} color={iconColor} />
+                                    <ThemedText style={styles.settingText}>Reading Stats</ThemedText>
+                                </View>
+                                <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
+                            </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.settingItem} onPress={handleAchievementsPress}>
+                            <View style={[styles.divider, { backgroundColor: borderColor }]} />
+                            {/* TODO: Fix achievements page */}
+                            {/* <TouchableOpacity style={styles.settingItem} onPress={handleAchievementsPress}>
                             <View style={styles.settingLeft}>
                                 <IconSymbol name="trophy.fill" size={20} color={iconColor} />
                                 <ThemedText style={styles.settingText}>Achievements</ThemedText>
                             </View>
                             <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
-                        <View style={[styles.divider, { backgroundColor: borderColor }]} />
+                            <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
-                        <TouchableOpacity style={styles.settingItem} onPress={() => router.push('/archive')}>
-                            <View style={styles.settingLeft}>
-                                <IconSymbol name="checkmark.circle.fill" size={20} color={iconColor} />
-                                <ThemedText style={styles.settingText}>Archives</ThemedText>
-                            </View>
-                            <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
-                        </TouchableOpacity>
+                            <TouchableOpacity style={styles.settingItem} onPress={() => router.push('/archive')}>
+                                <View style={styles.settingLeft}>
+                                    <IconSymbol name="checkmark.circle.fill" size={20} color={iconColor} />
+                                    <ThemedText style={styles.settingText}>Archives</ThemedText>
+                                </View>
+                                <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
+                            </TouchableOpacity>
 
-                        <View style={[styles.divider, { backgroundColor: borderColor }]} />
+                            <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
-                        <TouchableOpacity style={styles.settingItem}>
-                            <View style={styles.settingLeft}>
-                                <IconSymbol name="bell.fill" size={20} color={iconColor} />
-                                <ThemedText style={styles.settingText}>Notifications</ThemedText>
-                            </View>
-                            <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
-                        </TouchableOpacity>
+                            <TouchableOpacity style={styles.settingItem}>
+                                <View style={styles.settingLeft}>
+                                    <IconSymbol name="bell.fill" size={20} color={iconColor} />
+                                    <ThemedText style={styles.settingText}>Notifications</ThemedText>
+                                </View>
+                                <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
+                            </TouchableOpacity>
 
-                        <View style={[styles.divider, { backgroundColor: borderColor }]} />
+                            <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
-                        <TouchableOpacity style={styles.settingItem} onPress={handleThemePress}>
-                            <View style={styles.settingLeft}>
-                                <IconSymbol name="moon.fill" size={20} color={iconColor} />
-                                <ThemedText style={styles.settingText}>Appearance</ThemedText>
-                            </View>
-                            <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
-                        </TouchableOpacity>
-                    </ThemedView>
-                </View>
-                {/* Sign Out Section */}
-                <View style={styles.signOutSection}>
-                    <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
-                        <SignOutButton />
-                    </ThemedView>
-                </View>
-            </ThemedScrollView>
-        </ThemedView>
+                            <TouchableOpacity style={styles.settingItem} onPress={handleThemePress}>
+                                <View style={styles.settingLeft}>
+                                    <IconSymbol name="moon.fill" size={20} color={iconColor} />
+                                    <ThemedText style={styles.settingText}>Appearance</ThemedText>
+                                </View>
+                                <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
+                            </TouchableOpacity>
+                        </ThemedView>
+                    </View>
+                    {/* Sign Out Section */}
+                    <View style={styles.signOutSection}>
+                        <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
+                            <SignOutButton />
+                        </ThemedView>
+                    </View>
+                </ThemedScrollView>
+            </ThemedView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingTop: 60,
-        paddingBottom: 15,
-        borderBottomWidth: 1,
-    },
-    backButton: {
-        marginRight: 8,
-    },
-    headerTitle: {
-        fontSize: 18,
-        flex: 1,
-        textAlign: 'center',
-    },
-    headerSpacer: {
-        width: 40,
     },
     content: {
         flex: 1,
