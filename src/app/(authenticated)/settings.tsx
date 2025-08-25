@@ -30,6 +30,10 @@ export default function SettingsScreen() {
         router.push('/theme');
     };
 
+    const handleEditProfilePress = () => {
+        router.push('/profile/edit');
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
             <ThemedView backgroundColor="background" style={styles.container}>
@@ -54,7 +58,7 @@ export default function SettingsScreen() {
                     {/* Settings Options */}
                     <View style={styles.settingsSection}>
                         <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
-                            <TouchableOpacity style={styles.settingItem}>
+                            <TouchableOpacity style={styles.settingItem} onPress={handleEditProfilePress}>
                                 <View style={styles.settingLeft}>
                                     <IconSymbol name="person.fill" size={20} color={iconColor} />
                                     <ThemedText style={styles.settingText}>Edit Profile</ThemedText>
@@ -72,7 +76,7 @@ export default function SettingsScreen() {
                                 <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
                             </TouchableOpacity>
 
-                            <View style={[styles.divider, { backgroundColor: borderColor }]} />
+                            {/* <View style={[styles.divider, { backgroundColor: borderColor }]} /> */}
                             {/* TODO: Fix achievements page */}
                             {/* <TouchableOpacity style={styles.settingItem} onPress={handleAchievementsPress}>
                             <View style={styles.settingLeft}>

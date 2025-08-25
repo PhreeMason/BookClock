@@ -26,6 +26,7 @@ export default function ProtectedLayout() {
         <Stack.Screen name='stats' options={{ headerShown: false }} />
         <Stack.Screen name='archive' options={{ headerShown: false }} />
         <Stack.Screen name='theme' options={{ headerShown: false }} />
+        <Stack.Screen name='profile/edit' options={{ headerShown: false }} />
       </Stack>
     </DeadlineProvider>
   );
