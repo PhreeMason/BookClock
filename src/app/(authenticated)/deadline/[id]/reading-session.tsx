@@ -96,7 +96,7 @@ const ReadingSession = () => {
   const getFormatMessage = () => {
     switch (deadline.format) {
       case 'physical':
-        return 'Time to dive into your book! 📖';
+        return 'Time to dive into your book! 📖'; // TODO: change this messaging
       case 'audio':
         return 'Ready to listen? Put on your headphones! 🎧';
       case 'ebook':
