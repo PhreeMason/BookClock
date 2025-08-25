@@ -33,6 +33,7 @@ jest.mock('@/components/themed', () => ({
   ThemedButton: require('../__mocks__/theme').MockThemedButton,
   ThemedScrollView: require('../__mocks__/theme').MockThemedScrollView,
   ThemedKeyboardAvoidingView: require('../__mocks__/theme').MockThemedView,
+  ThemedKeyboardAwareScrollView: require('../__mocks__/theme').MockThemedScrollView,
 }));
 
 // Legacy mocks removed since those files no longer exist
