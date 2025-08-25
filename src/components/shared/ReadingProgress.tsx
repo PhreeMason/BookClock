@@ -5,20 +5,24 @@ import ProgressStats from '@/components/progress/ProgressStats'
 import QuickActionButtons from '@/components/progress/QuickActionButtons'
 import { ThemedButton, ThemedView } from '@/components/themed'
 import { useDeadlines } from '@/contexts/DeadlineProvider'
-import { useUpdateDeadlineProgress } from '@/hooks/useDeadlines'
+import { useDeleteFutureProgress, useUpdateDeadlineProgress } from '@/hooks/useDeadlines'
 import { formatProgressDisplay } from '@/lib/deadlineUtils'
 import { createProgressUpdateSchema } from '@/lib/progressUpdateSchema'
 import { useTheme } from '@/theme'
 import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { StyleSheet, View } from 'react-native'
+import { Alert, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 const ReadingProgress = ({
-    deadline
+    deadline,
+    timeSpentReading,
+    onProgressSubmitted
 }: {
     deadline: ReadingDeadlineWithProgress;
+    timeSpentReading?: number;
+    onProgressSubmitted?: () => void;
 }) => {
     const {theme} = useTheme();
     const { getDeadlineCalculations } = useDeadlines();
@@ -33,6 +37,7 @@ const ReadingProgress = ({
 
     const progressSchema = createProgressUpdateSchema(totalQuantity, deadline.format);
     const updateProgressMutation = useUpdateDeadlineProgress();
+    const deleteFutureProgressMutation = useDeleteFutureProgress();
     const borderColor = theme.border;
     
     const {
@@ -48,17 +53,19 @@ const ReadingProgress = ({
         mode: 'onSubmit',
     });
 
-    const onSubmitProgress = (data: any) => {
+    const handleProgressUpdate = (newProgress: number) => {
         updateProgressMutation.mutate({
             deadlineId: deadline.id,
-            currentProgress: data.currentProgress,
+            currentProgress: newProgress,
+            ...(timeSpentReading !== undefined && { timeSpentReading }),
         }, {
             onSuccess: () => {
                 Toast.show({
                     type: 'success',
                     text1: 'Progress Updated!',
-                    text2: `Updated to ${formatProgressDisplay(deadline.format, data.currentProgress)}`,
+                    text2: `Updated to ${formatProgressDisplay(deadline.format, newProgress)}`,
                 });
+                onProgressSubmitted?.();
             },
             onError: (error) => {
                 Toast.show({
@@ -69,6 +76,54 @@ const ReadingProgress = ({
                 console.error('Progress update error:', error);
             }
         });
+    };
+
+    const onSubmitProgress = (data: any) => {
+        const newProgress = data.currentProgress;
+        
+        // Check if the new progress is lower than current progress
+        if (newProgress < currentProgress) {
+            const progressUnit = deadline.format === 'audio' ? 'time' : 'page';
+            const currentDisplay = formatProgressDisplay(deadline.format, currentProgress);
+            const newDisplay = formatProgressDisplay(deadline.format, newProgress);
+            
+            Alert.alert(
+                'Backward Progress Warning',
+                `You're updating from ${currentDisplay} to ${newDisplay}. This will delete all progress entries greater than the new ${progressUnit}. Are you sure?`,
+                [
+                    {
+                        text: 'Cancel',
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'Update',
+                        style: 'destructive',
+                        onPress: () => {
+                            // First delete future progress, then update
+                            deleteFutureProgressMutation.mutate(
+                                { deadlineId: deadline.id, newProgress },
+                                {
+                                    onSuccess: () => {
+                                        handleProgressUpdate(newProgress);
+                                    },
+                                    onError: (error) => {
+                                        Toast.show({
+                                            type: 'error',
+                                            text1: 'Failed to Delete Future Progress',
+                                            text2: 'Please try again',
+                                        });
+                                        console.error('Delete future progress error:', error);
+                                    }
+                                }
+                            );
+                        },
+                    },
+                ]
+            );
+        } else {
+            // Normal forward progress update
+            handleProgressUpdate(newProgress);
+        }
     };
 
     const handleQuickUpdate = (increment: number) => {
@@ -87,7 +142,33 @@ const ReadingProgress = ({
         }
         
         const newProgress = Math.max(0, Math.min(totalQuantity, numericValue + increment));
-        setValue('currentProgress', newProgress, { shouldValidate: false });
+        
+        // Check if the new progress would be lower than current progress
+        if (newProgress < currentProgress) {
+            const progressUnit = deadline.format === 'audio' ? 'time' : 'page';
+            const currentDisplay = formatProgressDisplay(deadline.format, currentProgress);
+            const newDisplay = formatProgressDisplay(deadline.format, newProgress);
+            
+            Alert.alert(
+                'Backward Progress Warning',
+                `You're updating from ${currentDisplay} to ${newDisplay}. This will delete all progress entries beyond the new ${progressUnit}. Are you sure?`,
+                [
+                    {
+                        text: 'Cancel',
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'Update',
+                        style: 'destructive',
+                        onPress: () => {
+                            setValue('currentProgress', newProgress, { shouldValidate: false });
+                        },
+                    },
+                ]
+            );
+        } else {
+            setValue('currentProgress', newProgress, { shouldValidate: false });
+        }
     };
 
     return (

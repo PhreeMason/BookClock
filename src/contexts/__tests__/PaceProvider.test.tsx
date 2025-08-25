@@ -29,7 +29,8 @@ const createMockDeadline = (
     reading_deadline_id: id,
     current_progress: p.current_progress,
     created_at: p.created_at,
-    updated_at: p.updated_at || p.created_at
+    updated_at: p.updated_at || p.created_at,
+    time_spent_reading: null
   }))
 });
 

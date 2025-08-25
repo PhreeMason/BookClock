@@ -297,7 +297,11 @@ export const useUpdateDeadlineProgress = () => {
 
     return useMutation({
         mutationKey: ['updateDeadlineProgress'],
-        mutationFn: async (progressDetails: { deadlineId: string; currentProgress: number }) => {
+        mutationFn: async (progressDetails: { 
+            deadlineId: string; 
+            currentProgress: number; 
+            timeSpentReading?: number; 
+        }) => {
             if (!userId) {
                 throw new Error("User not authenticated");
             }
@@ -316,6 +320,7 @@ export const useUpdateDeadlineProgress = () => {
                     id: finalProgressId,
                     reading_deadline_id: progressDetails.deadlineId,
                     current_progress: progressDetails.currentProgress,
+                    time_spent_reading: progressDetails.timeSpentReading || null,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 })
@@ -518,5 +523,41 @@ export const useGetDeadlineById = (deadlineId: string | undefined) => {
         enabled: !!userId && !!deadlineId,
         refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 5, // 5 minutes
+    })
+}
+
+export const useDeleteFutureProgress = () => {
+    const supabase = useSupabase();
+    const user = useUser();
+    const userId = user?.user?.id;
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationKey: ['deleteFutureProgress'],
+        mutationFn: async ({ deadlineId, newProgress }: { deadlineId: string; newProgress: number }) => {
+            if (!userId) {
+                throw new Error("User not authenticated");
+            }
+            
+            // Delete all progress entries greater than the new progress value
+            const { error } = await supabase
+                .from('reading_deadline_progress')
+                .delete()
+                .eq('reading_deadline_id', deadlineId)
+                .gt('current_progress', newProgress);
+
+            if (error) {
+                console.error('Error deleting future progress:', error);
+                throw new Error(error.message);
+            }
+            
+            return { deadlineId, newProgress };
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['deadlines', userId] });
+        },
+        onError: (error) => {
+            console.error("Error deleting future progress:", error);
+        },
     })
 }

@@ -33,6 +33,10 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
   const isCompleted = latestStatus === 'complete';
   const isSetAside = latestStatus === 'set_aside';
   const isActive = latestStatus === 'reading';
+
+  const handleStartReadingSession = () => {
+    router.push(`/deadline/${deadline.id}/reading-session`);
+  };
   const handleComplete = () => {
     if (onComplete) {
       onComplete();
@@ -217,9 +221,15 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
 
   return (
     <ThemedView style={styles.actionButtons}>
-      {/* For active deadlines - show complete and set aside */}
+      {/* For active deadlines - show start reading session, complete and set aside */}
       {isActive && (
         <>
+          <ThemedButton
+            title="▶️ Start Reading Session"
+            variant="primary"
+            style={styles.startReadingBtn}
+            onPress={handleStartReadingSession}
+          />
           <ThemedButton
             title={isCompleting ? "Completing..." : "✓ Mark as Complete"}
             variant="success"
@@ -285,6 +295,9 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 24,
     paddingBottom: 32,
+  },
+  startReadingBtn: {
+    marginBottom: 8,
   },
   completeBtn: {
     marginBottom: 8,
