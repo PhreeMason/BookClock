@@ -97,7 +97,7 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
           </ThemedText>
         </View>
 
-        {/* Type and Format Badges - Top Right */}
+        {/* Format Badge - Top Right */}
         <View style={styles.badgesContainer}>
           <View style={styles.formatBadge}>
             <ThemedText style={styles.formatBadgeText}>{formatEmojiMap[deadline.format]}</ThemedText>
