@@ -523,6 +523,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          onboarding_complete: boolean
           updated_at: string | null
           username: string | null
           website: string | null
@@ -533,6 +534,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          onboarding_complete?: boolean
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -543,6 +545,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          onboarding_complete?: boolean
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -555,6 +558,7 @@ export type Database = {
           current_progress: number
           id: string
           reading_deadline_id: string
+          time_spent_reading: number | null
           updated_at: string
         }
         Insert: {
@@ -562,6 +566,7 @@ export type Database = {
           current_progress: number
           id: string
           reading_deadline_id: string
+          time_spent_reading?: number | null
           updated_at?: string
         }
         Update: {
@@ -569,6 +574,7 @@ export type Database = {
           current_progress?: number
           id?: string
           reading_deadline_id?: string
+          time_spent_reading?: number | null
           updated_at?: string
         }
         Relationships: [

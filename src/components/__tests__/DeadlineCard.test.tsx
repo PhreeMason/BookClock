@@ -60,15 +60,15 @@ const createMockProgress = (currentProgress: number) => ({
 });
 
 describe('DeadlineCard', () => {
-  const mockFormatUnitsPerDay = jest.fn();
   const mockGetDeadlineCalculations = jest.fn();
+  const mockFormatUnitsPerDay = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseDeadlines.mockReturnValue({
       deadlines: [],
-      activebooks: [],
-      overduebooks: [],
+      activeDeadlines: [],
+      overdueDeadlines: [],
       completedDeadlines: [],
       isLoading: false,
       error: null,
@@ -77,29 +77,35 @@ describe('DeadlineCard', () => {
       deleteDeadline: jest.fn(),
       completeDeadline: jest.fn(),
       setAsideDeadline: jest.fn(),
-      getDeadlineCalculations: jest.fn(() => ({
-        currentProgress: 50,
-        totalQuantity: 100,
-        remaining: 50,
-        progressPercentage: 50,
-        daysLeft: 10,
-        unitsPerDay: 5,
-        urgencyLevel: 'good' as const,
-        urgencyColor: '#22c55e',
-        statusMessage: 'On track',
-        readingEstimate: '10 days',
-        paceEstimate: '5 pages/day',
-        unit: 'pages',
-        userPace: 5,
-        requiredPace: 5,
-        paceStatus: 'green' as const,
-        paceMessage: 'Good pace'
-      })),
-      formatUnitsPerDay: jest.fn(),
+      reactivateDeadline: jest.fn(),
+      getDeadlineCalculations: mockGetDeadlineCalculations,
+      formatUnitsPerDay: mockFormatUnitsPerDay,
       getTotalReadingTimePerDay: jest.fn(),
       activeCount: 0,
       overdueCount: 0,
     } as any);
+    
+    // Set default mock return values
+    mockGetDeadlineCalculations.mockReturnValue({
+      currentProgress: 50,
+      totalQuantity: 100,
+      remaining: 50,
+      progressPercentage: 50,
+      daysLeft: 10,
+      unitsPerDay: 5,
+      urgencyLevel: 'good' as const,
+      urgencyColor: '#10b981',
+      statusMessage: 'On track',
+      readingEstimate: '10 days',
+      paceEstimate: '5 pages/day',
+      unit: 'pages',
+      userPace: 5,
+      requiredPace: 5,
+      paceStatus: 'green' as const,
+      paceMessage: 'Good pace'
+    });
+    
+    mockFormatUnitsPerDay.mockReturnValue('5 pages/day needed');
   });
 
   describe('Rendering', () => {
@@ -118,7 +124,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 60 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 20,
+        requiredPace: 60,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('60 pages/day needed');
@@ -147,10 +157,22 @@ describe('DeadlineCard', () => {
 
       mockUseDeadlines.mockReturnValue({
         getDeadlineCalculations: jest.fn().mockReturnValue({
+          currentProgress: 0,
+          totalQuantity: 300,
+          remaining: 300,
+          progressPercentage: 0,
           daysLeft: 5,
           unitsPerDay: 60,
           urgencyLevel: 'good' as const,
-          statusMessage: 'On track'
+          urgencyColor: '#4ADE80',
+          statusMessage: 'On track',
+          readingEstimate: '📖 About 8 hours of reading time',
+          paceEstimate: '📅 You\'ll need to read 60 pages/day to finish on time',
+          unit: 'pages',
+          userPace: 60,
+          requiredPace: 60,
+          paceStatus: 'green' as const,
+          paceMessage: 'On track'
         }),
         formatUnitsPerDay: jest.fn().mockReturnValue('60 pages/day needed')
       } as any);
@@ -177,7 +199,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 60 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 20,
+        requiredPace: 60,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('60 pages/day needed');
@@ -203,7 +229,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 60 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 20,
+        requiredPace: 60,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('60 pages/day needed');
@@ -228,7 +258,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 60 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 20,
+        requiredPace: 60,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('60 pages/day needed');
@@ -253,7 +287,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '🎧 About 5 hours of listening time',
         paceEstimate: '📅 You\'ll need to listen 1 hour/day to finish on time',
-        unit: 'minutes'
+        unit: 'minutes',
+        userPace: 30,
+        requiredPace: 60,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('1h 0m/day needed');
@@ -278,7 +316,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '📱 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 60 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 20,
+        requiredPace: 60,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('60 pages/day needed');
@@ -305,7 +347,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Return or renew',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '⚠️ This deadline has already passed',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 0,
+        requiredPace: 60,
+        paceStatus: 'red' as const,
+        paceMessage: 'Return or renew'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('60 pages/day needed');
@@ -332,7 +378,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 100 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 30,
+        requiredPace: 100,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('100 pages/day needed');
@@ -357,7 +407,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'A bit more daily',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 30 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 25,
+        requiredPace: 30,
+        paceStatus: 'orange' as const,
+        paceMessage: 'A bit more daily'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('30 pages/day needed');
@@ -382,7 +436,11 @@ describe('DeadlineCard', () => {
         statusMessage: "You're doing great",
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 15 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 20,
+        requiredPace: 15,
+        paceStatus: 'green' as const,
+        paceMessage: "You're doing great"
       });
 
       mockFormatUnitsPerDay.mockReturnValue('15 pages/day needed');
@@ -409,7 +467,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Return or renew',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '⚠️ This deadline has already passed',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 0,
+        requiredPace: 300,
+        paceStatus: 'red' as const,
+        paceMessage: 'Return or renew'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('300 pages/day needed');
@@ -435,7 +497,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Return or renew',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '⚠️ This deadline has already passed',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 0,
+        requiredPace: 300,
+        paceStatus: 'red' as const,
+        paceMessage: 'Return or renew'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('300 pages/day needed');
@@ -462,7 +528,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '📖 About 4 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 30 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 20,
+        requiredPace: 30,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('30 pages/day needed');
@@ -489,7 +559,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 60 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 20,
+        requiredPace: 60,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('60 pages/day needed');
@@ -514,7 +588,11 @@ describe('DeadlineCard', () => {
         statusMessage: 'Tough timeline',
         readingEstimate: '📖 About 8 hours of reading time',
         paceEstimate: '📅 You\'ll need to read 60 pages/day to finish on time',
-        unit: 'pages'
+        unit: 'pages',
+        userPace: 20,
+        requiredPace: 60,
+        paceStatus: 'red' as const,
+        paceMessage: 'Tough timeline'
       });
 
       mockFormatUnitsPerDay.mockReturnValue('60 pages/day needed');

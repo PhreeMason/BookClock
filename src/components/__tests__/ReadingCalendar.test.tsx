@@ -7,7 +7,9 @@ import React from 'react';
 import ReadingCalendar from '../features/calendar/ReadingCalendar';
 
 // Mock dependencies
-jest.mock('@/hooks/useReadingHistory');
+jest.mock('@/hooks/useReadingHistory', () => ({
+  useDeadlineHistory: jest.fn(),
+}));
 jest.mock('@/theme');
 jest.mock('react-native-calendars', () => {
   const React = require('react');
@@ -98,9 +100,7 @@ describe('ReadingCalendar', () => {
     ],
     summary: {
       totalDays: 2,
-      totalProgressMade: 60,
-      averageProgressPerDay: 30,
-      activeDeadlines: 2,
+      totalDeadlines: 2,
       ArchivedDeadlines: 0,
     },
   };
@@ -147,15 +147,15 @@ describe('ReadingCalendar', () => {
   );
 
   it('should render successfully with deadline data', () => {
-    const { getByText } = render(
+    const { getByText, getAllByText } = render(
       <ReadingCalendar selectedCategory="all" />,
       { wrapper }
     );
 
     expect(getByText('Deadline Progress Calendar')).toBeTruthy();
-    expect(getByText('Reading Deadlines')).toBeTruthy();
-    expect(getByText('Audio Deadlines')).toBeTruthy();
-    expect(getByText('Mixed Deadlines')).toBeTruthy();
+    expect(getAllByText('Reading').length).toBeGreaterThan(0);
+    expect(getByText('Audio')).toBeTruthy();
+    expect(getByText('Mixed')).toBeTruthy();
   });
 
   it('should display summary statistics correctly', () => {
@@ -166,12 +166,10 @@ describe('ReadingCalendar', () => {
 
     // Check that labels exist
     expect(getByText('Active Days')).toBeTruthy();
-    expect(getByText('Progress Made')).toBeTruthy();
-    expect(getByText('Active Deadlines')).toBeTruthy();
+    expect(getByText('Total Deadlines')).toBeTruthy();
     
     // Check that values exist (using getAllByText since numbers might appear multiple times)
-    expect(getAllByText('2').length).toBeGreaterThan(0); // Active Days and Active Deadlines
-    expect(getAllByText('60').length).toBeGreaterThan(0); // Progress Made
+    expect(getAllByText('2').length).toBeGreaterThan(0); // Active Days and Total Deadlines
   });
 
   it('should handle loading state', () => {
@@ -258,14 +256,14 @@ describe('ReadingCalendar', () => {
   });
 
   it('should display correct legend text', () => {
-    const { getByText } = render(
+    const { getByText, getAllByText } = render(
       <ReadingCalendar selectedCategory="all" />,
       { wrapper }
     );
 
-    expect(getByText('Reading Deadlines')).toBeTruthy();
-    expect(getByText('Audio Deadlines')).toBeTruthy();
-    expect(getByText('Mixed Deadlines')).toBeTruthy();
+    expect(getAllByText('Reading').length).toBeGreaterThan(0);
+    expect(getByText('Audio')).toBeTruthy();
+    expect(getByText('Mixed')).toBeTruthy();
   });
 
   it('should show correct date range text in summary', () => {
@@ -283,9 +281,7 @@ describe('ReadingCalendar', () => {
         entries: [],
         summary: {
           totalDays: 0,
-          totalProgressMade: 0,
-          averageProgressPerDay: 0,
-          activeDeadlines: 0,
+          totalDeadlines: 0,
           ArchivedDeadlines: 0,
         },
       },
@@ -303,8 +299,7 @@ describe('ReadingCalendar', () => {
 
     // Check that labels exist
     expect(getByText('Active Days')).toBeTruthy();
-    expect(getByText('Progress Made')).toBeTruthy();
-    expect(getByText('Active Deadlines')).toBeTruthy();
+    expect(getByText('Total Deadlines')).toBeTruthy();
     
     // Check that zero values are displayed (using getAllByText since "0" might appear multiple times)
     expect(getAllByText('0').length).toBeGreaterThan(0); // Should show 0 for all metrics

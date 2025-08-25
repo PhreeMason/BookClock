@@ -11,6 +11,14 @@ import { mockUseUser } from '@/__mocks__/externalLibraries';
 import '@/__mocks__/reactNativeComponents'; // This includes Calendar mock
 import { mockUseSupabase } from '@/__mocks__/supabase';
 
+// Mock the useDeadlineHistory hook
+jest.mock('@/hooks/useReadingHistory', () => ({
+  useDeadlineHistory: jest.fn(),
+}));
+
+import { useDeadlineHistory } from '@/hooks/useReadingHistory';
+const mockUseDeadlineHistory = useDeadlineHistory as jest.MockedFunction<typeof useDeadlineHistory>;
+
 describe('Deadline Calendar Integration', () => {
     let queryClient: QueryClient;
 
@@ -80,6 +88,23 @@ describe('Deadline Calendar Integration', () => {
             data: mockDeadlineData,
             error: null,
         });
+
+        // Mock useDeadlineHistory with proper data structure
+        mockUseDeadlineHistory.mockReturnValue({
+            data: {
+                entries: [],
+                summary: {
+                    totalDays: 2,
+                    totalDeadlines: 2,
+                    ArchivedDeadlines: 0,
+                },
+            },
+            isLoading: false,
+            isError: false,
+            error: null,
+            calendarData: {},
+            isSuccess: true,
+        } as any);
 
         jest.clearAllMocks();
     });
