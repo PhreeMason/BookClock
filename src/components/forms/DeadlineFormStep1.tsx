@@ -180,7 +180,8 @@ export const DeadlineFormStep1 = ({
                     options={[
                         { label: 'ARC', value: 'arc' },
                         { label: 'Library', value: 'library' },
-                        { label: 'Personal', value: 'personal' }
+                        { label: 'Personal', value: 'personal' },
+                        { label: 'Book Club', value: 'bookclub' }
                     ]}
                     allowCustom={true}
                     customPlaceholder="Enter custom source"
