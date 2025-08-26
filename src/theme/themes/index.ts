@@ -289,7 +289,7 @@ const blushNavyTheme: SimpleTheme = {
 };
 
 const corporateTheme: SimpleTheme = {
-    text: '#000000',
+    text: '#2C2C2C',
     background: '#ffffff',
     primary: '#14213d',
     secondary: '#e5e5e5',
@@ -314,6 +314,26 @@ const vibrantTheme: SimpleTheme = {
     accent: '#ff006e',
     isDark: false,
 };
+
+const deepPlumTheme: SimpleTheme = {
+    text: '#2C2C2C',
+    background: '#FDFDF0',
+    primary: '#98C9A3',
+    secondary: '#6B5B95',
+    accent: '#FEC8D8',
+    isDark: false,
+};
+
+// Primary Colors:
+// Navy: #2B3D4F (Headers, primary text, authority)
+// Warm Cream: #F5F1EA (Primary background, cards)
+// Soft Rose: #E8B4B8 (Accent, buttons, progress bars)
+
+// Supporting Colors:
+// Light Gray: #F3F4F6 (Disabled states, borders)
+// Charcoal: #374151 (Secondary text)
+// White: #FFFFFF (Cards, overlays)
+
 
 export const themes: Record<ThemeMode, SimpleTheme> = {
     light: lightTheme,
@@ -351,6 +371,7 @@ export const themes: Record<ThemeMode, SimpleTheme> = {
     corporate: corporateTheme,
     engineering: engineeringTheme,
     vibrant: vibrantTheme,
+    deepPlum: deepPlumTheme
 };
 
 export const themeNames: Record<ThemeMode, string> = {
@@ -389,4 +410,5 @@ export const themeNames: Record<ThemeMode, string> = {
     corporate: 'Corporate',
     engineering: 'Engineering',
     vibrant: 'Vibrant',
+    deepPlum: 'Deep Plum'
 };

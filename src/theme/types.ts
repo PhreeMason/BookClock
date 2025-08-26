@@ -78,7 +78,8 @@ export type ThemeMode = 'light' | 'dark' | 'nature' | 'ocean'
 | 'toxic' | 'midnight' | 'cherry' | 'forest' | 'desert' | 'bae' | 'bookish' 
 | 'twilightRead' | 'cozyLibrary' | 'sunsetPage' | 'dreamyRead' | 'neonTokyo' 
 | 'copperPunk' | 'acidDream' | 'velvetRebellion' | 'holographic' | 'biomechanical' 
-| 'plasmaStorm' | 'rustPunk' | 'quantumFlux' | 'viralGreen' | 'blushNavy' | 'corporate' | 'engineering' | 'vibrant';
+| 'plasmaStorm' | 'rustPunk' | 'quantumFlux' | 'viralGreen' | 'blushNavy' | 'corporate' 
+| 'engineering' | 'vibrant'| 'deepPlum';
 
 export interface ThemeContextValue {
   theme: Theme;
