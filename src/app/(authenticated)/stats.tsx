@@ -23,8 +23,6 @@ export default function StatsScreen() {
     const { userPaceData, userListeningPaceData } = usePace();
     const [selectedCategory, setSelectedCategory] = useState<FormatCategory>('combined');
     const iconColor = theme.primary;
-    const successColor = theme.success;
-    const warningColor = theme.warning;
 
     const handleBackPress = () => {
         router.back();
@@ -39,12 +37,6 @@ export default function StatsScreen() {
         ? 'Based on recent reading activity'
         : 'Default estimate';
 
-    const reliabilityText = userPaceData.isReliable
-        ? 'Reliable (≥3 reading days)'
-        : 'Estimate (insufficient data)';
-
-    const reliabilityColor = userPaceData.isReliable ? successColor : warningColor;
-
     // Format listening pace display
     const listeningPaceDisplay = userListeningPaceData.isReliable
         ? formatListeningPaceDisplay(userListeningPaceData.averagePace)
@@ -53,12 +45,6 @@ export default function StatsScreen() {
     const listeningPaceMethod = userListeningPaceData.calculationMethod === 'recent_data'
         ? 'Based on recent listening activity'
         : 'Default estimate';
-
-    const listeningReliabilityText = userListeningPaceData.isReliable
-        ? 'Reliable (≥3 listening days)'
-        : 'Estimate (insufficient data)';
-
-    const listeningReliabilityColor = userListeningPaceData.isReliable ? successColor : warningColor;
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
@@ -116,16 +102,6 @@ export default function StatsScreen() {
                                 <ThemedText color="textMuted" style={styles.paceDescription}>
                                     {paceMethod}
                                 </ThemedText>
-                                <View style={styles.reliabilityContainer}>
-                                    <IconSymbol
-                                        name={userPaceData.isReliable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"}
-                                        size={14}
-                                        color={reliabilityColor}
-                                    />
-                                    <ThemedText style={[styles.reliabilityTextSmall, { color: reliabilityColor }]}>
-                                        {reliabilityText}
-                                    </ThemedText>
-                                </View>
                                 {userPaceData.isReliable && (
                                     <ThemedText color="textMuted" style={styles.dataPointsTextSmall}>
                                         {userPaceData.readingDaysCount} reading days
@@ -147,16 +123,6 @@ export default function StatsScreen() {
                                 <ThemedText color="textMuted" style={styles.paceDescription}>
                                     {listeningPaceMethod}
                                 </ThemedText>
-                                <View style={styles.reliabilityContainer}>
-                                    <IconSymbol
-                                        name={userListeningPaceData.isReliable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"}
-                                        size={14}
-                                        color={listeningReliabilityColor}
-                                    />
-                                    <ThemedText style={[styles.reliabilityTextSmall, { color: listeningReliabilityColor }]}>
-                                        {listeningReliabilityText}
-                                    </ThemedText>
-                                </View>
                                 {userListeningPaceData.isReliable && (
                                     <ThemedText color="textMuted" style={styles.dataPointsTextSmall}>
                                         {userListeningPaceData.listeningDaysCount} listening days
@@ -177,31 +143,11 @@ export default function StatsScreen() {
 
                         <View style={styles.infoContainer}>
                             <ThemedText color="textMuted" style={styles.infoText}>
-                                Your reading pace is calculated using a two-tier system:
+                                Your reading pace is based on the average pages read per day within the last 14 days starting from your most recent logged day.
                             </ThemedText>
-
-                            <View style={styles.infoItem}>
-                                <IconSymbol name="1.circle.fill" size={20} color={successColor} />
-                                <View style={styles.infoTextContainer}>
-                                    <ThemedText style={styles.infoItemTitle}>Reliable Calculation</ThemedText>
-                                    <ThemedText color="textMuted" style={styles.infoItemText}>
-                                        When you have ≥3 reading days in the last 7 days, we use your actual reading activity.
-                                    </ThemedText>
-                                </View>
-                            </View>
-
-                            <View style={styles.infoItem}>
-                                <IconSymbol name="2.circle.fill" size={20} color={warningColor} />
-                                <View style={styles.infoTextContainer}>
-                                    <ThemedText style={styles.infoItemTitle}>Default Estimate</ThemedText>
-                                    <ThemedText color="textMuted" style={styles.infoItemText}>
-                                        When insufficient data is available, we use a default estimate of 25 pages/day.
-                                    </ThemedText>
-                                </View>
-                            </View>
-
-                            <ThemedText color="textMuted" style={styles.infoNote}>
-                                Reading pace is based only on physical books and ebooks (measured in pages). Audiobook listening pace is tracked separately.
+                            {/* example */}
+                            <ThemedText color="textMuted" style={styles.infoText}>
+                                If today is December 25th and the last progress update was December 15th, your pace is calculated based on your average from December 2nd - December 15th.
                             </ThemedText>
                         </View>
                     </ThemedView>
