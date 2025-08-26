@@ -43,7 +43,7 @@ export default function SettingsScreen() {
                     {/* User Profile Section */}
                     <ThemedView backgroundColor="card" borderColor="border" style={styles.section}>
                         <View style={styles.profileHeader}>
-                            <UserAvatar size={80} />
+                            <UserAvatar size={160} />
                             <View style={styles.profileInfo}>
                                 <ThemedText type="semiBold" style={styles.userName}>
                                     {user?.fullName || user?.firstName || 'User'}
@@ -145,12 +145,15 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     profileHeader: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         alignItems: 'center',
+        justifyContent: 'center'
     },
     profileInfo: {
-        marginLeft: 16,
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10
     },
     userName: {
         fontSize: 18,
