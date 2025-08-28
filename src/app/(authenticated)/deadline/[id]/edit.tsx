@@ -172,10 +172,6 @@ const EditDeadline = () => {
             created_at: deadline.created_at,
             updated_at: new Date().toISOString()
         }
-        console.log(JSON.stringify({
-            data
-        }, null, 2));
-        console.log('Updating deadline with details:', JSON.stringify(deadlineDetails, null, 2));
         // Calculate current progress accounting for format
         const finalCurrentProgress = calculateCurrentProgressFromForm(
             selectedFormat,
