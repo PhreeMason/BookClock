@@ -1,6 +1,6 @@
-import React from 'react';
-import { Text, type TextProps, StyleSheet } from 'react-native';
 import { useTheme } from '@/theme';
+import React from 'react';
+import { StyleSheet, Text, type TextProps } from 'react-native';
 
 export type ThemedTextProps = TextProps & {
   color?: string;
@@ -45,6 +45,7 @@ export function ThemedText({
   return (
     <Text
       style={[
+        { fontFamily: 'Nunito-Medium' },
         { color: getTextColor() },
         type === 'default' ? styles.default : undefined,
         type === 'title' ? styles.title : undefined,

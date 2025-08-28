@@ -22,6 +22,16 @@ export default function RootLayout() {
     const [loaded] = useFonts({
         SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
         Inter: require('../assets/fonts/Inter-Regular.ttf'),
+        "CrimsonText-Regular": require('../assets/fonts/CrimsonText-Regular.ttf'),
+        "CrimsonText-Bold": require('../assets/fonts/CrimsonText-Bold.ttf'),
+        "CrimsonText-SemiBold": require('../assets/fonts/CrimsonText-SemiBold.ttf'),
+        "Nunito-Bold": require('../assets/fonts/Nunito-Bold.ttf'),
+        "Nunito-ExtraBold": require('../assets/fonts/Nunito-ExtraBold.ttf'),
+        "Nunito-ExtraLight": require('../assets/fonts/Nunito-ExtraLight.ttf'),
+        "Nunito-Light": require('../assets/fonts/Nunito-Light.ttf'),
+        "Nunito-Medium": require('../assets/fonts/Nunito-Medium.ttf'),
+        "Nunito-Regular": require('../assets/fonts/Nunito-Regular.ttf'),
+        "Nunito-SemiBold": require('../assets/fonts/Nunito-SemiBold.ttf'),
     });
 
     if (!loaded) {
