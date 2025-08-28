@@ -9,6 +9,7 @@
     "web": "expo start --web",
     "lint": "expo lint src",
     "typecheck": "npx tsc --noEmit",
+    "build": "npx eas build --platform android --profile preview",
     "build:local": "npx eas build --platform android --profile preview --local",
     "supabase:genTypes": "npx supabase gen types --lang=typescript --project-id \"azghfvgabktnvdfjtxhl\" --schema public > src/types/supabase.ts",
     "test": "jest --runInBand",
