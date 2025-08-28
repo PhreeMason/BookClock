@@ -1,19 +1,19 @@
 import { ThemedText } from '@/components/themed';
 import { useDeadlines } from '@/contexts/DeadlineProvider';
+import { useFetchBookById } from '@/hooks/useBooks';
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { ImageBackground, Pressable, StyleSheet, View } from 'react-native';
-import { useFetchBookById } from '@/hooks/useBooks';
+import { ImageBackground, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 const urgencyBorderColorMap = {
   'complete': '#3B82F6',
   'set_aside': '#9CA3AF',
-  'overdue': '#DC2626',
-  'urgent': '#EF4444',
-  'good': '#4ADE80',
-  'approaching': '#FB923C',
-  'impossible': '#DC2626', // Same as overdue
+  'overdue': '#C17B7B',
+  'urgent': '#C17B7B',
+  'good': '#95B99C',
+  'approaching': '#D4A574',
+  'impossible': '#C17B7B', // Same as overdue
 }
 
 const backgroundImageUrl = {
@@ -49,8 +49,20 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
     statusMessage
   } = getDeadlineCalculations(deadline);
 
+  const shadowStyle = Platform.select({
+    ios: {
+      shadowColor: 'rgba(184, 169, 217, 0.1)',
+      shadowOffset: { width: 2, height: 8 },
+      shadowOpacity: 0.25,
+      shadowRadius: 8,
+    },
+    android: {
+      elevation: 5,
+    },
+  });
+
   let countdownColor = urgencyBorderColorMap[urgencyLevel];
-  let borderColor = urgencyBorderColorMap[urgencyLevel];
+  let borderColor = 'rgba(184, 169, 217, 0.1)';
 
   // Check if deadline is archived (completed or set aside)
   const latestStatus = deadline.status && deadline.status.length > 0 
@@ -137,11 +149,11 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
     <Pressable onPress={handlePress} style={({ pressed }) => [
       { opacity: pressed ? 0.8 : 1 }
     ]}>
-      <View style={[styles.card, { borderColor }]}>
+      <View style={[styles.card, shadowStyle, {borderColor}]}>
         <ImageBackground
           source={{ uri: getBackgroundImageUrl() }}
           style={styles.backgroundImage}
-          blurRadius={bookData?.cover_image_url ? 20 : 50} // Less blur for book covers
+          blurRadius={bookData?.cover_image_url ? 15 : 50} // Less blur for book covers
         >
           {renderBookContent()}
         </ImageBackground>
@@ -153,9 +165,10 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
 const styles = StyleSheet.create({
   card: {
     height: 200,
-    borderRadius: 16,
-    borderWidth: 3,
+    borderRadius: 24,
     overflow: 'hidden',
+    borderWidth: 1,
+    backgroundColor: 'white'
   },
   backgroundImage: {
     flex: 1,
@@ -175,7 +188,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)'
+    backgroundColor: 'rgba(147, 148, 147, 0.09)'
   },
   placeholderText: {
     fontSize: 48,
@@ -200,6 +213,7 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 6,
+    fontFamily: 'CrimsonText-Regular',
   },
   archivedIcon: {
     paddingTop: 6,
@@ -243,18 +257,21 @@ const styles = StyleSheet.create({
   titleContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 16,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
+    marginBottom: 12,
     textAlign: 'center',
-    marginBottom: 4,
     color: 'rgb(255, 255, 255)',
     textShadowColor: 'rgba(0,0,0, 0.4)',
-    textShadowOffset: { width: 3, height: 3 },
+    textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 6,
     letterSpacing: -0.1,
+    fontFamily: 'CrimsonText-SemiBold',
+    lineHeight: 26,
   },
   statsContainer: {
     alignItems: 'center',

@@ -1,10 +1,10 @@
 import { ThemedText, ThemedView } from '@/components/themed';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTheme } from '@/theme';
 import dayjs from 'dayjs';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 
 type HeaderProps = {
     activeCount: number;
@@ -55,12 +55,14 @@ const styles = StyleSheet.create({
     },
     dateRow: {
         paddingTop: 20,
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     dateText: {
-        fontWeight: '600',
-        fontSize: 20,
+        fontSize: 28,
         marginBottom: 10,
+        fontFamily: 'CrimsonText-Bold',
+        lineHeight: 28,
+        letterSpacing: -0.4,
     },
     statusSummary: {
         fontSize: 14,

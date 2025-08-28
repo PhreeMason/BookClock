@@ -324,15 +324,29 @@ const deepPlumTheme: SimpleTheme = {
     isDark: false,
 };
 
-// Primary Colors:
-// Navy: #2B3D4F (Headers, primary text, authority)
-// Warm Cream: #F5F1EA (Primary background, cards)
-// Soft Rose: #E8B4B8 (Accent, buttons, progress bars)
+// Background: Soft cream (#FAF7F2) or warm off-white instead of black
+// Primary accent: Dusty rose (#D4A5A7) or soft lavender (#B8A9D9) instead of harsh purple
+// Success states: Sage green (#95B99C) instead of bright green
+// Warning states: Warm terracotta (#D4A574) instead of yellow
+// Typography: Deep charcoal (#3A3A3A) instead of pure white
 
-// Supporting Colors:
-// Light Gray: #F3F4F6 (Disabled states, borders)
-// Charcoal: #374151 (Secondary text)
-// White: #FFFFFF (Cards, overlays)
+const cozyBearTheme: SimpleTheme = {
+    text: '#3A3A3A',
+    background: '#FDFDF0',
+    primary: '#B8A9D9',
+    secondary: '#95B99C',
+    accent: '#D4A574',
+    isDark: false,
+};
+
+// const darkModeCozyBear: SimpleTheme = {
+//     text: '#3A3A3A',
+//     background: '#1F1B24',
+//     primary: '#B8A9D9',
+//     secondary: '#95B99C',
+//     accent: '#D4A574',
+//     isDark: true,
+// }
 
 
 export const themes: Record<ThemeMode, SimpleTheme> = {
@@ -371,7 +385,8 @@ export const themes: Record<ThemeMode, SimpleTheme> = {
     corporate: corporateTheme,
     engineering: engineeringTheme,
     vibrant: vibrantTheme,
-    deepPlum: deepPlumTheme
+    deepPlum: deepPlumTheme,
+    cozyBear: cozyBearTheme
 };
 
 export const themeNames: Record<ThemeMode, string> = {
@@ -410,5 +425,6 @@ export const themeNames: Record<ThemeMode, string> = {
     corporate: 'Corporate',
     engineering: 'Engineering',
     vibrant: 'Vibrant',
-    deepPlum: 'Deep Plum'
+    deepPlum: 'Deep Plum',
+    cozyBear: 'Cozy Bear'
 };
