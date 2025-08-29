@@ -51,3 +51,5 @@ android/
 supabase/.temp/
 
 coverage/
+
+google-services.json

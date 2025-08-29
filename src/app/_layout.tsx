@@ -6,16 +6,27 @@ import {
     QueryClientProvider,
 } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
+import * as Notifications from 'expo-notifications';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
+import { NotificationProvider } from '@/contexts/NotificationProvider';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemeProvider } from '@/theme';
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 const queryClient = new QueryClient()
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+    }),
+});
 
 export default function RootLayout() {
     const colorScheme = useColorScheme();
@@ -40,22 +51,24 @@ export default function RootLayout() {
     }
 
     return (
-        <ThemeProvider>
-            <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <QueryClientProvider client={queryClient}>
-                    <ClerkProvider 
-                        {...(tokenCache ? { tokenCache } : {})}
-                        {...(CLERK_PUBLISHABLE_KEY ? { publishableKey: CLERK_PUBLISHABLE_KEY } : {})}
-                    >
-                        <Stack>
-                            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                            <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
-                        </Stack>
-                        <StatusBar style="auto" />
-                        <Toast />
-                    </ClerkProvider>
-                </QueryClientProvider>
-            </NavigationThemeProvider>
-        </ThemeProvider>
+        <NotificationProvider>
+            <ThemeProvider>
+                <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                    <QueryClientProvider client={queryClient}>
+                        <ClerkProvider
+                            {...(tokenCache ? { tokenCache } : {})}
+                            {...(CLERK_PUBLISHABLE_KEY ? { publishableKey: CLERK_PUBLISHABLE_KEY } : {})}
+                        >
+                            <Stack>
+                                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                                <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
+                            </Stack>
+                            <StatusBar style="auto" />
+                            <Toast />
+                        </ClerkProvider>
+                    </QueryClientProvider>
+                </NavigationThemeProvider>
+            </ThemeProvider>
+        </NotificationProvider>
     );
 }
