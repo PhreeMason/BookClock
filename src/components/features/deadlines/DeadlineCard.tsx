@@ -62,7 +62,7 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
       shadowRadius: 8,
     },
     android: {
-      elevation: 5,
+      elevation: 1,
     },
   });
 
@@ -157,7 +157,7 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
               <Image
                 source={{ uri: getBackgroundImageUrl() }}
                 style={styles.newBookCover}
-                resizeMode='cover'
+                resizeMode='contain'
               />
             ) : (
               <LinearGradient
@@ -203,7 +203,7 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
           </View>
         </View>
       ) : (
-        <View style={[styles.newContainer, shadowStyle, { borderColor }]}>
+        <View style={[styles.newContainer]}>
           <View style={styles.newBookContent}>
             {bookData?.cover_image_url ? (
               <Image
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'stretch',
     overflow: 'hidden',
-    borderColor: 'rgba(232, 194, 185, 0.15)'
+    borderColor: ' rgba(232, 194, 185, 0.15)'
   },
   newBookContent: {
     flexDirection: 'row',
@@ -291,9 +291,9 @@ const styles = StyleSheet.create({
   },
   newBookTitle: {
     color: '#2B3D4F',
-    fontSize: 18,
+    fontSize: 16,
     marginBottom: 2,
-    fontFamily: 'CrimsonText-Bold',
+    fontFamily: 'Nunito-Bold',
   },
   newBookDeadline: {
     color: '#6B7280',

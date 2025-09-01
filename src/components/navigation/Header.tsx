@@ -5,12 +5,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TodaysGoals from '../progress/TodaysGoals';
 
 const Header = () => {
     const today = Date.now();
-    const formattedDate = dayjs(today).format('dddd, MMMM DD');
-
+    const formattedDate = dayjs(today).format('dddd, MMMM D');
+    const insets = useSafeAreaInsets();
     const handleSettingsPress = () => {
         router.push('/settings');
     };
@@ -20,7 +21,7 @@ const Header = () => {
             colors={['#E8C2B9', '#B8A9D9']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={styles.container}
+            style={[styles.container, { paddingTop: Math.max(insets.top, 10) }]}
         >
             <ThemedView backgroundColor="none" style={styles.dateRow}>
                 <ThemedText style={styles.dateText}>{formattedDate}</ThemedText>
@@ -44,17 +45,20 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         gap: 10,
         paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingBottom: 13,
     },
     dateRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        paddingBottom: 10,
+        paddingTop: 18
     },
     dateText: {
-        fontSize: 28,
-        fontFamily: 'CrimsonText-Bold',
+        fontSize: 26,
+        fontFamily: 'Nunito-Bold',
         letterSpacing: -0.4,
+        lineHeight: 30,
         color: 'rgba(250, 248, 245, 1)',
     },
     statusSummary: {

@@ -18,14 +18,14 @@ const DeadlineView = () => {
     const router = useRouter();
     const { deadlines } = useDeadlines();
     const { theme } = useTheme();
-    const backgroundColor = theme.surfaceHover;
+    const backgroundColor = theme.background;
 
     // First try to find deadline in context (for active deadlines)
     let deadline = deadlines.find(d => d.id === id);
-    
+
     // If not found, use fallback hook (for archived deadlines)
     const { data: fallbackDeadline, isLoading: isFallbackLoading, error: fallbackError } = useGetDeadlineById(deadline ? undefined : id);
-    
+
     // Use fallback deadline if context deadline not found
     if (!deadline && fallbackDeadline) {
         deadline = fallbackDeadline;
@@ -34,8 +34,10 @@ const DeadlineView = () => {
     // Show loading state when using fallback
     if (!deadline && isFallbackLoading) {
         return (
-            <SafeAreaView style={{ flex: 1, backgroundColor }}>
-                <ThemedView style={[styles.container, {padding: 20, justifyContent: 'center', alignItems: 'center'}]}>
+            <SafeAreaView
+                edges={['right', 'bottom', 'left']}
+                style={{ flex: 1, backgroundColor }}>
+                <ThemedView style={[styles.container, { padding: 20, justifyContent: 'center', alignItems: 'center' }]}>
                     <ThemedText>Loading deadline...</ThemedText>
                 </ThemedView>
             </SafeAreaView>
@@ -45,8 +47,10 @@ const DeadlineView = () => {
     // Show error or not found state
     if (!deadline || fallbackError) {
         return (
-            <SafeAreaView style={{ flex: 1, backgroundColor }}>
-                <ThemedView style={[styles.container, {padding: 20}]}>
+            <SafeAreaView
+                edges={['right', 'bottom', 'left']}
+                style={{ flex: 1, backgroundColor }}>
+                <ThemedView style={[styles.container, { padding: 20 }]}>
                     <ThemedText type="title">Deadline not found</ThemedText>
                     <ThemedButton
                         title="Go Back"
@@ -77,19 +81,21 @@ const DeadlineView = () => {
     };
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor }]}>
+        <SafeAreaView
+            edges={['right', 'bottom', 'left']}
+            style={[styles.container, { backgroundColor }]}
+        >
             <DeadlineViewHeader
                 onBack={handleBack}
                 onEdit={handleEdit}
             />
 
-            <ThemedScrollView style={styles.content}>
+            <ThemedScrollView style={[styles.content, { backgroundColor: 'white' }]}>
                 <DeadlineHeroSection deadline={deadline} />
 
                 <ReadingProgress deadline={deadline} />
 
                 <DailyReadingChart deadline={deadline} />
-
 
                 <BookDetailsSection deadline={deadline} />
 

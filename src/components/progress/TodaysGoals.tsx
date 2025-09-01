@@ -41,7 +41,7 @@ const TodaysGoals: React.FC = () => {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText style={styles.sparkle}>✨</ThemedText>
+        <ThemedText style={styles.sparkle}>🎯</ThemedText>
         <ThemedText style={styles.title}>TODAY'S READING GOALS</ThemedText>
       </View>
 
@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 32,
     elevation: 8,
+    marginHorizontal: 6,
   },
   header: {
     flexDirection: 'row',

@@ -35,7 +35,8 @@ export default function SettingsScreen() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+        <SafeAreaView 
+            edges={['right', 'bottom', 'left']} style={{ flex: 1, backgroundColor: theme.background }}>
             <ThemedView backgroundColor="background" style={styles.container}>
                 <AppHeader title="Settings" onBack={handleBackPress} />
 

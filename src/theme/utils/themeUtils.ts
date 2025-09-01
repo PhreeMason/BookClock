@@ -1,6 +1,6 @@
-import { SimpleTheme, Theme, ComputedColors } from '../types';
 import { designTokens } from '../tokens';
-import { opacity, mix, lighten, darken } from './colorUtils';
+import { ComputedColors, SimpleTheme, Theme } from '../types';
+import { darken, lighten, mix, opacity } from './colorUtils';
 
 export function computeColors(base: SimpleTheme, isDark: boolean): ComputedColors {
   return {
@@ -18,12 +18,12 @@ export function computeColors(base: SimpleTheme, isDark: boolean): ComputedColor
     borderHover: opacity(base.text, 0.25),
     
     // Semantic colors
-    danger: '#ef4444',
-    dangerHover: darken('#ef4444', 0.1),
-    success: '#10b981',
-    successHover: darken('#10b981', 0.1),
-    warning: '#f59e0b',
-    warningHover: darken('#f59e0b', 0.1),
+    danger: '#E8B4B8',
+    dangerHover: darken('#E8B4B8', 0.1),
+    success: '#B8A9D9',
+    successHover: darken('#B8A9D9', 0.1),
+    warning: '#E8B4A0',
+    warningHover: darken('#E8B4A0', 0.1),
     info: base.primary,
     infoHover: isDark ? lighten(base.primary, 0.1) : darken(base.primary, 0.1),
   };
