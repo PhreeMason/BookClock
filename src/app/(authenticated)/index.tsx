@@ -1,7 +1,6 @@
 import ActiveReads from '@/components/features/deadlines/ActiveReads';
-import Header from '@/components/navigation/Header';
 import OverdueReads from '@/components/features/deadlines/OverdueReads';
-import { useDeadlines } from '@/contexts/DeadlineProvider';
+import Header from '@/components/navigation/Header';
 import { useTheme } from '@/theme';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,7 +8,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const TopTabs = createMaterialTopTabNavigator();
 
 export default function MyTabs() {
-    const { activeCount, overdueCount, getTotalReadingTimePerDay } = useDeadlines();
     const { theme } = useTheme();
     const backgroundColor = theme.surfaceHover;
     const textColor = theme.text;
@@ -18,11 +16,7 @@ export default function MyTabs() {
     
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor }}>
-            <Header
-                activeCount={activeCount}
-                attentionCount={overdueCount}
-                totalReadingTimePerDay={getTotalReadingTimePerDay()}
-            />
+            <Header />
             <TopTabs.Navigator
                 screenOptions={{
                     tabBarLabelStyle: { fontSize: 18, fontWeight: '600' },

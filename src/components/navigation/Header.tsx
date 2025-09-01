@@ -1,68 +1,63 @@
 import { ThemedText, ThemedView } from '@/components/themed';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { useTheme } from '@/theme';
 import dayjs from 'dayjs';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
+import TodaysGoals from '../progress/TodaysGoals';
 
-type HeaderProps = {
-    activeCount: number;
-    attentionCount: number;
-    totalReadingTimePerDay: string;
-}
-
-const Header = ({ activeCount, attentionCount, totalReadingTimePerDay }: HeaderProps) => {
-    const today = Date.now()
-    const formattedDate = dayjs(today).format('dddd, MMMM DD')
-    const { theme } = useTheme();
-    const iconColor = theme.primary;
+const Header = () => {
+    const today = Date.now();
+    const formattedDate = dayjs(today).format('dddd, MMMM DD');
 
     const handleSettingsPress = () => {
         router.push('/settings');
     };
 
     return (
-        <ThemedView backgroundColor="surfaceHover" borderColor="border" style={styles.container}>
-            <ThemedView backgroundColor="surfaceHover" style={styles.dateRow}>
+        <LinearGradient
+            colors={['#E8C2B9', '#B8A9D9']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.container}
+        >
+            <ThemedView backgroundColor="none" style={styles.dateRow}>
                 <ThemedText style={styles.dateText}>{formattedDate}</ThemedText>
-                <ThemedText color="textMuted" style={styles.statusSummary}>
-                    {activeCount} active • {attentionCount} needs attention
-                </ThemedText>
-                <ThemedText color="textMuted" style={styles.readingTimeSummary}>
-                    {totalReadingTimePerDay}
-                </ThemedText>
+                <TouchableOpacity
+                    style={styles.settings}
+                    onPress={handleSettingsPress}
+                >
+                    <IconSymbol size={28} name="gearshape.fill" color={"rgba(222, 222, 222, 0.76)"} />
+                </TouchableOpacity>
             </ThemedView>
-            <TouchableOpacity
-                style={styles.settings}
-                onPress={handleSettingsPress}
-            >
-                <IconSymbol size={28} name="gearshape.fill" color={iconColor} />
-            </TouchableOpacity>
-        </ThemedView>
-    )
-}
+            <TodaysGoals />
+        </LinearGradient>
+
+    );
+};
 
 export default Header
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row',
+        flex: 1,
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         borderBottomWidth: 1,
-        paddingBottom: 15,
+        paddingBottom: 10,
     },
     dateRow: {
-        paddingTop: 20,
+        flex: 1,
+        flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
     },
     dateText: {
         fontSize: 28,
-        marginBottom: 10,
         fontFamily: 'CrimsonText-Bold',
-        lineHeight: 28,
         letterSpacing: -0.4,
+        color: 'rgba(250, 248, 245, 1)',
     },
     statusSummary: {
         fontSize: 14,
@@ -71,7 +66,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     settings: {
-        justifyContent: 'center'
+        padding: 1,
+        borderRadius: 50,
     }
 
 })

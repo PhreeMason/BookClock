@@ -57,7 +57,7 @@ jest.mock('@/contexts/DeadlineProvider', () => {
       getUrgencyColor: jest.fn(),
       getStatusMessage: jest.fn(),
       formatUnitsPerDay: jest.fn(),
-      getTotalReadingTimePerDay: jest.fn(() => ({ hours: 0, minutes: 0 })),
+      getTotalReadingPagesForDay: jest.fn(() => ({ hours: 0, minutes: 0 })),
       activeCount: sampleDeadlines.length,
       overdueCount: 0,
     })),
