@@ -29,10 +29,6 @@ const ActiveReads = () => {
     return (
         <ThemedScrollView backgroundColor="background">
             <ThemedView backgroundColor="background" style={styles.container}>
-                <ThemedText
-                    type='semiBold'
-                    color='textMuted'
-                    style={styles.pageTitle}>ACTIVE DEADLINES</ThemedText>
                 {activeDeadlines.length > 0 ? (
                     activeDeadlines.map((deadline) => (
                         <DeadlineCard

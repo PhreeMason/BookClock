@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         gap: 10,
         paddingHorizontal: 20,
-        borderBottomWidth: 1,
         paddingVertical: 10,
     },
     dateRow: {

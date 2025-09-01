@@ -20,7 +20,7 @@ export default function MyTabs() {
             <TopTabs.Navigator
                 screenOptions={{
                     tabBarLabelStyle: { fontSize: 18, fontWeight: '600' },
-                    tabBarStyle: { backgroundColor },
+                    tabBarStyle: { backgroundColor: 'white' },
                     tabBarIndicatorStyle: { backgroundColor: accentColor },
                     tabBarActiveTintColor: textColor,
                     tabBarInactiveTintColor: textColor,
