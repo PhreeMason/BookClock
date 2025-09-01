@@ -4,7 +4,7 @@
     "slug": "bookClock",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/images/logo.jpg",
+    "icon": "./src/assets/images/icon.png",
     "scheme": "bookclock",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/logo.jpg",
+        "foregroundImage": "./src/assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -27,15 +27,16 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./src/assets/images/logo.jpg"
+      "favicon": "./src/assets/images/icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./src/assets/images/logo.jpg",
-          "imageWidth": 200,
+          "image": "./src/assets/images/splash.png",
+          "imageWidth": 1242,
+          "imageHeight": 2688,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
