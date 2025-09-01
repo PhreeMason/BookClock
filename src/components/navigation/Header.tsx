@@ -41,14 +41,13 @@ export default Header
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         justifyContent: 'space-between',
+        gap: 10,
         paddingHorizontal: 20,
         borderBottomWidth: 1,
-        paddingBottom: 10,
+        paddingVertical: 10,
     },
     dateRow: {
-        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
