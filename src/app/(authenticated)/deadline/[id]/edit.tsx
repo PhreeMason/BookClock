@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import {
@@ -14,7 +14,7 @@ import {
     FormProgressBar,
     StepIndicators
 } from '@/components/forms';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import AppHeader from '@/components/shared/AppHeader';
 import { useTheme } from '@/theme';
 
 import {
@@ -131,14 +131,17 @@ const EditDeadline = () => {
     // Show error if deadline not found
     if (!deadline) {
         return (
-            <SafeAreaView style={{flex: 1, backgroundColor}}>
+            <SafeAreaView edges={['right', 'bottom', 'left']} style={{flex: 1, backgroundColor}}>
                 <ThemedView style={styles.container}>
-                    <ThemedText>Deadline not found</ThemedText>
-                    <ThemedButton 
-                        title="Go Back"
-                        onPress={() => router.back()}
-                        style={{ marginTop: 16 }}
-                    />
+                    <AppHeader title="Edit Deadline" onBack={() => router.back()} />
+                    <ThemedView style={styles.content}>
+                        <ThemedText>Deadline not found</ThemedText>
+                        <ThemedButton 
+                            title="Go Back"
+                            onPress={() => router.back()}
+                            style={{ marginTop: 16 }}
+                        />
+                    </ThemedView>
                 </ThemedView>
             </SafeAreaView>
         );
@@ -281,18 +284,9 @@ const EditDeadline = () => {
     };
 
     return (
-        <SafeAreaView style={{flex: 1 , backgroundColor}}>
+        <SafeAreaView edges={['right', 'bottom', 'left']} style={{flex: 1 , backgroundColor}}>
             <ThemedKeyboardAvoidingView style={styles.container}>
-                <ThemedView backgroundColor="card" style={styles.mainHeader}>
-                    <TouchableOpacity
-                        style={styles.backToViewButton}
-                        onPress={goBackToView}
-                    >
-                        <IconSymbol size={24} name="chevron.left" color={theme.primary} />
-                    </TouchableOpacity>
-                    <ThemedText style={styles.mainHeaderTitle}>Edit Deadline</ThemedText>
-                    <ThemedView style={styles.placeholder} />
-                </ThemedView>
+                <AppHeader title="Edit Deadline" onBack={goBackToView} />
 
                 <FormProgressBar currentStep={currentStep} totalSteps={totalSteps} />
                 <StepIndicators currentStep={currentStep} totalSteps={totalSteps} />
@@ -356,26 +350,6 @@ const EditDeadline = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    mainHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingTop: 16,
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-    },
-    backToViewButton: {
-        padding: 8,
-        borderRadius: 8,
-    },
-    mainHeaderTitle: {
-        fontSize: 20,
-        fontWeight: '600',
-    },
-    placeholder: {
-        width: 40,
     },
     content: {
         flex: 1,
