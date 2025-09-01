@@ -46,17 +46,17 @@ const TodaysGoals: React.FC = () => {
       </View>
 
       <View style={styles.progressSection}>
-        <TodaysProgress
+        {audioDeadlines.length > 0 ? <TodaysProgress
           total={totalReadingTimeForToday}
           current={currentReadingTimeForToday}
           type="reading"
-        />
+        /> : null}
 
-        <TodaysProgress
+        {audioDeadlines.length > 0 ? <TodaysProgress
           total={totalAudioTimeForToday}
           current={currentAudioTimeForToday}
           type="listening"
-        />
+        /> : null}
       </View>
     </ThemedView>
   )
