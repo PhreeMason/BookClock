@@ -37,7 +37,7 @@ export const mockDeadlineContext = {
     paceMessage: 'Slightly behind pace',
   })),
   formatUnitsPerDay: jest.fn((units: number, format: string) => `${units} ${format === 'audio' ? 'min' : 'pages'}/day`),
-  getTotalReadingTimePerDay: jest.fn(() => ({ hours: 1, minutes: 30 })),
+  getTotalReadingPagesForDay: jest.fn(() => ({ hours: 1, minutes: 30 })),
   activeCount: 0,
   overdueCount: 0,
 };
@@ -193,7 +193,7 @@ export const resetContextMocks = () => {
   mockDeadlineContext.setAsidebook.mockClear();
   mockDeadlineContext.getDeadlineCalculations.mockClear();
   mockDeadlineContext.formatUnitsPerDay.mockClear();
-  mockDeadlineContext.getTotalReadingTimePerDay.mockClear();
+  mockDeadlineContext.getTotalReadingPagesForDay.mockClear();
   
   mockUsebooks.mockReturnValue(mockDeadlineContext);
   

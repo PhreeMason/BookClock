@@ -1,6 +1,6 @@
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
+import { calculateDaysLeft as calculateDaysLeftUtil, isDateBefore } from './dateUtils';
 import { calculateTotalQuantity } from './deadlineCalculations';
-import { isDateBefore, calculateDaysLeft as calculateDaysLeftUtil } from './dateUtils';
 
 /**
  * Sorts deadlines by priority: first by due date (earliest first), then by updated_at (most recent first), 
@@ -150,7 +150,7 @@ export const formatProgressDisplay = (format: 'physical' | 'ebook' | 'audio', pr
  * @param getDeadlineCalculations - Function that calculates units per day for a deadline
  * @returns Formatted string showing total daily reading time needed or "No active deadlines"
  */
-export const getTotalReadingTimePerDay = (
+export const getTotalReadingPagesForDay = (
     activeDeadlines: ReadingDeadlineWithProgress[],
     getDeadlineCalculations: (deadline: ReadingDeadlineWithProgress) => {
         unitsPerDay: number;
