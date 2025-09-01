@@ -58,81 +58,103 @@ const calculatePaceFromActivityDays = (activityDays: ActivityDay[]): number => {
   return totalAmount / daysBetween;
 };
 
-export const getRecentReadingDays = (
-  deadlines: ReadingDeadlineWithProgress[]
-): ReadingDay[] => {
-
-  const dailyProgress: { [date: string]: number } = {};
-
-  // Filter to only physical and ebook deadlines (no audio mixing)
-  const readingDeadlines = deadlines.filter(d => d.format === 'physical' || d.format === 'ebook');
-  const allProgressUpdates = readingDeadlines.flatMap(d => d.progress || []);
+/**
+ * Calculates the cutoff date based on the most recent progress across all filtered deadlines
+ */
+const calculateCutoffTime = (deadlines: ReadingDeadlineWithProgress[]): number | null => {
+  const allProgressUpdates = deadlines.flatMap(d => d.progress || []);
+  if (allProgressUpdates.length === 0) {
+    return null;
+  }
   const allProgressUpdatesSorted = allProgressUpdates.sort(
     (a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime()
   );
   
-  // Handle case where there are no progress updates
-  if (allProgressUpdatesSorted.length === 0) {
-    return [];
-  }
-  
   const cutoffDate = new Date(allProgressUpdatesSorted[0].created_at);
   cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER_FOR_PACE);
-  const cutoffTime = cutoffDate.getTime();
+  return cutoffDate.getTime();
+};
+
+/**
+ * Processes progress entries for a single book and accumulates daily progress
+ */
+const processBookProgress = (
+  book: ReadingDeadlineWithProgress,
+  cutoffTime: number,
+  dailyProgress: { [date: string]: number },
+  format?: 'physical' | 'ebook' | 'audio'
+): void => {
+  if (!book.progress || !Array.isArray(book.progress)) return;
+
+  const progress = book.progress.slice().sort(
+    (a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
+  );
+
+  if (progress.length === 0) return;
+
+  // Check if first progress was created at same time as deadline (initial progress)
+  let baselineProgress = 0;
+  const originalFirstDate = new Date(progress[0].created_at);
+  if (originalFirstDate.getTime() === new Date(book.created_at).getTime()) {
+    baselineProgress = progress[0].current_progress;
+    progress.shift();
+  }
+  
+  if (progress.length === 0) return;
+
+  // Handle the first remaining progress entry
+  const firstProgress = progress[0];
+  const firstDate = new Date(firstProgress.created_at);
+
+  if (firstDate.getTime() >= cutoffTime) {
+    const dateStr = firstDate.toISOString().slice(0, 10);
+    const amount = firstProgress.current_progress - baselineProgress;
+    
+    // For audio format, filter out large initial listening sessions (>5 hours)
+    const INITIAL_LISTENING_THRESHOLD = 300; // 5 hours max for initial listening
+    if (format === 'audio' && baselineProgress === 0 && amount > INITIAL_LISTENING_THRESHOLD) {
+      // Skip this entry - it's too large for a single listening session
+    } else if (amount > 0) {
+      dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + amount;
+    }
+  }
+
+  // Calculate differences between consecutive progress entries
+  for (let i = 1; i < progress.length; i++) {
+    const prev = progress[i - 1];
+    const curr = progress[i];
+
+    const endDate = new Date(curr.created_at).getTime();
+
+    // Skip if the end date is before the cutoff
+    if (endDate < cutoffTime) continue;
+
+    const progressDiff = curr.current_progress - prev.current_progress;
+
+    // Only assign the progress to the end date (when progress was recorded)
+    const endDateObj = new Date(endDate);
+    if (endDateObj.getTime() >= cutoffTime) {
+      const dateStr = endDateObj.toISOString().slice(0, 10);
+      dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + progressDiff;
+    }
+  }
+};
+
+export const getRecentReadingDays = (
+  deadlines: ReadingDeadlineWithProgress[]
+): ReadingDay[] => {
+  const dailyProgress: { [date: string]: number } = {};
+
+  // Filter to only physical and ebook deadlines (no audio mixing)
+  const readingDeadlines = deadlines.filter(d => d.format === 'physical' || d.format === 'ebook');
+  
+  const cutoffTime = calculateCutoffTime(readingDeadlines);
+  if (cutoffTime === null) {
+    return [];
+  }
 
   readingDeadlines.forEach(book => {
-    // Sort progress updates by date
-    if (!book.progress || !Array.isArray(book.progress)) return;
-
-    const progress = book.progress.slice().sort(
-      (a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
-    );
-
-    if (progress.length === 0) return;
-
-    // Check if first progress was created at same time as deadline (initial progress)
-    let baselineProgress = 0;
-    const originalFirstDate = new Date(progress[0].created_at);
-    if (originalFirstDate.getTime() === new Date(book.created_at).getTime()) {
-      baselineProgress = progress[0].current_progress;
-      progress.shift();
-    }
-    
-    if (progress.length === 0) return;
-
-    // Handle the first remaining progress entry
-    const firstProgress = progress[0];
-    const firstDate = new Date(firstProgress.created_at);
-
-    if (firstDate.getTime() >= cutoffTime) {
-      const dateStr = firstDate.toISOString().slice(0, 10);
-      const pagesRead = firstProgress.current_progress - baselineProgress;
-      if (pagesRead > 0) {
-        dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + pagesRead;
-      }
-    }
-
-    // Calculate differences between consecutive progress entries
-    for (let i = 1; i < progress.length; i++) {
-      const prev = progress[i - 1];
-      const curr = progress[i];
-
-      const endDate = new Date(curr.created_at).getTime();
-
-      // Skip if the end date is before the cutoff
-      if (endDate < cutoffTime) continue;
-
-      const progressDiff = curr.current_progress - prev.current_progress;
-
-      // Both physical and ebook are already in pages (no conversion needed)
-
-      // Only assign the progress to the end date (when progress was recorded)
-      const endDateObj = new Date(endDate);
-      if (endDateObj.getTime() >= cutoffTime) {
-        const dateStr = endDateObj.toISOString().slice(0, 10);
-        dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + progressDiff;
-      }
-    }
+    processBookProgress(book, cutoffTime, dailyProgress, book.format);
   });
 
   // Convert dictionary to sorted array
@@ -314,61 +336,18 @@ export const formatPaceDisplay = (pace: number, format: 'physical' | 'ebook' | '
 export const getRecentListeningDays = (
   deadlines: ReadingDeadlineWithProgress[]
 ): ListeningDay[] => {
-
   const dailyProgress: { [date: string]: number } = {};
 
   // Filter to only audio deadlines
   const audioDeadlines = deadlines.filter(d => d.format === 'audio');
+  
+  const cutoffTime = calculateCutoffTime(audioDeadlines);
+  if (cutoffTime === null) {
+    return [];
+  }
 
   audioDeadlines.forEach(book => {
-    // Sort progress updates by date
-    if (!book.progress || !Array.isArray(book.progress)) return;
-
-    const progress = book.progress.slice().sort(
-      (a, b) => new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
-    );
-
-    if (progress.length === 0) return;
-    const mostRecentProgress = progress[progress.length - 1];
-    const cutoffDate = new Date(mostRecentProgress.created_at);
-    cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER_FOR_PACE);
-    const cutoffTime = cutoffDate.getTime();
-
-    // Only count first progress if it's reasonable for a single day
-    const firstProgress = progress[0];
-    const firstDate = new Date(firstProgress.created_at);
-    const INITIAL_LISTENING_THRESHOLD = 300; // 5 hours max for initial listening
-
-    if (firstDate.getTime() >= cutoffTime &&
-      firstProgress.current_progress > 0 &&
-      firstProgress.current_progress <= INITIAL_LISTENING_THRESHOLD) {
-      const dateStr = firstDate.toISOString().slice(0, 10);
-      const minutesListened = firstProgress.current_progress;
-
-      dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + minutesListened;
-    }
-
-    // Calculate differences between consecutive progress entries
-    for (let i = 1; i < progress.length; i++) {
-      const prev = progress[i - 1];
-      const curr = progress[i];
-
-      const endDate = new Date(curr.created_at).getTime();
-
-      // Skip if the end date is before the cutoff
-      if (endDate < cutoffTime) continue;
-
-      const progressDiff = curr.current_progress - prev.current_progress;
-
-      // Only positive progress (minutes listened)
-      if (progressDiff > 0) {
-        const endDateObj = new Date(endDate);
-        if (endDateObj.getTime() >= cutoffTime) {
-          const dateStr = endDateObj.toISOString().slice(0, 10);
-          dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + progressDiff;
-        }
-      }
-    }
+    processBookProgress(book, cutoffTime, dailyProgress, book.format);
   });
 
   // Convert dictionary to sorted array
