@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookTrack - Book Details</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #F5F1EA 0%, #FAF8F5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 0;
+        }
+
+        .mobile-container {
+            width: 390px;
+            max-width: 100%;
+            background: white;
+            min-height: 844px;
+            box-shadow: 0 10px 40px rgba(232, 180, 184, 0.15);
+            border-radius: 40px;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #E8C2B9 0%, #B8A9D9 100%);
+            padding: 48px 24px 24px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(184, 169, 217, 0.15);
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 18px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .edit-btn {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Book Card */
+        .book-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .book-cover-large {
+            width: 80px;
+            height: 110px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #9775FA 0%, #5F3DC4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 12px rgba(151, 117, 250, 0.3);
+        }
+
+        .book-main-info {
+            flex: 1;
+        }
+
+        .book-title-large {
+            color: #2B3D4F;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .pace-info {
+            background: linear-gradient(135deg, rgba(232, 194, 185, 0.15) 0%, rgba(184, 169, 217, 0.15) 100%);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        .pace-main {
+            color: #8B5A8C;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .pace-secondary {
+            color: #B8A9D9;
+            font-size: 12px;
+        }
+
+        .days-indicator {
+            width: 56px;
+            height: 56px;
+            border: 3px solid #E8B4B8;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #C8698A;
+        }
+
+        .days-number-large {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .days-label-small {
+            font-size: 10px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .section-icon {
+            font-size: 18px;
+        }
+
+        .section-title {
+            color: #2B3D4F;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Progress Section */
+        .progress-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(232, 194, 185, 0.15);
+            margin-bottom: 20px;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .progress-stat {
+            text-align: center;
+        }
+
+        .progress-number {
+            color: #8B5A8C;
+            font-size: 28px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .progress-label {
+            color: #6B7280;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .progress-bar-large {
+            height: 12px;
+            background: rgba(232, 194, 185, 0.2);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill-large {
+            height: 100%;
+            background: linear-gradient(90deg, #E8C2B9 0%, #B8A9D9 100%);
+            border-radius: 100px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #6B7280;
+            margin-top: 8px;
+        }
+
+        .deadline-date {
+            color: #C8698A;
+            font-weight: 600;
+        }
+
+        .progress-input-section {
+            margin-bottom: 16px;
+        }
+
+        .progress-input {
+            width: 100%;
+            background: white;
+            border: 2px solid rgba(232, 194, 185, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #8B5A8C;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-input:focus {
+            outline: none;
+            border-color: #B8A9D9;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quick-btn {
+            background: linear-gradient(135deg, rgba(232, 194, 185, 0.1) 0%, rgba(184, 169, 217, 0.1) 100%);
+            border: 1px solid rgba(232, 194, 185, 0.2);
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(232, 180, 184, 0.15);
+        }
+
+        .quick-btn-value {
+            color: #8B5A8C;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Progress Actions */
+        .progress-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 0;
+        }
+
+        /* Update Progress Button */
+        .update-btn {
+            background: linear-gradient(135deg, #B8A9D9 0%, #E8C2B9 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(184, 169, 217, 0.25);
+        }
+
+        .update-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 169, 217, 0.35);
+        }
+
+        /* Session Button */
+        .session-btn {
+            background: linear-gradient(135deg, rgba(184, 169, 217, 0.1) 0%, rgba(232, 194, 185, 0.1) 100%);
+            color: #8B5A8C;
+            border: 2px solid rgba(184, 169, 217, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .session-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(184, 169, 217, 0.15) 0%, rgba(232, 194, 185, 0.15) 100%);
+            box-shadow: 0 4px 12px rgba(184, 169, 217, 0.15);
+        }
+
+        /* Collapsible Stats Section */
+        .stats-section {
+            margin-top: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stats-toggle {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(232, 194, 185, 0.05) 0%, rgba(184, 169, 217, 0.05) 100%);
+            border: 1px solid rgba(232, 194, 185, 0.15);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            list-style: none;
+            transition: all 0.3s ease;
+        }
+
+        .stats-toggle:hover {
+            background: linear-gradient(135deg, rgba(232, 194, 185, 0.1) 0%, rgba(184, 169, 217, 0.1) 100%);
+        }
+
+        .stats-toggle::-webkit-details-marker {
+            display: none;
+        }
+
+        .stats-toggle-text {
+            color: #8B5A8C;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .stats-toggle-icon {
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        details[open] .stats-toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        .stats-content {
+            padding: 20px 0;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(232, 194, 185, 0.15);
+        }
+
+        .chart-header {
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            color: #2B3D4F;
+            font-size: 14px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .chart-subtitle {
+            color: #6B7280;
+            font-size: 12px;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .bar-chart {
+            position: relative;
+            height: 120px;
+            margin-bottom: 16px;
+        }
+
+        .chart-bars {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 100px;
+            padding: 0 8px;
+        }
+
+        .bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bar {
+            width: 32px;
+            background: linear-gradient(180deg, #B8A9D9 0%, #E8C2B9 100%);
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 4px;
+            min-height: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .bar.inactive {
+            background: rgba(184, 169, 217, 0.2);
+        }
+
+        .bar-value {
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .bar-label {
+            color: #6B7280;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .chart-goal-line {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #C8698A;
+            border-top: 2px dashed #C8698A;
+            opacity: 0.3;
+        }
+
+        .goal-label {
+            position: absolute;
+            right: 8px;
+            top: -18px;
+            color: #C8698A;
+            font-size: 10px;
+            font-weight: 600;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .chart-footer {
+            text-align: center;
+            padding-top: 12px;
+            border-top: 1px solid rgba(232, 194, 185, 0.1);
+        }
+
+        .chart-insight {
+            color: #8B5A8C;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Book Details */
+        .details-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(232, 194, 185, 0.05) 0%, rgba(184, 169, 217, 0.05) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(232, 194, 185, 0.1);
+        }
+
+        .detail-label {
+            color: #6B7280;
+            font-size: 14px;
+        }
+
+        .detail-value {
+            color: #2B3D4F;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            padding: 0 24px 32px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .primary-action {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .secondary-action {
+            background: linear-gradient(135deg, rgba(139, 90, 140, 0.1) 0%, rgba(184, 169, 217, 0.1) 100%);
+            color: #8B5A8C;
+            border: 1px solid rgba(139, 90, 140, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .danger-action {
+            background: white;
+            color: #EF4444;
+            border: 1px solid #EF4444;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="nav-bar">
+                <div class="back-btn">←</div>
+                <div class="page-title">Book Details</div>
+                <div class="edit-btn">Edit</div>
+            </div>
+            
+            <div class="book-card">
+                <div class="book-cover-large">⚔️</div>
+                <div class="book-main-info">
+                    <div class="book-title-large">Words of Radiance</div>
+                    <div class="pace-info">
+                        <div class="pace-main">55 pages/day needed</div>
+                        <div class="pace-secondary">Read ~12 pages/day more</div>
+                    </div>
+                </div>
+                <div class="days-indicator">
+                    <span class="days-number-large">7</span>
+                    <span class="days-label-small">days left</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content-section">
+            <!-- Progress Section -->
+            <div class="section-header">
+                <span class="section-icon">📊</span>
+                <span class="section-title">Reading Progress</span>
+            </div>
+            
+            <div class="progress-card">
+                <div class="progress-stats">
+                    <div class="progress-stat">
+                        <span class="progress-number">700</span>
+                        <span class="progress-label">of 1080 read</span>
+                    </div>
+                    <div class="progress-stat">
+                        <span class="progress-number">380</span>
+                        <span class="progress-label">pages left</span>
+                    </div>
+                </div>
+                
+                <div class="progress-bar-large">
+                    <div class="progress-fill-large" style="width: 65%"></div>
+                </div>
+                
+                <div class="progress-footer">
+                    <span>65% Complete</span>
+                    <span class="deadline-date">Due September 8</span>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="progress-input-section">
+                <input type="number" class="progress-input" value="0" />
+                <div class="quick-actions">
+                    <div class="quick-btn">
+                        <div class="quick-btn-value">-1</div>
+                    </div>
+                    <div class="quick-btn">
+                        <div class="quick-btn-value">+1</div>
+                    </div>
+                    <div class="quick-btn">
+                        <div class="quick-btn-value">+5</div>
+                    </div>
+                    <div class="quick-btn">
+                        <div class="quick-btn-value">+10</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-actions">
+                <button class="session-btn">
+                    <span>⏱️</span>
+                    <span>Start Session</span>
+                </button>
+                <button class="update-btn">
+                    <span>✏️</span>
+                    <span>Update Progress</span>
+                </button>
+            </div>
+
+            <!-- Collapsible Stats Section -->
+            <details class="stats-section">
+                <summary class="stats-toggle">
+                    <span class="stats-toggle-text">View Reading Stats</span>
+                    <span class="stats-toggle-icon">📊</span>
+                </summary>
+                
+                <div class="stats-content">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <span class="chart-title">Daily Progress</span>
+                            <span class="chart-subtitle">Pages read per day</span>
+                        </div>
+                        
+                        <div class="bar-chart">
+                            <div class="chart-bars">
+                                <div class="bar-group">
+                                    <div class="bar" style="height: 70px;">
+                                        <span class="bar-value">58</span>
+                                    </div>
+                                    <span class="bar-label">8/26</span>
+                                </div>
+                                <div class="bar-group">
+                                    <div class="bar" style="height: 45px;">
+                                        <span class="bar-value">36</span>
+                                    </div>
+                                    <span class="bar-label">8/27</span>
+                                </div>
+                                <div class="bar-group">
+                                    <div class="bar" style="height: 60px;">
+                                        <span class="bar-value">48</span>
+                                    </div>
+                                    <span class="bar-label">8/28</span>
+                                </div>
+                                <div class="bar-group">
+                                    <div class="bar" style="height: 0px;">
+                                        <span class="bar-value">0</span>
+                                    </div>
+                                    <span class="bar-label">8/29</span>
+                                </div>
+                                <div class="bar-group">
+                                    <div class="bar inactive" style="height: 25px;">
+                                        <span class="bar-value">?</span>
+                                    </div>
+                                    <span class="bar-label">8/30</span>
+                                </div>
+                            </div>
+                            <div class="chart-goal-line">
+                                <span class="goal-label">Daily goal: 48 pg</span>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-footer">
+                            <span class="chart-insight">You're averaging 36 pages/day</span>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Book Details -->
+            <div class="section-header" style="margin-top: 32px;">
+                <span class="section-icon">📚</span>
+                <span class="section-title">Book Details</span>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-row">
+                    <span class="detail-label">Author</span>
+                    <span class="detail-value">Brandon Sanderson</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Format</span>
+                    <span class="detail-value">Physical</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Priority</span>
+                    <span class="detail-value" style="color: #B8A9D9;">Flexible</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Source</span>
+                    <span class="detail-value">Library</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Added</span>
+                    <span class="detail-value">August 25, 2025</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="primary-action">
+                <span>✓</span>
+                <span>Mark as Complete</span>
+            </button>
+            <button class="secondary-action" style="background: linear-gradient(135deg, rgba(245, 194, 161, 0.1) 0%, rgba(232, 180, 160, 0.1) 100%); color: #D4876A; border-color: rgba(212, 135, 106, 0.2);">
+                <span>⏸️</span>
+                <span>Pause Book</span>
+            </button>
+            <button class="danger-action">
+                <span>🗑️</span>
+                <span>Delete Deadline</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

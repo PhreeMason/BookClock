@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookTrack - Daily Reading Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #F5F1EA 0%, #FAF8F5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 0;
+        }
+
+        .mobile-container {
+            width: 390px;
+            max-width: 100%;
+            background: white;
+            min-height: 844px;
+            box-shadow: 0 10px 40px rgba(232, 180, 184, 0.15);
+            border-radius: 40px;
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #E8C2B9 0%, #B8A9D9 100%);
+            padding: 48px 24px 32px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(184, 169, 217, 0.15);
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 15s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, 30px); }
+        }
+
+        .date-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .date-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            text-shadow: 0 2px 4px rgba(139, 90, 140, 0.2);
+        }
+
+        .settings-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .daily-status {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 32px rgba(139, 90, 140, 0.12);
+        }
+
+        .status-title {
+            color: #8B5A8C;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sparkle {
+            display: inline-block;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.9); }
+        }
+
+        .reading-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #FAF8F5 0%, #FFF 100%);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(232, 194, 185, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #E8C2B9 0%, #B8A9D9 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2B3D4F;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            font-size: 18px;
+        }
+
+        .stat-value {
+            color: #8B5A8C;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(232, 194, 185, 0.2);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E8C2B9 0%, #B8A9D9 100%);
+            border-radius: 100px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 20px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6));
+            animation: shimmerProgress 2s infinite;
+        }
+
+        @keyframes shimmerProgress {
+            0% { transform: translateX(-20px); }
+            100% { transform: translateX(20px); }
+        }
+
+        .stat-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .remaining-text {
+            color: #C8698A;
+            font-weight: 600;
+        }
+
+        .motivation-banner {
+            margin-top: 20px;
+            background: linear-gradient(135deg, rgba(232, 180, 184, 0.1) 0%, rgba(184, 169, 217, 0.1) 100%);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(232, 194, 185, 0.2);
+        }
+
+        .remaining-summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .remaining-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(184, 169, 217, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .remaining-info {
+            flex: 1;
+        }
+
+        .remaining-label {
+            color: #8B5A8C;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .remaining-time {
+            color: #2B3D4F;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .status-indicator {
+            color: #B8A9D9;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .content-section {
+            padding: 24px;
+        }
+
+        .section-title {
+            color: #2B3D4F;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .book-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .book-item {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            border: 1px solid rgba(232, 194, 185, 0.15);
+            display: flex;
+            align-items: stretch;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .book-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(232, 180, 184, 0.15);
+        }
+
+        .book-item.priority {
+            background: linear-gradient(135deg, rgba(184, 169, 217, 0.03) 0%, rgba(232, 194, 185, 0.03) 100%);
+            border: 1px solid rgba(184, 169, 217, 0.25);
+            box-shadow: 0 0 20px rgba(184, 169, 217, 0.12);
+        }
+
+        .priority-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 18px;
+            animation: subtle-pulse 3s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        @keyframes subtle-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(0.95); }
+        }
+
+        .book-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            flex: 2;
+        }
+
+        .book-cover {
+            width: 48px;
+            height: 64px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #E8C2B9 0%, #B8A9D9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .book-info {
+            flex: 1;
+        }
+
+        .book-title {
+            color: #2B3D4F;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .book-deadline {
+            color: #6B7280;
+            font-size: 11px;
+        }
+
+        .book-days-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            border-left: 1px solid rgba(232, 194, 185, 0.1);
+        }
+
+        .book-days-square {
+            width: 72px;
+            height: 72px;
+            border: 3px solid;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .days-feasible {
+            border-color: #B8A9D9;
+            color: #8B5A8C;
+        }
+        
+        .days-tight {
+            border-color: #E8B4A0;
+            color: #D4876A;
+        }
+        
+        .days-not-feasible {
+            border-color: #E8B4B8;
+            color: #C8698A;
+        }
+        
+        .days-number {
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        
+        .days-label {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+            opacity: 0.8;
+        }
+
+        .add-button {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #E8C2B9 0%, #B8A9D9 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(232, 180, 184, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .add-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(232, 180, 184, 0.4);
+        }
+
+        .add-icon {
+            color: white;
+            font-size: 24px;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="header-section">
+            <div class="date-header">
+                <div class="date-text">Friday, August 29</div>
+                <div class="settings-btn">⚙️</div>
+            </div>
+            
+            <div class="daily-status">
+                <div class="status-title">
+                    <span class="sparkle">✨</span>
+                    Today's Reading Goals
+                </div>
+                
+                <div class="reading-stats">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-label">
+                                <span class="stat-icon">📖</span>
+                                <span>Today's Reading</span>
+                            </div>
+                            <div class="stat-value">22/63</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 35%"></div>
+                        </div>
+                        <div class="stat-footer">
+                            <span>You're doing great!</span>
+                            <span class="remaining-text">41 pages left</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-label">
+                                <span class="stat-icon">🎧</span>
+                                <span>Today's Listening</span>
+                            </div>
+                            <div class="stat-value">46m/1h 36m</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 48%"></div>
+                        </div>
+                        <div class="stat-footer">
+                            <span>Great pace!</span>
+                            <span class="remaining-text">50m left</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div class="section-title">
+                <span>📖</span>
+                Active Deadlines
+            </div>
+            
+            <div class="book-list">
+                <div class="book-item priority">
+                    <span class="priority-indicator">🌸</span>
+                    <div class="book-content">
+                        <div class="book-cover" style="background: linear-gradient(135deg, #FF6B6B 0%, #C92A2A 100%);">📕</div>
+                        <div class="book-info">
+                            <div class="book-title">Running</div>
+                            <div class="book-deadline">6 pages/day needed</div>
+                        </div>
+                    </div>
+                    <div class="book-days-container">
+                        <div class="book-days-square days-not-feasible">
+                            <span class="days-number">2</span>
+                            <span class="days-label">days</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="book-item">
+                    <div class="book-content">
+                        <div class="book-cover" style="background: linear-gradient(135deg, #4DABF7 0%, #1864AB 100%);">💰</div>
+                        <div class="book-info">
+                            <div class="book-title">$100M Money Models</div>
+                            <div class="book-deadline">14 pages/day needed</div>
+                        </div>
+                    </div>
+                    <div class="book-days-container">
+                        <div class="book-days-square days-feasible">
+                            <span class="days-number">8</span>
+                            <span class="days-label">days</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="book-item">
+                    <div class="book-content">
+                        <div class="book-cover" style="background: linear-gradient(135deg, #9775FA 0%, #5F3DC4 100%);">⚔️</div>
+                        <div class="book-info">
+                            <div class="book-title">Oathbringer</div>
+                            <div class="book-deadline">2h 7m/day needed</div>
+                        </div>
+                    </div>
+                    <div class="book-days-container">
+                        <div class="book-days-square days-feasible">
+                            <span class="days-number">17</span>
+                            <span class="days-label">days</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="add-button">
+            <span class="add-icon">+</span>
+        </div>
+    </div>
+</body>
+</html>
