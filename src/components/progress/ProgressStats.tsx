@@ -55,7 +55,7 @@ const ProgressStats: React.FC<ProgressStatsProps> = ({
 const styles = StyleSheet.create({
   progressStats: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     marginBottom: 20,
   },
   statItem: {

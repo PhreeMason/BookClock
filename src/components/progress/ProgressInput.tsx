@@ -1,6 +1,8 @@
+import CustomInput from '@/components/shared/CustomInput';
+import { useTheme } from '@/theme';
 import React from 'react';
 import { Control, Controller } from 'react-hook-form';
-import CustomInput from '@/components/shared/CustomInput';
+import { StyleSheet } from 'react-native';
 import AudiobookProgressInput from './AudiobookProgressInput';
 
 interface ProgressInputProps {
@@ -12,6 +14,8 @@ const ProgressInput: React.FC<ProgressInputProps> = ({
   format,
   control
 }) => {
+  const { theme } = useTheme();
+
   if (format === 'audio') {
     return (
       <Controller
@@ -36,8 +40,17 @@ const ProgressInput: React.FC<ProgressInputProps> = ({
       inputType="integer"
       placeholder="Enter current progress"
       keyboardType="numeric"
+      style={[styles.input, {color: theme.primary}]}
     />
   );
 };
 
 export default ProgressInput;
+
+const styles = StyleSheet.create({
+  input: {
+    backgroundColor: 'white',
+    fontSize: 22,
+    fontFamily: 'Nunito-Bold',
+  }
+});

@@ -3,7 +3,7 @@ import ProgressHeader from '@/components/progress/ProgressHeader'
 import ProgressInput from '@/components/progress/ProgressInput'
 import ProgressStats from '@/components/progress/ProgressStats'
 import QuickActionButtons from '@/components/progress/QuickActionButtons'
-import { ThemedButton, ThemedView } from '@/components/themed'
+import { ThemedButton, ThemedText, ThemedView } from '@/components/themed'
 import { useDeadlines } from '@/contexts/DeadlineProvider'
 import { useDeleteFutureProgress, useUpdateDeadlineProgress } from '@/hooks/useDeadlines'
 import { formatProgressDisplay } from '@/lib/deadlineUtils'
@@ -11,10 +11,11 @@ import { createProgressUpdateSchema } from '@/lib/progressUpdateSchema'
 import { useTheme } from '@/theme'
 import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { Alert, StyleSheet, View } from 'react-native'
-import Toast from 'react-native-toast-message'
+import { router } from 'expo-router'
 import { useCallback } from 'react'
+import { useForm } from 'react-hook-form'
+import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native'
+import Toast from 'react-native-toast-message'
 
 const ReadingProgress = ({
     deadline,
@@ -25,7 +26,7 @@ const ReadingProgress = ({
     timeSpentReading?: number;
     onProgressSubmitted?: () => void;
 }) => {
-    const {theme} = useTheme();
+    const { theme } = useTheme();
     const { getDeadlineCalculations, completeDeadline } = useDeadlines();
     const calculations = getDeadlineCalculations(deadline);
     const {
@@ -40,7 +41,7 @@ const ReadingProgress = ({
     const updateProgressMutation = useUpdateDeadlineProgress();
     const deleteFutureProgressMutation = useDeleteFutureProgress();
     const borderColor = theme.border;
-    
+
     const {
         control,
         handleSubmit,
@@ -102,7 +103,7 @@ const ReadingProgress = ({
 
     const handleProgressUpdateSuccess = useCallback((newProgress: number) => {
         const isBookComplete = newProgress >= totalQuantity;
-        
+
         if (isBookComplete) {
             showCompletionDialog(newProgress, deadline.book_title);
         } else {
@@ -156,7 +157,7 @@ const ReadingProgress = ({
         const progressUnit = deadline.format === 'audio' ? 'time' : 'page';
         const currentDisplay = formatProgressDisplay(deadline.format, currentProgress);
         const newDisplay = formatProgressDisplay(deadline.format, newProgress);
-        
+
         Alert.alert(
             'Backward Progress Warning',
             `You're updating from ${currentDisplay} to ${newDisplay}. This will delete all progress entries greater than the new ${progressUnit}. Are you sure?`,
@@ -176,7 +177,12 @@ const ReadingProgress = ({
 
     const onSubmitProgress = useCallback((data: any) => {
         const newProgress = data.currentProgress;
-        
+
+        // Check if the new progress is the same as current progress
+        if (newProgress === currentProgress) {
+            return; // Do nothing if values are the same
+        }
+
         // Check if the new progress is lower than current progress
         if (newProgress < currentProgress) {
             showBackwardProgressWarning(newProgress);
@@ -188,10 +194,10 @@ const ReadingProgress = ({
 
     const handleQuickUpdate = (increment: number) => {
         const currentFormValue = getValues('currentProgress');
-        
+
         // Convert form value to number, handling both strings and numbers
         let numericValue: number;
-        
+
         if (typeof currentFormValue === 'number' && !isNaN(currentFormValue)) {
             numericValue = currentFormValue;
         } else if (typeof currentFormValue === 'string') {
@@ -200,15 +206,15 @@ const ReadingProgress = ({
         } else {
             numericValue = currentProgress;
         }
-        
+
         const newProgress = Math.max(0, Math.min(totalQuantity, numericValue + increment));
-        
+
         // Check if the new progress would be lower than current progress
         if (newProgress < currentProgress) {
             const progressUnit = deadline.format === 'audio' ? 'time' : 'page';
             const currentDisplay = formatProgressDisplay(deadline.format, currentProgress);
             const newDisplay = formatProgressDisplay(deadline.format, newProgress);
-            
+
             Alert.alert(
                 'Backward Progress Warning',
                 `You're updating from ${currentDisplay} to ${newDisplay}. This will delete all progress entries beyond the new ${progressUnit}. Are you sure?`,
@@ -231,22 +237,28 @@ const ReadingProgress = ({
         }
     };
 
+    const handleStartReadingSession = () => {
+        router.push(`/deadline/${deadline.id}/reading-session`);
+      };
+
     return (
         <ThemedView backgroundColor="card" style={[styles.section, { borderColor }]}>
             <ProgressHeader />
-            
-            <ProgressStats
-                currentProgress={currentProgress}
-                totalQuantity={totalQuantity}
-                remaining={remaining}
-                format={deadline.format}
-                urgencyLevel={urgencyLevel}
-            />
 
-            <ProgressBar
-                progressPercentage={progressPercentage}
-                deadlineDate={deadline.deadline_date}
-            />
+            <ThemedView style={[styles.progressSection, { borderColor: 'rgba(232, 194, 185, 0.15)' }]}>
+                <ProgressStats
+                    currentProgress={currentProgress}
+                    totalQuantity={totalQuantity}
+                    remaining={remaining}
+                    format={deadline.format}
+                    urgencyLevel={urgencyLevel}
+                />
+
+                <ProgressBar
+                    progressPercentage={progressPercentage}
+                    deadlineDate={deadline.deadline_date}
+                />
+            </ThemedView>
 
             <View style={styles.updateSection}>
                 <ProgressInput
@@ -258,13 +270,25 @@ const ReadingProgress = ({
                     onQuickUpdate={handleQuickUpdate}
                 />
 
-                <ThemedButton
-                    title={updateProgressMutation.isPending ? "Updating..." : "✏️ Update Progress"}
-                    variant="primary"
-                    style={styles.updateProgressBtn}
-                    onPress={handleSubmit(onSubmitProgress)}
-                    disabled={updateProgressMutation.isPending}
-                />
+                <ThemedView style={styles.updateProgressBtns}>
+                    <TouchableOpacity
+                        style={styles.sessionBtn}
+                        onPress={handleStartReadingSession}
+                        disabled={updateProgressMutation.isPending}
+                    >
+                        <ThemedText style={styles.sessionIcon}>⏱️</ThemedText>
+                        <ThemedText style={styles.sessionText}>
+                            {updateProgressMutation.isPending ? "Updating..." : "Start Session"}
+                        </ThemedText>
+                    </TouchableOpacity>
+                    <ThemedButton
+                        title={updateProgressMutation.isPending ? "Updating..." : "✏️ Update Progress"}
+                        variant="primary"
+                        style={styles.updateProgressBtn}
+                        onPress={handleSubmit(onSubmitProgress)}
+                        disabled={updateProgressMutation.isPending}
+                    />
+                </ThemedView>
             </View>
         </ThemedView>
     )
@@ -274,15 +298,44 @@ export default ReadingProgress
 
 const styles = StyleSheet.create({
     section: {
-        padding: 20,
+        padding: 8,
         borderRadius: 12,
         marginBottom: 16,
-        borderWidth: 1,
     },
     updateSection: {
         marginTop: 8,
     },
     updateProgressBtn: {
-        marginTop: 8,
     },
+    sessionBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        paddingVertical: 12,
+        paddingHorizontal: 18,
+        backgroundColor: 'rgba(232, 194, 185, 0.05)',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(232, 194, 185, 0.41)',
+    },
+    sessionIcon: {
+        fontSize: 20,
+    },
+    sessionText: {
+        fontSize: 16,
+        fontFamily: 'Nunito-SemiBold',
+    },
+    progressSection: {
+        borderWidth: 1,
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+    },
+    updateProgressBtns: {
+        flexDirection: 'row',
+        marginTop: 8,
+        justifyContent: 'space-between',
+        gap: 12,
+    }
 });

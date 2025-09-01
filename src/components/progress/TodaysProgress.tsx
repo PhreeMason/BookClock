@@ -1,8 +1,8 @@
-import { LinearGradient } from 'expo-linear-gradient'
-import React, { useEffect, useRef } from 'react'
-import { Animated, StyleSheet, View } from 'react-native'
-import { ThemedText, ThemedView } from '../themed'
 import { formatProgressDisplay } from '@/lib/deadlineUtils'
+import React from 'react'
+import { StyleSheet, View } from 'react-native'
+import { ThemedText, ThemedView } from '../themed'
+import LinearProgressBar from '../shared/LinearProgressBar'
 
 const formatMinutesToTime = (minutes: number): string => {
   return formatProgressDisplay('audio', minutes)
@@ -22,7 +22,7 @@ const TodaysProgress: React.FC<TodaysProgressProps> = ({
   const progressPercentage = (current / total) * 100;
   const isListening = type === 'listening';
   const icon = isListening ? '🎧' : '📖';
-  const label = isListening ? "Today's Listening" : "Today's Reading";
+  const label = isListening ? "Listening" : "Reading";
   
   const getDisplayValue = () => {
     if (isListening) {
@@ -38,20 +38,6 @@ const TodaysProgress: React.FC<TodaysProgressProps> = ({
     }
     return `${remaining} pages left`;
   };
-  const shimmerTranslateX = useRef(new Animated.Value(-20)).current;
-
-  useEffect(() => {
-    const shimmerAnimation = Animated.loop(
-      Animated.timing(shimmerTranslateX, {
-        toValue: 40,
-        duration: 1800,
-        useNativeDriver: true,
-      })
-    );
-    shimmerAnimation.start();
-
-    return () => shimmerAnimation.stop();
-  }, [shimmerTranslateX]);
 
   return (
     <ThemedView style={styles.statCard}>
@@ -63,32 +49,14 @@ const TodaysProgress: React.FC<TodaysProgressProps> = ({
         <ThemedText style={styles.statValue}>{getDisplayValue()}</ThemedText>
       </View>
       
-      <View style={styles.progressBar}>
-        <LinearGradient 
-          colors={['#E8C2B9', '#B8A9D9']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={[styles.progressFill, { width: `${progressPercentage}%` }]}
-        >
-          <Animated.View
-            style={[
-              styles.shimmer,
-              {
-                transform: [{ translateX: shimmerTranslateX }],
-              },
-            ]}
-          >
-            <LinearGradient
-              colors={['transparent', 'rgba(255, 255, 255, 0.6), #B8A9D9']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.shimmerGradient}
-            />
-          </Animated.View>
-        </LinearGradient>
-      </View>
+      <LinearProgressBar 
+        progressPercentage={progressPercentage}
+        height={8}
+        borderRadius={100}
+        showShimmer={true}
+      />
       
-      <View style={styles.statFooter}>
+      <View style={[styles.statFooter, { marginTop: 8 }]}>
         <ThemedText style={styles.encouragementText}>{isListening ? 'Great pace!' : "You're doing great!"}</ThemedText>
         <ThemedText style={styles.remainingText}>{getRemainingText()}</ThemedText>
       </View>
@@ -123,35 +91,12 @@ const styles = StyleSheet.create({
   labelText: {
     color: '#2B3D4F',
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: 'Nunito-SemiBold',
   },
   statValue: {
     color: '#8B5A8C',
     fontSize: 20,
     fontWeight: '700',
-  },
-  progressBar: {
-    height: 8,
-    backgroundColor: 'rgba(232, 194, 185, 0.2)',
-    borderRadius: 100,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 100,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  shimmer: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    width: 20,
-  },
-  shimmerGradient: {
-    flex: 1,
   },
   statFooter: {
     flexDirection: 'row',
