@@ -1,13 +1,14 @@
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import {
-    calculateRequiredPace,
-    calculateUserPace,
-    calculateUserListeningPace,
-    formatPaceDisplay,
-    formatListeningPaceDisplay,
-    getPaceBasedStatus,
-    getRecentReadingDays,
-    getRecentListeningDays
+  calculateRequiredPace,
+  calculateUserListeningPace,
+  calculateUserPace,
+  formatListeningPaceDisplay,
+  formatPaceDisplay,
+  getPaceBasedStatus,
+  getRecentListeningDays,
+  getRecentReadingDays,
+  minimumUnitsPerDayFromDeadline
 } from '../paceCalculations';
 
 // Helper function to create mock deadlines
@@ -467,6 +468,143 @@ describe('paceCalculations', () => {
       
       // Should still include the negative progress day (user might have corrected an error)
       expect(readingDays).toHaveLength(2);
+    });
+  });
+
+  describe('minimumUnitsPerDayFromDeadline', () => {
+    it('should return empty array when no progress entries', () => {
+      const deadline = createMockDeadline('1', 'physical', 300, []);
+      
+      const result = minimumUnitsPerDayFromDeadline(deadline);
+      expect(result).toEqual([]);
+    });
+
+    it('should calculate pace using cumulative progress values', () => {
+      const deadline = createMockDeadline('1', 'physical', 300, [
+        { current_progress: 50, created_at: daysAgo(4) },
+        { current_progress: 100, created_at: daysAgo(3) },
+        { current_progress: 150, created_at: daysAgo(2) }
+      ]);
+      deadline.deadline_date = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+
+      const result = minimumUnitsPerDayFromDeadline(deadline);
+      
+      expect(result).toHaveLength(3);
+      // Day 1: 250 remaining / 14 days = 18
+      expect(result[0].value).toBe(18);
+      // Day 2: 200 remaining / 13 days = 16
+      expect(result[1].value).toBe(16);
+      // Day 3: 150 remaining / 12 days = 13
+      expect(result[2].value).toBe(13);
+    });
+
+    it('should return 0 when book is completed', () => {
+      const deadline = createMockDeadline('1', 'audio', 202, [
+        { current_progress: 132, created_at: daysAgo(3) },
+        { current_progress: 147, created_at: daysAgo(2) },
+        { current_progress: 202, created_at: daysAgo(1) } // Complete
+      ]);
+      deadline.deadline_date = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+
+      const result = minimumUnitsPerDayFromDeadline(deadline);
+      
+      expect(result).toHaveLength(3);
+      expect(result[0].value).toBeGreaterThan(0); // 70 remaining
+      expect(result[1].value).toBeGreaterThan(0); // 55 remaining  
+      expect(result[2].value).toBe(0); // Complete
+    });
+
+    it('should handle over-reading (progress > total)', () => {
+      const deadline = createMockDeadline('1', 'ebook', 200, [
+        { current_progress: 100, created_at: daysAgo(2) },
+        { current_progress: 250, created_at: daysAgo(1) } // Over-read
+      ]);
+      deadline.deadline_date = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString();
+
+      const result = minimumUnitsPerDayFromDeadline(deadline);
+      
+      expect(result).toHaveLength(2);
+      expect(result[0].value).toBe(15); // 100 remaining / 7 days = 14.29 -> ceil to 15
+      expect(result[1].value).toBe(0); // Over-complete
+    });
+
+    it('should handle past deadlines', () => {
+      const deadline = createMockDeadline('1', 'physical', 300, [
+        { current_progress: 100, created_at: daysAgo(10) },
+        { current_progress: 150, created_at: daysAgo(5) }
+      ]);
+      deadline.deadline_date = daysAgo(2); // Past deadline
+
+      const result = minimumUnitsPerDayFromDeadline(deadline);
+      
+      expect(result).toHaveLength(2);
+      // Both should be 0 or positive based on when deadline passed
+      expect(result[0].value).toBeGreaterThanOrEqual(0);
+      expect(result[1].value).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should sort progress entries by date', () => {
+      const deadline = createMockDeadline('1', 'physical', 300, [
+        { current_progress: 150, created_at: daysAgo(2) }, // Out of order
+        { current_progress: 50, created_at: daysAgo(4) },
+        { current_progress: 100, created_at: daysAgo(3) }
+      ]);
+      deadline.deadline_date = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+
+      const result = minimumUnitsPerDayFromDeadline(deadline);
+      
+      expect(result).toHaveLength(3);
+      // Should be sorted: day 4, day 3, day 2
+      expect(result[0].value).toBe(18); // 250 remaining at day 4
+      expect(result[1].value).toBe(16); // 200 remaining at day 3
+      expect(result[2].value).toBe(13); // 150 remaining at day 2
+    });
+
+    it('should handle duplicate dates by using latest progress for that date', () => {
+      const deadline = createMockDeadline('1', 'audio', 300, [
+        { current_progress: 50, created_at: '2025-08-19T10:00:00Z' },
+        { current_progress: 100, created_at: '2025-08-20T09:00:00Z' },
+        { current_progress: 120, created_at: '2025-08-20T15:00:00Z' }, // Same day, later progress
+        { current_progress: 150, created_at: '2025-08-21T10:00:00Z' }
+      ]);
+      deadline.deadline_date = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+
+      const result = minimumUnitsPerDayFromDeadline(deadline);
+      
+      // Should only have 3 entries, not 4 (8/20 should appear only once)
+      expect(result).toHaveLength(3);
+      expect(result[0].label).toBe('8/19');
+      expect(result[1].label).toBe('8/20'); // Should appear only once
+      expect(result[2].label).toBe('8/21');
+      
+      // Should use the latest progress for 8/20 (120, not 100)
+      expect(result[1].value).toBeGreaterThan(0);
+      
+      // Verify no duplicate dates in labels
+      const labels = result.map(r => r.label);
+      const uniqueLabels = [...new Set(labels)];
+      expect(labels).toEqual(uniqueLabels);
+    });
+
+    it('should match the real scenario from logs', () => {
+      // Simulating the exact scenario from the logs
+      const deadline = createMockDeadline('1', 'audio', 2893, [
+        { current_progress: 132, created_at: '2025-08-13T00:00:00Z' },
+        { current_progress: 147, created_at: '2025-08-14T00:00:00Z' }, // 132 + 15
+        { current_progress: 1220, created_at: '2025-08-19T00:00:00Z' }, // 147 + 1073
+        { current_progress: 1562, created_at: '2025-08-20T00:00:00Z' } // 1220 + 342
+      ]);
+      deadline.deadline_date = '2025-09-02T00:35:00Z';
+      deadline.created_at = '2025-08-12T00:37:29.148535Z';
+
+      const result = minimumUnitsPerDayFromDeadline(deadline);
+      
+      expect(result).toHaveLength(4);
+      // These should be based on cumulative progress
+      expect(result[0].value).toBeGreaterThan(100); // 2761 remaining / ~20 days
+      expect(result[1].value).toBeGreaterThan(100); // 2746 remaining / ~19 days
+      expect(result[2].value).toBeLessThan(150); // 1673 remaining / ~14 days
+      expect(result[3].value).toBeLessThan(130); // 1331 remaining / ~13 days
     });
   });
 

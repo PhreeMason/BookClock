@@ -1,7 +1,8 @@
 import { ThemedText, ThemedView } from "@/components/themed";
-import { calculateRequiredPace } from "@/lib/paceCalculations";
+import { calculateCutoffTime, calculateRequiredPace, minimumUnitsPerDayFromDeadline, processBookProgress } from "@/lib/paceCalculations";
 import { useTheme } from "@/theme";
 import { ReadingDeadlineWithProgress } from "@/types/deadline";
+import dayjs from "dayjs";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { BarChart, LineChart } from "react-native-gifted-charts";
@@ -19,67 +20,28 @@ interface ReadingDay {
 const getBookReadingDays = (
   deadline: ReadingDeadlineWithProgress
 ): ReadingDay[] => {
-  // Use the deadline's created date as the beginning
-  const cutoffDate = new Date(deadline.created_at!);
-  const cutoffTime = cutoffDate.getTime();
-
   const dailyProgress: { [date: string]: number } = {};
 
   // Sort progress updates by date
   if (!deadline.progress || !Array.isArray(deadline.progress)) return [];
 
-  const progress = deadline.progress
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
-    );
-
-  if (progress.length < 1) {
-        return []
-  }
-  // Only count first progress if it's very small (likely represents actual reading that day)
-  const firstProgress = progress[0];
-  const firstDate = new Date(firstProgress.created_at);
-  const INITIAL_PROGRESS_THRESHOLD = 50; // Only count if less than 50 pages/minutes
-
-  if (
-    firstDate.getTime() >= cutoffTime &&
-    firstProgress.current_progress > 0 &&
-    firstProgress.current_progress <= INITIAL_PROGRESS_THRESHOLD
-  ) {
-    const dateStr = firstDate.toISOString().slice(0, 10);
-    dailyProgress[dateStr] = firstProgress.current_progress;
+  const cutoffTime = calculateCutoffTime([deadline]);
+  if (cutoffTime === null) {
+    return [];
   }
 
-  // Calculate differences between consecutive progress entries
-  for (let i = 1; i < progress.length; i++) {
-    const prev = progress[i - 1];
-    const curr = progress[i];
-
-    const endDate = new Date(curr.created_at).getTime();
-
-    // Skip if the end date is before the cutoff
-    if (endDate < cutoffTime) continue;
-
-    const progressDiff = curr.current_progress - prev.current_progress;
-
-    // Only assign the progress to the end date (when progress was recorded)
-    const endDateObj = new Date(endDate);
-    if (endDateObj.getTime() >= cutoffTime) {
-      const dateStr = endDateObj.toISOString().slice(0, 10);
-      dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + progressDiff;
-    }
-  }
+  processBookProgress(deadline, cutoffTime, dailyProgress, deadline.format);
 
   // Convert dictionary to sorted array
-  return Object.entries(dailyProgress)
+  const result = Object.entries(dailyProgress)
     .map(([date, progressRead]) => ({
       date,
       progressRead: Number(progressRead.toFixed(2)),
       format: deadline.format as "physical" | "ebook" | "audio",
     }))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  return result;
 };
 
 const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
@@ -102,13 +64,13 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   const getChartTitle = (format: string) => {
     switch (format) {
       case "audio":
-        return "Daily Listening Progress";
+        return "Daily Required Pace";
       case "ebook":
-        return "Daily Reading Progress";
+        return "Required Daily Pace";
       case "physical":
-        return "Daily Reading Progress";
+        return "Required Daily Pace";
       default:
-        return "Daily Reading Progress";
+        return "Required Daily Pace";
     }
   };
 
@@ -136,7 +98,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
     return (
       <ThemedView style={styles.container}>
         <ThemedText style={[styles.title, { color: theme.text }]}>
-          Daily Reading Progress
+          Required Daily Pace
         </ThemedText>
         <ThemedView style={styles.emptyState}>
           <ThemedText
@@ -180,50 +142,42 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   const displayDailyMinimum = dailyMinimum;
 
   // Prepare data for the bar chart
-  const chartData = recentDays.map((day, index) => ({
-    value: Math.round(day.progressRead),
-    label: new Date(day.date).toLocaleDateString("en-US", {
-      month: "numeric",
-      day: "numeric",
-    }),
-    frontColor: theme.primary,
-    spacing: index === recentDays.length - 1 ? 0 : 2,
-    labelWidth: 40,
-    labelTextStyle: {
-      color: theme.text,
-      fontSize: 9,
-      fontWeight: "400",
-    },
-    topLabelComponent: () => (
-      <ThemedText style={{
-        color: theme.text,
-        fontSize: 10,
-        fontWeight: '600',
-        textAlign: 'center',
-        backgroundColor: 'transparent',
-      }}>
-        {Math.round(day.progressRead)}
-      </ThemedText>
-    ),
-  }));
-
-  // Prepare data for the line chart (cumulative progress)
-  let cumulativeProgress = 0;
-  const lineChartData = recentDays.map((day) => {
-    cumulativeProgress += day.progressRead;
+  const chartData = recentDays.map((day) => {
+    const label = dayjs(day.date).format("M/DD");
     return {
-      value: Math.round(cumulativeProgress),
-      label: new Date(day.date).toLocaleDateString("en-US", {
-        month: "numeric",
-        day: "numeric",
-      }),
+      value: Math.round(day.progressRead),
+      label: label,
+      frontColor: theme.primary,
+      spacing: 2, // Changed: consistent spacing for all bars
+      labelWidth: 40,
       labelTextStyle: {
         color: theme.text,
         fontSize: 9,
         fontWeight: "400",
       },
+      topLabelComponent: () => (
+        <ThemedText style={{
+          color: theme.text,
+          fontSize: 10,
+          fontWeight: '600',
+          textAlign: 'center',
+          backgroundColor: 'transparent',
+        }}>
+          {Math.round(day.progressRead)}
+        </ThemedText>
+      ),
     };
   });
+
+  // Prepare data for the line chart (required daily pace)
+  const lineChartRealData = minimumUnitsPerDayFromDeadline(deadline).map((day) => ({
+    ...day,
+    labelTextStyle: {
+      color: theme.text,
+      fontSize: 9,
+      fontWeight: "400",
+    }
+  }));
 
   const maxValue = Math.max(
     ...chartData.map((d) => d.value),
@@ -231,7 +185,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
   );
   const yAxisMax = Math.ceil(maxValue * 1.2); // Add 20% padding
 
-  const lineMaxValue = Math.max(...lineChartData.map((d) => d.value));
+  const lineMaxValue = Math.max(...lineChartRealData.map((d) => d.value));
   const lineYAxisMax = Math.ceil(lineMaxValue * 1.1); // Add 10% padding
 
   return (
@@ -239,15 +193,15 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
       <ThemedText style={[styles.title, { color: theme.text }]}>
         {chartTitle}
       </ThemedText>
-      
+
       <View style={styles.chartContainer}>
-        {/* Line Chart - Cumulative Progress */}
+        {/* Line Chart - Required Daily Pace */}
         <View style={styles.lineChartSection} testID="line-chart">
           <ThemedText style={[styles.chartSubtitle, { color: theme.textMuted }]}>
-            Cumulative Progress
+            Required Daily Pace
           </ThemedText>
           <LineChart
-            data={lineChartData}
+            data={lineChartRealData}
             width={300}
             height={120}
             spacing={chartData.length > 1 ? 280 / (chartData.length - 1) : 280}
@@ -278,7 +232,7 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
             animationDuration={1000}
           />
         </View>
-        
+
         {/* Bar Chart - Daily Progress */}
         <View style={styles.barChartSection} testID="bar-chart">
           <ThemedText style={[styles.chartSubtitle, { color: theme.textMuted }]}>
@@ -286,10 +240,14 @@ const DailyReadingChart: React.FC<DailyReadingChartProps> = ({ deadline }) => {
           </ThemedText>
           <BarChart
             data={chartData}
-            width={300}
+            width={350}
             height={180}
-            barWidth={Math.max(20, Math.min(35, 280 / chartData.length))}
-            spacing={Math.max(2, Math.min(15, 280 / chartData.length / 3))}
+            initialSpacing={10}
+            endSpacing={10}
+            barWidth={(() => {
+              const calculatedWidth = Math.max(20, Math.min(35, 320 / chartData.length));
+              return calculatedWidth;
+            })()}
             roundedTop
             hideRules
             xAxisThickness={2}

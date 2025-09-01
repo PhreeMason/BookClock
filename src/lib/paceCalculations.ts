@@ -1,4 +1,5 @@
 import { ReadingDeadlineWithProgress } from '@/types/deadline';
+import dayjs from 'dayjs';
 
 export interface ReadingDay {
   date: string;
@@ -61,7 +62,7 @@ const calculatePaceFromActivityDays = (activityDays: ActivityDay[]): number => {
 /**
  * Calculates the cutoff date based on the most recent progress across all filtered deadlines
  */
-const calculateCutoffTime = (deadlines: ReadingDeadlineWithProgress[]): number | null => {
+export const calculateCutoffTime = (deadlines: ReadingDeadlineWithProgress[]): number | null => {
   const allProgressUpdates = deadlines.flatMap(d => d.progress || []);
   if (allProgressUpdates.length === 0) {
     return null;
@@ -69,7 +70,7 @@ const calculateCutoffTime = (deadlines: ReadingDeadlineWithProgress[]): number |
   const allProgressUpdatesSorted = allProgressUpdates.sort(
     (a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime()
   );
-  
+
   const cutoffDate = new Date(allProgressUpdatesSorted[0].created_at);
   cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER_FOR_PACE);
   return cutoffDate.getTime();
@@ -78,7 +79,7 @@ const calculateCutoffTime = (deadlines: ReadingDeadlineWithProgress[]): number |
 /**
  * Processes progress entries for a single book and accumulates daily progress
  */
-const processBookProgress = (
+export const processBookProgress = (
   book: ReadingDeadlineWithProgress,
   cutoffTime: number,
   dailyProgress: { [date: string]: number },
@@ -99,7 +100,7 @@ const processBookProgress = (
     baselineProgress = progress[0].current_progress;
     progress.shift();
   }
-  
+
   if (progress.length === 0) return;
 
   // Handle the first remaining progress entry
@@ -109,7 +110,7 @@ const processBookProgress = (
   if (firstDate.getTime() >= cutoffTime) {
     const dateStr = firstDate.toISOString().slice(0, 10);
     const amount = firstProgress.current_progress - baselineProgress;
-    
+
     // For audio format, filter out large initial listening sessions (>5 hours)
     const INITIAL_LISTENING_THRESHOLD = 300; // 5 hours max for initial listening
     if (format === 'audio' && baselineProgress === 0 && amount > INITIAL_LISTENING_THRESHOLD) {
@@ -147,7 +148,7 @@ export const getRecentReadingDays = (
 
   // Filter to only physical and ebook deadlines (no audio mixing)
   const readingDeadlines = deadlines.filter(d => d.format === 'physical' || d.format === 'ebook');
-  
+
   const cutoffTime = calculateCutoffTime(readingDeadlines);
   if (cutoffTime === null) {
     return [];
@@ -340,7 +341,7 @@ export const getRecentListeningDays = (
 
   // Filter to only audio deadlines
   const audioDeadlines = deadlines.filter(d => d.format === 'audio');
-  
+
   const cutoffTime = calculateCutoffTime(audioDeadlines);
   if (cutoffTime === null) {
     return [];
@@ -406,3 +407,62 @@ export const formatListeningPaceDisplay = (pace: number): string => {
   }
   return `${minutes}m/day`;
 };
+
+
+type PacePerDay = { value: number, label: string }
+
+export const minimumUnitsPerDayFromDeadline = (deadline: ReadingDeadlineWithProgress): PacePerDay[] => {
+  if (!deadline.progress || deadline.progress.length === 0) {
+    return [];
+  }
+
+  const pacePerDay: PacePerDay[] = [];
+  const deadlineDate = new Date(deadline.deadline_date).getTime();
+  const total = deadline.total_quantity;
+
+  // Sort progress entries by date
+  const sortedProgress = [...deadline.progress].sort((a, b) => 
+    new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+
+  // Filter progress entries to only include those before today
+  const today = new Date().getTime();
+  const progressBeforeToday = sortedProgress.filter(p => 
+    new Date(p.created_at).getTime() <= today
+  );
+
+  // Group by date and keep only the latest progress for each day
+  const progressByDate = new Map<string, typeof progressBeforeToday[0]>();
+  
+  for (const progress of progressBeforeToday) {
+    const dateKey = dayjs(progress.created_at).format('YYYY-MM-DD');
+    const existing = progressByDate.get(dateKey);
+    
+    // Keep the progress entry with the latest timestamp for each date
+    if (!existing || new Date(progress.created_at).getTime() > new Date(existing.created_at).getTime()) {
+      progressByDate.set(dateKey, progress);
+    }
+  }
+
+  // Convert back to array and sort by date
+  const uniqueProgress = Array.from(progressByDate.values()).sort((a, b) => 
+    new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+
+  for (const progress of uniqueProgress) {
+    const progressDate = new Date(progress.created_at).getTime();
+    const daysLeft = Math.ceil((deadlineDate - progressDate) / (1000 * 60 * 60 * 24));
+    let value = 0;
+    
+    if (daysLeft > 0) {
+      const remainingUnits = Math.max(0, total - progress.current_progress);
+      value = Math.ceil(remainingUnits / daysLeft);
+    }
+    
+    const label = dayjs(progress.created_at).format('M/D');
+    pacePerDay.push({ value, label });
+  }
+
+  return pacePerDay;
+};
+
