@@ -2,9 +2,12 @@ import { ReadingDeadlineWithProgress } from '@/types/deadline';
 import {
     calculateRequiredPace,
     calculateUserPace,
+    calculateUserListeningPace,
     formatPaceDisplay,
+    formatListeningPaceDisplay,
     getPaceBasedStatus,
-    getRecentReadingDays
+    getRecentReadingDays,
+    getRecentListeningDays
 } from '../paceCalculations';
 
 // Helper function to create mock deadlines
@@ -77,7 +80,7 @@ describe('paceCalculations', () => {
   });
 
   describe('calculateUserPace', () => {
-    it('should use Tier 1 calculation when ≥3 reading days available', () => {
+    it('should calculate pace as total pages divided by days between first and last reading day', () => {
       const deadlines = [
         createMockDeadline('1', 'physical', 300, [
           { current_progress: 30, created_at: daysAgo(6) },
@@ -91,10 +94,11 @@ describe('paceCalculations', () => {
       expect(result.calculationMethod).toBe('recent_data');
       expect(result.isReliable).toBe(true);
       expect(result.readingDaysCount).toBe(3);
-      expect(result.averagePace).toBe((30 + 30 + 40) / 3); // 33.33
+      // Total pages: 30 + 30 + 40 = 100, Days between first (day 6) and last (day 2) = 4 days
+      expect(result.averagePace).toBe(100 / 4); // 25 pages/day
     });
 
-    it('should use Tier 2 fallback when <3 reading days available', () => {
+    it('should calculate pace correctly with fewer reading days', () => {
       const deadlines = [
         createMockDeadline('1', 'physical', 300, [
           { current_progress: 50, created_at: daysAgo(5) },
@@ -104,10 +108,11 @@ describe('paceCalculations', () => {
 
       const result = calculateUserPace(deadlines);
       
-      expect(result.calculationMethod).toBe('default_fallback');
-      expect(result.isReliable).toBe(false);
+      expect(result.calculationMethod).toBe('recent_data');
+      expect(result.isReliable).toBe(true);
       expect(result.readingDaysCount).toBe(2);
-      expect(result.averagePace).toBe(25); // Default fallback
+      // Total pages: 50 + 30 = 80, Days between first (day 5) and last (day 3) = 2 days
+      expect(result.averagePace).toBe(80 / 2); // 40 pages/day
     });
 
     it('should handle empty deadlines array', () => {
@@ -116,7 +121,57 @@ describe('paceCalculations', () => {
       expect(result.calculationMethod).toBe('default_fallback');
       expect(result.isReliable).toBe(false);
       expect(result.readingDaysCount).toBe(0);
-      expect(result.averagePace).toBe(25);
+      expect(result.averagePace).toBe(0);
+    });
+
+    it('should handle single reading day', () => {
+      const deadlines = [
+        createMockDeadline('1', 'physical', 300, [
+          { current_progress: 45, created_at: daysAgo(3) }
+        ])
+      ];
+
+      const result = calculateUserPace(deadlines);
+      
+      expect(result.calculationMethod).toBe('recent_data');
+      expect(result.isReliable).toBe(true);
+      expect(result.readingDaysCount).toBe(1);
+      // Single day means daysBetween = 0, but we ceil it to 1
+      expect(result.averagePace).toBe(45);
+    });
+
+    it('should filter out audio books from pace calculation', () => {
+      const deadlines = [
+        createMockDeadline('1', 'physical', 300, [
+          { current_progress: 30, created_at: daysAgo(4) },
+          { current_progress: 60, created_at: daysAgo(2) }
+        ]),
+        createMockDeadline('2', 'audio', 600, [
+          { current_progress: 120, created_at: daysAgo(3) } // Should be ignored
+        ])
+      ];
+
+      const result = calculateUserPace(deadlines);
+      
+      expect(result.readingDaysCount).toBe(2);
+      // Only physical book progress: 30 + 30 = 60 pages over 2 days
+      expect(result.averagePace).toBe(60 / 2); // 30 pages/day
+    });
+
+    it('should respect 21-day cutoff from most recent progress', () => {
+      const deadlines = [
+        createMockDeadline('1', 'physical', 300, [
+          { current_progress: 20, created_at: daysAgo(25) }, // Too old, should be filtered out
+          { current_progress: 40, created_at: daysAgo(5) },
+          { current_progress: 70, created_at: daysAgo(2) }
+        ])
+      ];
+
+      const result = calculateUserPace(deadlines);
+      
+      expect(result.readingDaysCount).toBe(2); // Only recent 2 entries
+      // Reading days: day 5 (20 pages) + day 2 (30 pages) = 50 total over 3 days
+      expect(result.averagePace).toBeCloseTo(50 / 3, 2);
     });
   });
 
@@ -215,6 +270,206 @@ describe('paceCalculations', () => {
     });
   });
 
+  describe('getRecentListeningDays', () => {
+    it('should extract listening days from audio deadlines only', () => {
+      const physicalBook = createMockDeadline('1', 'physical', 300, [
+        { current_progress: 25, created_at: daysAgo(3) }
+      ]);
+      
+      const audioBook = createMockDeadline('2', 'audio', 600, [
+        { current_progress: 45, created_at: daysAgo(5) },
+        { current_progress: 90, created_at: daysAgo(3) }
+      ]);
+
+      const result = getRecentListeningDays([physicalBook, audioBook]);
+      
+      expect(result).toHaveLength(2);
+      expect(result[0].minutesListened).toBe(45);
+      expect(result[1].minutesListened).toBe(45);
+    });
+
+    it('should filter out large initial listening sessions', () => {
+      const audioBook = createMockDeadline('1', 'audio', 600, [
+        { current_progress: 400, created_at: daysAgo(5) }, // Too large for single day
+        { current_progress: 450, created_at: daysAgo(3) }
+      ]);
+
+      const result = getRecentListeningDays([audioBook]);
+      
+      expect(result).toHaveLength(1);
+      expect(result[0].minutesListened).toBe(50); // Only the difference
+    });
+
+    it('should respect 21-day cutoff for listening days', () => {
+      const audioBook = createMockDeadline('1', 'audio', 600, [
+        { current_progress: 30, created_at: daysAgo(25) }, // Too old
+        { current_progress: 60, created_at: daysAgo(5) },
+        { current_progress: 90, created_at: daysAgo(2) }
+      ]);
+
+      const result = getRecentListeningDays([audioBook]);
+      
+      expect(result).toHaveLength(2); // Only recent entries
+    });
+  });
+
+  describe('calculateUserListeningPace', () => {
+    it('should calculate pace as total minutes divided by days between first and last listening day', () => {
+      const audioDeadlines = [
+        createMockDeadline('1', 'audio', 600, [
+          { current_progress: 60, created_at: daysAgo(5) },
+          { current_progress: 120, created_at: daysAgo(3) }
+        ])
+      ];
+
+      const result = calculateUserListeningPace(audioDeadlines);
+      
+      expect(result.calculationMethod).toBe('recent_data');
+      expect(result.isReliable).toBe(true);
+      expect(result.listeningDaysCount).toBe(2);
+      // Total minutes: 60 + 60 = 120, Days between first (day 5) and last (day 3) = 2 days
+      expect(result.averagePace).toBe(120 / 2); // 60 minutes/day
+    });
+
+    it('should handle empty audio deadlines', () => {
+      const result = calculateUserListeningPace([]);
+      
+      expect(result.calculationMethod).toBe('default_fallback');
+      expect(result.isReliable).toBe(false);
+      expect(result.listeningDaysCount).toBe(0);
+      expect(result.averagePace).toBe(0);
+    });
+
+    it('should handle single listening day', () => {
+      const audioDeadlines = [
+        createMockDeadline('1', 'audio', 600, [
+          { current_progress: 45, created_at: daysAgo(3) }
+        ])
+      ];
+
+      const result = calculateUserListeningPace(audioDeadlines);
+      
+      expect(result.calculationMethod).toBe('recent_data');
+      expect(result.isReliable).toBe(true);
+      expect(result.listeningDaysCount).toBe(1);
+      // Single day means daysBetween = 0, but we max it to 1
+      expect(result.averagePace).toBe(45);
+    });
+
+    it('should ignore physical and ebook deadlines', () => {
+      const mixedDeadlines = [
+        createMockDeadline('1', 'physical', 300, [
+          { current_progress: 50, created_at: daysAgo(3) }
+        ]),
+        createMockDeadline('2', 'audio', 600, [
+          { current_progress: 90, created_at: daysAgo(2) }
+        ])
+      ];
+
+      const result = calculateUserListeningPace(mixedDeadlines);
+      
+      expect(result.listeningDaysCount).toBe(1);
+      expect(result.averagePace).toBe(90); // Only audio book counted
+    });
+
+    it('should respect 21-day cutoff for listening pace', () => {
+      const audioDeadlines = [
+        createMockDeadline('1', 'audio', 600, [
+          { current_progress: 30, created_at: daysAgo(25) }, // Too old, should be filtered out
+          { current_progress: 60, created_at: daysAgo(5) },
+          { current_progress: 120, created_at: daysAgo(2) }
+        ])
+      ];
+
+      const result = calculateUserListeningPace(audioDeadlines);
+      
+      expect(result.listeningDaysCount).toBe(2); // Only recent 2 entries
+      // Listening days: day 5 (30 minutes after filtering old baseline) + day 2 (60 minutes) = 90 total over 3 days
+      expect(result.averagePace).toBeCloseTo(90 / 3, 2);
+    });
+
+    it('should filter out large initial listening sessions', () => {
+      const audioDeadlines = [
+        createMockDeadline('1', 'audio', 600, [
+          { current_progress: 400, created_at: daysAgo(5) }, // Too large, will be filtered
+          { current_progress: 450, created_at: daysAgo(3) }
+        ])
+      ];
+
+      const result = calculateUserListeningPace(audioDeadlines);
+      
+      expect(result.listeningDaysCount).toBe(1); // Only the difference
+      expect(result.averagePace).toBe(50); // 50 minutes in 1 day
+    });
+  });
+
+  describe('formatListeningPaceDisplay', () => {
+    it('should format minutes correctly', () => {
+      expect(formatListeningPaceDisplay(45)).toBe('45m/day');
+      expect(formatListeningPaceDisplay(30)).toBe('30m/day');
+    });
+
+    it('should format hours and minutes correctly', () => {
+      expect(formatListeningPaceDisplay(90)).toBe('1h 30m/day');
+      expect(formatListeningPaceDisplay(120)).toBe('2h 0m/day');
+      expect(formatListeningPaceDisplay(135)).toBe('2h 15m/day');
+    });
+
+    it('should handle zero and small values', () => {
+      expect(formatListeningPaceDisplay(0)).toBe('0m/day');
+      expect(formatListeningPaceDisplay(1)).toBe('1m/day');
+    });
+  });
+
+  describe('Edge cases and error handling', () => {
+    it('should handle deadlines with no progress entries', () => {
+      const emptyDeadline = createMockDeadline('1', 'physical', 300, []);
+      
+      const readingDays = getRecentReadingDays([emptyDeadline]);
+      const userPace = calculateUserPace([emptyDeadline]);
+      
+      expect(readingDays).toHaveLength(0);
+      expect(userPace.readingDaysCount).toBe(0);
+      expect(userPace.averagePace).toBe(0);
+    });
+
+    it('should handle malformed progress data gracefully', () => {
+      const deadline = {
+        ...createMockDeadline('1', 'physical', 300, []),
+        progress: null as any
+      };
+      
+      const readingDays = getRecentReadingDays([deadline]);
+      expect(readingDays).toHaveLength(0);
+    });
+
+    it('should filter out progress entries created at same time as deadline', () => {
+      const createdAt = daysAgo(5);
+      const deadline = createMockDeadline('1', 'physical', 300, [
+        { current_progress: 100, created_at: createdAt }, // Same as deadline creation
+        { current_progress: 130, created_at: daysAgo(3) }
+      ]);
+      deadline.created_at = createdAt;
+
+      const readingDays = getRecentReadingDays([deadline]);
+      
+      expect(readingDays).toHaveLength(1);
+      expect(readingDays[0].pagesRead).toBe(30); // Only the difference
+    });
+
+    it('should handle negative progress differences', () => {
+      const deadline = createMockDeadline('1', 'physical', 300, [
+        { current_progress: 100, created_at: daysAgo(5) },
+        { current_progress: 90, created_at: daysAgo(3) } // Negative progress
+      ]);
+
+      const readingDays = getRecentReadingDays([deadline]);
+      
+      // Should still include the negative progress day (user might have corrected an error)
+      expect(readingDays).toHaveLength(2);
+    });
+  });
+
   describe('Integration tests', () => {
     it('should work end-to-end with realistic scenario', () => {
       // User has been reading consistently
@@ -225,22 +480,59 @@ describe('paceCalculations', () => {
           { current_progress: 120, created_at: daysAgo(2) }
         ]),
         createMockDeadline('book2', 'audio', 300, [
-          { current_progress: 45, created_at: daysAgo(5) }, // 30 page equivalents
-          { current_progress: 90, created_at: daysAgo(3) }  // 30 page equivalents
+          { current_progress: 45, created_at: daysAgo(5) },
+          { current_progress: 90, created_at: daysAgo(3) }
         ])
       ];
 
       // Calculate user pace (only physical books counted for reading pace)
       const userPace = calculateUserPace(deadlines);
       expect(userPace.isReliable).toBe(true);
-      expect(userPace.averagePace).toBeCloseTo(40, 1); // (40+40+40)/3 = 120/3 = 40 (audio not mixed in)
+      // Physical: 40+40+40 = 120 pages over 4 days (from day 6 to day 2) = 30 pages/day
+      expect(userPace.averagePace).toBeCloseTo(30, 1);
+
+      // Calculate listening pace separately
+      const listeningPace = calculateUserListeningPace(deadlines);
+      expect(listeningPace.isReliable).toBe(true);
+      // Audio: 45 + 45 = 90 minutes over 2 days (from day 5 to day 3) = 45 minutes/day
+      expect(listeningPace.averagePace).toBe(90 / 2); // 45 minutes/day
 
       // Calculate status for a new deadline
       const requiredPace = calculateRequiredPace(200, 50, 5, 'physical'); // Need 30 pages/day
       const status = getPaceBasedStatus(userPace.averagePace, requiredPace, 5, 25);
       
-      expect(status.color).toBe('green'); // User pace (33.33) > required (30)
+      expect(status.color).toBe('green'); // User pace (30) >= required (30)
       expect(status.level).toBe('good');
+    });
+
+    it('should handle mixed format scenarios correctly', () => {
+      const mixedDeadlines = [
+        createMockDeadline('physical1', 'physical', 300, [
+          { current_progress: 25, created_at: daysAgo(4) },
+          { current_progress: 50, created_at: daysAgo(2) }
+        ]),
+        createMockDeadline('ebook1', 'ebook', 200, [
+          { current_progress: 30, created_at: daysAgo(3) }
+        ]),
+        createMockDeadline('audio1', 'audio', 500, [
+          { current_progress: 60, created_at: daysAgo(4) },
+          { current_progress: 120, created_at: daysAgo(1) }
+        ])
+      ];
+
+      const readingDays = getRecentReadingDays(mixedDeadlines);
+      const listeningDays = getRecentListeningDays(mixedDeadlines);
+
+      // Reading days should include physical and ebook, but not audio
+      expect(readingDays).toHaveLength(3);
+      expect(readingDays.some(day => day.pagesRead === 25)).toBe(true); // Physical
+      expect(readingDays.some(day => day.pagesRead === 25)).toBe(true); // Physical diff
+      expect(readingDays.some(day => day.pagesRead === 30)).toBe(true); // Ebook
+
+      // Listening days should only include audio
+      expect(listeningDays).toHaveLength(2);
+      expect(listeningDays[0].minutesListened).toBe(60);
+      expect(listeningDays[1].minutesListened).toBe(60);
     });
   });
 });

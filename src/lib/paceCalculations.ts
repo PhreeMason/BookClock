@@ -32,16 +32,53 @@ export interface PaceBasedStatus {
   message: string;
 }
 
+const DAYS_TO_CONSIDER_FOR_PACE = 21;
+
+interface ActivityDay {
+  date: string;
+  amount: number; // pages for reading, minutes for listening
+}
+
+/**
+ * Shared utility to calculate pace using the "total amount divided by days between first and last" algorithm
+ */
+const calculatePaceFromActivityDays = (activityDays: ActivityDay[]): number => {
+  const activityDaysCount = activityDays.length;
+  if (activityDaysCount === 0) {
+    return 0;
+  }
+
+  const totalAmount = activityDays.reduce((sum, day) => sum + day.amount, 0);
+
+  // Count the number of days between the first and the last day
+  const firstDay = new Date(activityDays[0].date);
+  const lastDay = new Date(activityDays[activityDaysCount - 1].date);
+  const daysBetween = Math.max(1, Math.ceil((lastDay.getTime() - firstDay.getTime()) / (1000 * 60 * 60 * 24)));
+
+  return totalAmount / daysBetween;
+};
 
 export const getRecentReadingDays = (
   deadlines: ReadingDeadlineWithProgress[]
 ): ReadingDay[] => {
-  const DAYS_TO_CONSIDER = 14;
 
   const dailyProgress: { [date: string]: number } = {};
 
   // Filter to only physical and ebook deadlines (no audio mixing)
   const readingDeadlines = deadlines.filter(d => d.format === 'physical' || d.format === 'ebook');
+  const allProgressUpdates = readingDeadlines.flatMap(d => d.progress || []);
+  const allProgressUpdatesSorted = allProgressUpdates.sort(
+    (a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime()
+  );
+  
+  // Handle case where there are no progress updates
+  if (allProgressUpdatesSorted.length === 0) {
+    return [];
+  }
+  
+  const cutoffDate = new Date(allProgressUpdatesSorted[0].created_at);
+  cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER_FOR_PACE);
+  const cutoffTime = cutoffDate.getTime();
 
   readingDeadlines.forEach(book => {
     // Sort progress updates by date
@@ -52,26 +89,27 @@ export const getRecentReadingDays = (
     );
 
     if (progress.length === 0) return;
-    // get date of most recent progress entry
-    const mostRecentProgress = progress[progress.length - 1];
-    const cutoffDate = new Date(mostRecentProgress.created_at);
-    cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER);
-    const cutoffTime = cutoffDate.getTime();
 
-    // Only count first progress if it's very small (likely represents actual reading that day)
-    // Large initial progress values represent "I'm already X pages into this book" not "I read X pages today"
+    // Check if first progress was created at same time as deadline (initial progress)
+    let baselineProgress = 0;
+    const originalFirstDate = new Date(progress[0].created_at);
+    if (originalFirstDate.getTime() === new Date(book.created_at).getTime()) {
+      baselineProgress = progress[0].current_progress;
+      progress.shift();
+    }
+    
+    if (progress.length === 0) return;
+
+    // Handle the first remaining progress entry
     const firstProgress = progress[0];
     const firstDate = new Date(firstProgress.created_at);
-    const INITIAL_PROGRESS_THRESHOLD = 50; // Only count if less than 50 pages
 
-    if (firstDate.getTime() >= cutoffTime &&
-      firstProgress.current_progress > 0 &&
-      firstProgress.current_progress <= INITIAL_PROGRESS_THRESHOLD) {
+    if (firstDate.getTime() >= cutoffTime) {
       const dateStr = firstDate.toISOString().slice(0, 10);
-      // Both physical and ebook are already in pages
-      const pagesRead = firstProgress.current_progress;
-
-      dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + pagesRead;
+      const pagesRead = firstProgress.current_progress - baselineProgress;
+      if (pagesRead > 0) {
+        dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + pagesRead;
+      }
     }
 
     // Calculate differences between consecutive progress entries
@@ -125,8 +163,13 @@ export const calculateUserPace = (deadlines: ReadingDeadlineWithProgress[]): Use
     };
   }
 
-  const totalPages = recentReadingDays.reduce((sum, day) => sum + day.pagesRead, 0);
-  const averagePace = totalPages / readingDaysCount;
+  // Convert ReadingDay[] to ActivityDay[] format
+  const activityDays: ActivityDay[] = recentReadingDays.map(day => ({
+    date: day.date,
+    amount: day.pagesRead
+  }));
+
+  const averagePace = calculatePaceFromActivityDays(activityDays);
 
   return {
     averagePace,
@@ -271,7 +314,6 @@ export const formatPaceDisplay = (pace: number, format: 'physical' | 'ebook' | '
 export const getRecentListeningDays = (
   deadlines: ReadingDeadlineWithProgress[]
 ): ListeningDay[] => {
-  const DAYS_TO_CONSIDER = 14;
 
   const dailyProgress: { [date: string]: number } = {};
 
@@ -289,7 +331,7 @@ export const getRecentListeningDays = (
     if (progress.length === 0) return;
     const mostRecentProgress = progress[progress.length - 1];
     const cutoffDate = new Date(mostRecentProgress.created_at);
-    cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER);
+    cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_CONSIDER_FOR_PACE);
     const cutoffTime = cutoffDate.getTime();
 
     // Only count first progress if it's reasonable for a single day
@@ -341,7 +383,7 @@ export const getRecentListeningDays = (
 
 /**
  * Calculates user's listening pace based on recent audio book activity.
- * The daily average of all non zero days within the last 14 days is used starting with the most recent non zero day.
+ * Uses the same algorithm as reading pace: total minutes divided by days between first and last listening day.
  */
 export const calculateUserListeningPace = (deadlines: ReadingDeadlineWithProgress[]): UserListeningPaceData => {
   const recentDays = getRecentListeningDays(deadlines);
@@ -356,8 +398,13 @@ export const calculateUserListeningPace = (deadlines: ReadingDeadlineWithProgres
     };
   }
 
-  const totalMinutes = recentDays.reduce((sum, day) => sum + day.minutesListened, 0);
-  const averagePace = totalMinutes / listeningDaysCount;
+  // Convert ListeningDay[] to ActivityDay[] format
+  const activityDays: ActivityDay[] = recentDays.map(day => ({
+    date: day.date,
+    amount: day.minutesListened
+  }));
+
+  const averagePace = calculatePaceFromActivityDays(activityDays);
 
   return {
     averagePace,
@@ -365,7 +412,6 @@ export const calculateUserListeningPace = (deadlines: ReadingDeadlineWithProgres
     isReliable: true,
     calculationMethod: 'recent_data'
   };
-
 }
 
 /**

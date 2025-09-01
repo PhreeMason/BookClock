@@ -627,7 +627,7 @@ export type Database = {
           author: string | null
           book_id: string | null
           book_title: string
-          created_at: string | null
+          created_at: string
           deadline_date: string
           flexibility: Database["public"]["Enums"]["deadline_flexibility"]
           format: Database["public"]["Enums"]["book_format_enum"]
@@ -641,7 +641,7 @@ export type Database = {
           author?: string | null
           book_id?: string | null
           book_title: string
-          created_at?: string | null
+          created_at?: string
           deadline_date: string
           flexibility: Database["public"]["Enums"]["deadline_flexibility"]
           format?: Database["public"]["Enums"]["book_format_enum"]
@@ -655,7 +655,7 @@ export type Database = {
           author?: string | null
           book_id?: string | null
           book_title?: string
-          created_at?: string | null
+          created_at?: string
           deadline_date?: string
           flexibility?: Database["public"]["Enums"]["deadline_flexibility"]
           format?: Database["public"]["Enums"]["book_format_enum"]
