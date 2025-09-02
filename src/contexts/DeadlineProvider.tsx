@@ -58,6 +58,7 @@ interface DeadlineContextType {
   };
 
   formatUnitsPerDay: (units: number, format: 'physical' | 'ebook' | 'audio') => string;
+  formatUnitsPerDayForDisplay: (units: number, format: 'physical' | 'ebook' | 'audio', remaining: number, daysLeft: number) => string;
   
   // Counts
   activeCount: number;
@@ -142,7 +143,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     return Math.max(0, currentProgress - progressAtStartOfDay);
   };
 
-  // Format the units per day display based on format
+  // Format the units per day display based on format (original version for general use)
   const formatUnitsPerDay = (units: number, format: 'physical' | 'ebook' | 'audio'): string => {
     if (format === 'audio') {
       const hours = Math.floor(units / 60);
@@ -154,6 +155,68 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     }
     const unit = getUnitForFormat(format);
     return `${units} ${unit}/day needed`;
+  };
+
+  // Special formatting for DeadlineCard display - handles < 1 unit/day cases
+  const formatUnitsPerDayForDisplay = (units: number, format: 'physical' | 'ebook' | 'audio', remaining: number, daysLeft: number): string => {
+    // Calculate the actual decimal value for precise formatting
+    const actualUnitsPerDay = daysLeft > 0 ? remaining / daysLeft : units;
+    
+    if (format === 'audio') {
+      // For audio: if less than 1 minute per day, show in week format when appropriate
+      if (actualUnitsPerDay < 1 && daysLeft > 0) {
+        const daysPerMinute = Math.round(1 / actualUnitsPerDay);
+        
+        // Convert to weeks if it makes sense
+        if (daysPerMinute === 7) {
+          return '1 minute/week';
+        } else if (daysPerMinute === 14) {
+          return '1 minute/2 weeks';
+        } else if (daysPerMinute === 21) {
+          return '1 minute/3 weeks';
+        } else if (daysPerMinute === 28) {
+          return '1 minute/month';
+        } else if (daysPerMinute > 7 && daysPerMinute % 7 === 0) {
+          const weeks = daysPerMinute / 7;
+          return `1 minute/${weeks} weeks`;
+        }
+        
+        return `1 minute every ${daysPerMinute} days`;
+      }
+      
+      // For >= 1 minute/day, use standard formatting
+      const hours = Math.floor(units / 60);
+      const minutes = Math.round(units % 60);
+      if (hours > 0) {
+        return minutes > 0 ? `${hours}h ${minutes}m/day needed` : `${hours}h/day needed`;
+      }
+      return `${Math.round(units)} minutes/day needed`;
+    }
+    
+    // For physical/ebook: if less than 1 page per day, show in week format when appropriate
+    if (actualUnitsPerDay < 1 && daysLeft > 0) {
+      const daysPerPage = Math.round(1 / actualUnitsPerDay);
+      
+      // Convert to weeks if it makes sense
+      if (daysPerPage === 7) {
+        return '1 page/week';
+      } else if (daysPerPage === 14) {
+        return '1 page/2 weeks';
+      } else if (daysPerPage === 21) {
+        return '1 page/3 weeks';
+      } else if (daysPerPage === 28) {
+        return '1 page/month';
+      } else if (daysPerPage > 7 && daysPerPage % 7 === 0) {
+        const weeks = daysPerPage / 7;
+        return `1 page/${weeks} weeks`;
+      }
+      
+      return `1 page every ${daysPerPage} days`;
+    }
+    
+    // For >= 1 page/day, use standard formatting
+    const unit = getUnitForFormat(format);
+    return `${Math.round(units)} ${unit}/day needed`;
   };
 
   // Comprehensive calculations for a single deadline (enhanced with pace-based logic)
@@ -348,6 +411,7 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     getDeadlineCalculations,
     
     formatUnitsPerDay,
+    formatUnitsPerDayForDisplay,
     
     // Counts
     activeCount: activeDeadlines.length,

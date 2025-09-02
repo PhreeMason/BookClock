@@ -40,7 +40,7 @@ interface DeadlineCardProps {
 }
 
 export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCardProps) {
-  const { getDeadlineCalculations, formatUnitsPerDay } = useDeadlines();
+  const { getDeadlineCalculations, formatUnitsPerDayForDisplay } = useDeadlines();
   const router = useRouter();
 
   // Fetch book data if deadline has a book_id
@@ -51,7 +51,8 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
   const {
     daysLeft,
     unitsPerDay,
-    urgencyLevel
+    urgencyLevel,
+    remaining
   } = getDeadlineCalculations(deadline);
 
   const shadowStyle = Platform.select({
@@ -146,122 +147,81 @@ export function DeadlineCard({ deadline, disableNavigation = false }: DeadlineCa
     return gradients[index] as [string, string];
   };
 
+  // Book Cover Component
+  const BookCover = ({ resizeMode = 'cover' }: { resizeMode?: 'cover' | 'contain' }) => {
+    if (bookData?.cover_image_url) {
+      return (
+        <Image
+          source={{ uri: getBackgroundImageUrl() }}
+          style={styles.bookCover}
+          resizeMode={resizeMode}
+        />
+      );
+    }
+    
+    return (
+      <LinearGradient
+        colors={getGradientBackground()}
+        style={[styles.bookCover, styles.bookCoverPlaceholder]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <ThemedText style={styles.bookCoverIcon}>{getBookCoverIcon()}</ThemedText>
+      </LinearGradient>
+    );
+  };
+
+  // Countdown/Status Display Component
+  const CountdownDisplay = () => (
+    <View style={styles.countdownContainer}>
+      <View style={[styles.countdownSquare, { borderColor }]}>
+        {isArchived ? (
+          <>
+            <ThemedText style={[styles.archivedIcon, { color: countdownColor }]}>
+              {latestStatus === 'complete' ? '✓' : '📌'}
+            </ThemedText>
+            <ThemedText style={[styles.countdownLabel, { color: countdownColor }]}>
+              {latestStatus === 'complete' ? 'Done' : 'Paused'}
+            </ThemedText>
+          </>
+        ) : (
+          <>
+            <ThemedText style={[styles.countdownNumber, { color: countdownColor }]}>
+              {daysLeft}
+            </ThemedText>
+            <ThemedText style={[styles.countdownLabel, { color: countdownColor }]}>
+              days
+            </ThemedText>
+          </>
+        )}
+      </View>
+    </View>
+  );
+
   return (
     <Pressable onPress={handlePress} style={({ pressed }) => [
       { opacity: pressed ? 0.8 : 1, backgroundColor: 'transparent' },
     ]}>
-      {isArchived ? (
-        <View style={[styles.newContainer, shadowStyle, { borderColor }]}>
-          <View style={styles.newBookContent}>
-            {bookData?.cover_image_url ? (
-              <Image
-                source={{ uri: getBackgroundImageUrl() }}
-                style={styles.newBookCover}
-                resizeMode='contain'
-              />
-            ) : (
-              <LinearGradient
-                colors={getGradientBackground()}
-                style={[styles.newBookCover, styles.bookCoverPlaceholder]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <ThemedText style={styles.bookCoverIcon}>{getBookCoverIcon()}</ThemedText>
-              </LinearGradient>
-            )}
-            <View style={styles.newBookInfo}>
-              <ThemedText style={styles.newBookTitle} numberOfLines={2}>
-                {deadline.book_title}
-              </ThemedText>
-              <ThemedText style={styles.newBookDeadline}>
-                {formatUnitsPerDay(unitsPerDay, deadline.format)}
-              </ThemedText>
-            </View>
-          </View>
-          <View style={styles.newDaysContainer}>
-            <View style={[styles.newDaysSquare, { borderColor }]}>
-              {isArchived ? (
-                <>
-                  <ThemedText style={[styles.archivedIcon, { color: countdownColor }]}>
-                    {latestStatus === 'complete' ? '✓' : '📌'}
-                  </ThemedText>
-                  <ThemedText style={[styles.newDaysLabel, { color: countdownColor }]}>
-                    {latestStatus === 'complete' ? 'Done' : 'Paused'}
-                  </ThemedText>
-                </>
-              ) : (
-                <>
-                  <ThemedText style={[styles.newDaysNumber, { color: countdownColor }]}>
-                    {daysLeft}
-                  </ThemedText>
-                  <ThemedText style={[styles.newDaysLabel, { color: countdownColor }]}>
-                    days
-                  </ThemedText>
-                </>
-              )}
-            </View>
+      <View style={[styles.cardContainer, isArchived && shadowStyle, { borderColor }]}>
+        <View style={styles.bookContent}>
+          <BookCover resizeMode={isArchived ? 'contain' : 'cover'} />
+          <View style={styles.bookInfo}>
+            <ThemedText style={styles.bookTitle} numberOfLines={2}>
+              {deadline.book_title}
+            </ThemedText>
+            <ThemedText style={styles.bookDeadline}>
+              {formatUnitsPerDayForDisplay(unitsPerDay, deadline.format, remaining, daysLeft)}
+            </ThemedText>
           </View>
         </View>
-      ) : (
-        <View style={[styles.newContainer]}>
-          <View style={styles.newBookContent}>
-            {bookData?.cover_image_url ? (
-              <Image
-                source={{ uri: getBackgroundImageUrl() }}
-                style={styles.newBookCover}
-                resizeMode='cover'
-              />
-            ) : (
-              <LinearGradient
-                colors={getGradientBackground()}
-                style={[styles.newBookCover, styles.bookCoverPlaceholder]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <ThemedText style={styles.bookCoverIcon}>{getBookCoverIcon()}</ThemedText>
-              </LinearGradient>
-            )}
-            <View style={styles.newBookInfo}>
-              <ThemedText style={styles.newBookTitle} numberOfLines={2}>
-                {deadline.book_title}
-              </ThemedText>
-              <ThemedText style={styles.newBookDeadline}>
-                {formatUnitsPerDay(unitsPerDay, deadline.format)}
-              </ThemedText>
-            </View>
-          </View>
-          <View style={styles.newDaysContainer}>
-            <View style={[styles.newDaysSquare, { borderColor }]}>
-              <ThemedText style={[styles.newDaysNumber, { color: countdownColor }]}>
-                {daysLeft}
-              </ThemedText>
-              <ThemedText style={[styles.newDaysLabel, { color: countdownColor }]}>
-                days
-              </ThemedText>
-            </View>
-          </View>
-        </View>
-      )}
+        <CountdownDisplay />
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    justifyContent: "space-between",
-    padding: 20,
-    borderRadius: 20,
-  },
-  coverAndTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: "flex-start",
-    gap: 10
-  },
-  newContainer: {
+  cardContainer: {
     backgroundColor: 'white',
     borderRadius: 16,
     padding: 0,
@@ -269,9 +229,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'stretch',
     overflow: 'hidden',
-    borderColor: ' rgba(232, 194, 185, 0.15)'
+    borderColor: 'rgba(232, 194, 185, 0.15)'
   },
-  newBookContent: {
+  bookContent: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -279,27 +239,27 @@ const styles = StyleSheet.create({
     flex: 3,
     minWidth: 0,
   },
-  newBookCover: {
+  bookCover: {
     width: 48,
     height: 64,
     borderRadius: 8,
     flexShrink: 0,
   },
-  newBookInfo: {
+  bookInfo: {
     flex: 1,
     minWidth: 0,
   },
-  newBookTitle: {
+  bookTitle: {
     color: '#2B3D4F',
     fontSize: 16,
     marginBottom: 2,
     fontFamily: 'Nunito-Bold',
   },
-  newBookDeadline: {
+  bookDeadline: {
     color: '#6B7280',
     fontSize: 11,
   },
-  newDaysContainer: {
+  countdownContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -315,7 +275,7 @@ const styles = StyleSheet.create({
   bookCoverIcon: {
     fontSize: 20,
   },
-  newDaysSquare: {
+  countdownSquare: {
     width: 72,
     height: 72,
     borderWidth: 3,
@@ -325,15 +285,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
-  newDaysNumber: {
+  countdownNumber: {
     fontSize: 28,
     fontWeight: '800',
-    lineHeight: 28,
+    lineHeight: 30,
+    textAlign: 'center',
+    includeFontPadding: false,
+    marginBottom: -6,
   },
-  newDaysLabel: {
+  countdownLabel: {
     fontSize: 11,
     fontWeight: '600',
-    marginTop: 2,
+    marginTop: -4,
+    marginBottom: -2,
     opacity: 0.8,
   },
   archivedIcon: {
