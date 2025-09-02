@@ -73,13 +73,7 @@ export interface Theme extends SimpleTheme, ComputedColors {
   isDark: boolean;
 }
 
-export type ThemeMode = 'light' | 'dark' | 'nature' | 'ocean' 
-| 'sunset' | 'cyberpunk' | 'neon' | 'volcano' | 'galaxy' | 'retro' 
-| 'toxic' | 'midnight' | 'cherry' | 'forest' | 'desert' | 'bae' | 'bookish' 
-| 'twilightRead' | 'cozyLibrary' | 'sunsetPage' | 'dreamyRead' | 'neonTokyo' 
-| 'copperPunk' | 'acidDream' | 'velvetRebellion' | 'holographic' | 'biomechanical' 
-| 'plasmaStorm' | 'rustPunk' | 'quantumFlux' | 'viralGreen' | 'blushNavy' | 'corporate' 
-| 'engineering' | 'vibrant'| 'deepPlum' | 'cozyBear' | 'theOne';
+export type ThemeMode = 'theOneDark' | 'theOne';
 
 export interface ThemeContextValue {
   theme: Theme;
