@@ -1,16 +1,16 @@
 import { ThemedText } from '@/components/themed';
-import { useSearchBooksList, useFetchBookData } from '@/hooks/useBooks';
-import { BookSearchResult, SelectedBook } from '@/types/bookSearch';
+import { useFetchBookData, useSearchBooksList } from '@/hooks/useBooks';
 import { useTheme } from '@/theme';
-import React, { useState, useCallback, useEffect } from 'react';
+import { BookSearchResult, SelectedBook } from '@/types/bookSearch';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-    FlatList,
+    ActivityIndicator,
     Image,
+    ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
     View,
-    ActivityIndicator,
 } from 'react-native';
 import { IconSymbol } from '../ui/IconSymbol';
 
@@ -98,33 +98,6 @@ const BookSearchInput: React.FC<BookSearchInputProps> = ({
         onBookSelected(null);
     };
 
-    const renderSearchResult = ({ item }: { item: BookSearchResult }) => (
-        <TouchableOpacity
-            style={[styles.resultItem, { borderBottomColor: theme.border }]}
-            onPress={() => handleBookSelection(item)}
-            testID={`book-result-${item.api_id}`}
-        >
-            <View style={styles.resultContent}>
-                {item.cover_image_url && (
-                    <Image 
-                        source={{ uri: item.cover_image_url }} 
-                        style={styles.bookCover}
-                        testID={`book-cover-${item.api_id}`}
-                    />
-                )}
-                <View style={styles.bookInfo}>
-                    <ThemedText style={styles.bookTitle} numberOfLines={2}>
-                        {item.title}
-                    </ThemedText>
-                    {item.metadata.authors && item.metadata.authors.length > 0 && (
-                        <ThemedText color="textMuted" style={styles.bookAuthor} numberOfLines={1}>
-                            by {item.metadata.authors[0]}
-                        </ThemedText>
-                    )}
-                </View>
-            </View>
-        </TouchableOpacity>
-    );
 
     const renderSelectedBook = () => {
         if (!selectedBook) return null;
@@ -219,14 +192,41 @@ const BookSearchInput: React.FC<BookSearchInputProps> = ({
 
             {showResults && searchResults?.bookList && searchResults.bookList.length > 0 && (
                 <View style={[styles.resultsContainer, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-                    <FlatList
-                        data={searchResults.bookList.slice(0, 5)} // Limit to 5 results
-                        renderItem={renderSearchResult}
-                        keyExtractor={(item) => item.api_id || Math.random().toString()}
+                    <ScrollView
                         style={styles.resultsList}
                         testID="book-search-results"
                         keyboardShouldPersistTaps="handled"
-                    />
+                        nestedScrollEnabled={true}
+                    >
+                        {searchResults.bookList.map((item) => (
+                            <TouchableOpacity
+                                key={item.api_id || Math.random().toString()}
+                                style={[styles.resultItem, { borderBottomColor: theme.border }]}
+                                onPress={() => handleBookSelection(item)}
+                                testID={`book-result-${item.api_id}`}
+                            >
+                                <View style={styles.resultContent}>
+                                    {item.cover_image_url && (
+                                        <Image 
+                                            source={{ uri: item.cover_image_url }} 
+                                            style={styles.bookCover}
+                                            testID={`book-cover-${item.api_id}`}
+                                        />
+                                    )}
+                                    <View style={styles.bookInfo}>
+                                        <ThemedText style={styles.bookTitle} numberOfLines={2}>
+                                            {item.title}
+                                        </ThemedText>
+                                        {item.metadata.authors && item.metadata.authors.length > 0 && (
+                                            <ThemedText color="textMuted" style={styles.bookAuthor} numberOfLines={1}>
+                                                by {item.metadata.authors[0]}
+                                            </ThemedText>
+                                        )}
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
                 </View>
             )}
 
@@ -271,7 +271,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginTop: 4,
         maxHeight: 200,
-        overflow: 'hidden',
     },
     resultsList: {
         maxHeight: 200,

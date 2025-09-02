@@ -79,7 +79,7 @@ export type ThemeMode = 'light' | 'dark' | 'nature' | 'ocean'
 | 'twilightRead' | 'cozyLibrary' | 'sunsetPage' | 'dreamyRead' | 'neonTokyo' 
 | 'copperPunk' | 'acidDream' | 'velvetRebellion' | 'holographic' | 'biomechanical' 
 | 'plasmaStorm' | 'rustPunk' | 'quantumFlux' | 'viralGreen' | 'blushNavy' | 'corporate' 
-| 'engineering' | 'vibrant'| 'deepPlum' | 'cozyBear';
+| 'engineering' | 'vibrant'| 'deepPlum' | 'cozyBear' | 'theOne';
 
 export interface ThemeContextValue {
   theme: Theme;

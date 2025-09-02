@@ -332,22 +332,21 @@ const deepPlumTheme: SimpleTheme = {
 
 const cozyBearTheme: SimpleTheme = {
     text: '#3A3A3A',
-    background: '#FDFDF0',
+    background: '#ffffff',
     primary: '#B8A9D9',
     secondary: '#95B99C',
     accent: '#D4A574',
     isDark: false,
 };
 
-// const darkModeCozyBear: SimpleTheme = {
-//     text: '#3A3A3A',
-//     background: '#1F1B24',
-//     primary: '#B8A9D9',
-//     secondary: '#95B99C',
-//     accent: '#D4A574',
-//     isDark: true,
-// }
-
+const theOneTheme: SimpleTheme = {
+    text: '#3A3A3A',
+    background: '#ffffff',
+    primary: '#B8A9D9',
+    secondary: '#E8B4A0',
+    accent: '#E8B4B8',
+    isDark: false,
+}
 
 export const themes: Record<ThemeMode, SimpleTheme> = {
     light: lightTheme,
@@ -386,7 +385,8 @@ export const themes: Record<ThemeMode, SimpleTheme> = {
     engineering: engineeringTheme,
     vibrant: vibrantTheme,
     deepPlum: deepPlumTheme,
-    cozyBear: cozyBearTheme
+    cozyBear: cozyBearTheme,
+    theOne: theOneTheme
 };
 
 export const themeNames: Record<ThemeMode, string> = {
@@ -426,5 +426,6 @@ export const themeNames: Record<ThemeMode, string> = {
     engineering: 'Engineering',
     vibrant: 'Vibrant',
     deepPlum: 'Deep Plum',
-    cozyBear: 'Cozy Bear'
+    cozyBear: 'Cozy Bear',
+    theOne: 'The One'
 };

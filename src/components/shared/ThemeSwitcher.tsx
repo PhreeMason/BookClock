@@ -1,15 +1,15 @@
-import { ThemedText, ThemedView } from '@/components/themed';
+import { ThemedScrollView, ThemedText } from '@/components/themed';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ThemeMode, themeNames, useTheme } from '@/theme';
 import { themes } from '@/theme/themes';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 
 export function ThemeSwitcher() {
     const { theme, themeMode, setThemeMode, availableThemes } = useTheme();
 
     return (
-        <ThemedView backgroundColor="card" borderColor="border" style={styles.container}>
+        <ThemedScrollView backgroundColor="card" style={styles.container}>
             <ThemedText type="semiBold" style={styles.title}>
                 Choose Theme
             </ThemedText>
@@ -51,7 +51,7 @@ export function ThemeSwitcher() {
                     );
                 })}
             </View>
-        </ThemedView>
+        </ThemedScrollView>
     );
 }
 
@@ -72,10 +72,9 @@ function getThemePreviewColor(mode: ThemeMode, colorType: 'primary' | 'secondary
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         borderRadius: 12,
-        borderWidth: 1,
         padding: 20,
-        marginBottom: 20,
     },
     title: {
         fontSize: 18,

@@ -9,16 +9,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ThemeScreen() {
     const { theme } = useTheme();
-    
+
     const handleBackPress = () => {
         router.back();
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+        <SafeAreaView
+            edges={['right', 'bottom', 'left']}
+            style={{ flex: 1, backgroundColor: theme.background }}
+        >
             <ThemedView backgroundColor="background" style={styles.container}>
                 <AppHeader title="Appearance" onBack={handleBackPress} />
-                
                 <View style={styles.content}>
                     <ThemeSwitcher />
                 </View>

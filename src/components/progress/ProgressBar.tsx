@@ -1,7 +1,8 @@
+import { formatDisplayDate } from '@/lib/dateUtils';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ThemedText, ThemedView } from '../themed';
-import { formatDisplayDate } from '@/lib/dateUtils';
+import LinearProgressBar from '../shared/LinearProgressBar';
+import { ThemedText } from '../themed';
 
 interface ProgressBarProps {
   progressPercentage: number;
@@ -18,12 +19,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
   return (
     <View style={styles.progressBarContainer}>
-      <ThemedView backgroundColor="primary" style={styles.progressBar}>
-        <ThemedView
-          backgroundColor="accent"
-          style={[styles.progressFill, { width: `${progressPercentage}%` }]}
-        />
-      </ThemedView>
+      <LinearProgressBar 
+        progressPercentage={progressPercentage}
+        height={12}
+        borderRadius={4}
+        showShimmer={true}
+      />
       <View style={styles.progressText}>
         <ThemedText color="textMuted">{progressPercentage}%</ThemedText>
         <ThemedText color="textMuted">
@@ -38,20 +39,11 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     marginBottom: 20,
   },
-  progressBar: {
-    height: 8,
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
   progressText: {
     gap: 4,
     justifyContent: 'space-between',
     flexDirection: 'row',
+    marginTop: 8,
   },
   deadlineContainer: {
     alignItems: 'center',

@@ -80,7 +80,7 @@ describe('DeadlineCard', () => {
       reactivateDeadline: jest.fn(),
       getDeadlineCalculations: mockGetDeadlineCalculations,
       formatUnitsPerDay: mockFormatUnitsPerDay,
-      getTotalReadingTimePerDay: jest.fn(),
+      getTotalReadingPagesForDay: jest.fn(),
       activeCount: 0,
       overdueCount: 0,
     } as any);

@@ -27,10 +27,6 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
   const isCompleted = latestStatus === 'complete';
   const isSetAside = latestStatus === 'set_aside';
   const isActive = latestStatus === 'reading';
-
-  const handleStartReadingSession = () => {
-    router.push(`/deadline/${deadline.id}/reading-session`);
-  };
   const handleComplete = () => {
     // Show confirmation dialog before completing
     Alert.alert(
@@ -223,12 +219,6 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
       {isActive && (
         <>
           <ThemedButton
-            title="▶️ Start Reading Session"
-            variant="primary"
-            style={styles.startReadingBtn}
-            onPress={handleStartReadingSession}
-          />
-          <ThemedButton
             title={isCompleting ? "Completing..." : "✓ Mark as Complete"}
             variant="success"
             style={styles.completeBtn}
@@ -236,7 +226,7 @@ const DeadlineActionButtons: React.FC<DeadlineActionButtonsProps> = ({
             disabled={isCompleting}
           />
           <ThemedButton
-            title={isSettingAside ? "Setting aside..." : "📚 Set Aside"}
+            title={isSettingAside ? "Pausing..." : "📚 Pause"}
             variant="secondary"
             style={styles.archiveBtn}
             onPress={handleSetAside}

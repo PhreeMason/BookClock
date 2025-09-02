@@ -1,48 +1,46 @@
-import { useTheme } from '@/theme'
+import { ThemedText, ThemedView } from '@/components/themed'
 import { ReadingDeadlineWithProgress } from '@/types/deadline'
 import dayjs from 'dayjs'
 import React from 'react'
 import { StyleSheet } from 'react-native'
-import { ThemedText, ThemedView } from '@/components/themed'
 
-const makeUpperCaseFirstLetter = (str: string) => {
+const makeUpperCaseFirstLetter = (str: string | null | undefined) => {
+    if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 const BookDetailsSection = (
     { deadline }: { deadline: ReadingDeadlineWithProgress }
 ) => {
-    const { theme } = useTheme();
-    const borderColor = theme.border;
     return (
-        <ThemedView borderColor={borderColor} backgroundColor="card" style={styles.section}>
+        <ThemedView backgroundColor="card" style={styles.section}>
             <ThemedView style={styles.sectionTitle}>
                 <ThemedText style={styles.sectionIcon}>📚</ThemedText>
                 <ThemedText type="subtitle">Book Details</ThemedText>
             </ThemedView>
 
             <ThemedView style={styles.detailsGrid}>
-                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
-                    <ThemedText color="textMuted">Author</ThemedText>
+                <ThemedView style={styles.detailRow}>
+                    <ThemedText color="textMuted" style={styles.detailLabel}>Author</ThemedText>
                     <ThemedText style={styles.detailsValue}>{deadline.author || 'Unknown'}</ThemedText>
                 </ThemedView>
-                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
-                    <ThemedText color="textMuted">Format</ThemedText>
+                <ThemedView style={styles.detailRow}>
+                    <ThemedText color="textMuted" style={styles.detailLabel}>Format</ThemedText>
                     <ThemedText style={styles.detailsValue}>
-                        {deadline.format.charAt(0).toUpperCase() + deadline.format.slice(1)}
+                        {makeUpperCaseFirstLetter(deadline.format)}
                     </ThemedText>
                 </ThemedView>
-                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
-                    <ThemedText color="textMuted">Priority</ThemedText>
+                <ThemedView style={styles.detailRow}>
+                    <ThemedText color="textMuted" style={styles.detailLabel}>Priority</ThemedText>
                     <ThemedText style={styles.detailsValue}>{makeUpperCaseFirstLetter(deadline.flexibility)}</ThemedText>
                 </ThemedView>
-                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
-                    <ThemedText color="textMuted">Source</ThemedText>
+                <ThemedView style={styles.detailRow}>
+                    <ThemedText color="textMuted" style={styles.detailLabel}>Source</ThemedText>
                     <ThemedText style={styles.detailsValue}>{makeUpperCaseFirstLetter(deadline.source)}</ThemedText>
                 </ThemedView>
-                <ThemedView style={[styles.detailRow, { borderBottomColor: theme.border }]}>
-                    <ThemedText color="textMuted">Added</ThemedText>
-                    <ThemedText style={styles.detailsValue}>{dayjs(deadline.created_at || '').format('MMMM DD, YYYY')}</ThemedText>
+                <ThemedView style={styles.detailRow}>
+                    <ThemedText color="textMuted" style={styles.detailLabel}>Added</ThemedText>
+                    <ThemedText style={styles.detailsValue}>{dayjs(deadline.created_at || '').format('MMMM D, YYYY')}</ThemedText>
                 </ThemedView>
             </ThemedView>
         </ThemedView>
@@ -56,7 +54,6 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 20,
         marginBottom: 16,
-        borderWidth: 1,
     },
     sectionTitle: {
         flexDirection: 'row',
@@ -68,17 +65,24 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     detailsGrid: {
-        gap: 16,
+        gap: 12,
     },
     detailRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: 12,
-        borderBottomWidth: 1,
+        paddingHorizontal: 16,
+        backgroundColor: 'rgba(232, 194, 185, 0.05)',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(232, 194, 185, 0.1)',
+    },
+    detailLabel: {
+        fontSize: 15,
     },
     detailsValue: {
         fontWeight: '600',
-        fontSize: 17,
+        fontSize: 15,
     },
 })

@@ -182,8 +182,8 @@ const AudiobookProgressInput: React.FC<AudiobookProgressInputProps> = ({
         style={[
           styles.input,
           {
-            backgroundColor: theme.surface,
-            color: theme.text,
+            backgroundColor: theme.background,
+            color: theme.primary,
             borderColor: isValid ? theme.border : theme.danger,
             borderWidth: isValid ? 1 : 2,
           }
@@ -206,7 +206,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: 22,
+    fontFamily: 'Nunito-Bold',
   },
   helpText: {
     fontSize: 12,

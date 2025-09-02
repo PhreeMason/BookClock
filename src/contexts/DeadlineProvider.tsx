@@ -6,8 +6,9 @@ import {
     getPaceEstimate,
     getReadingEstimate
 } from '@/lib/deadlineCalculations';
-import { calculateDaysLeft, calculateProgress, calculateProgressPercentage, getTotalReadingTimePerDay, getUnitForFormat, separateDeadlines } from '@/lib/deadlineUtils';
+import { calculateDaysLeft, calculateProgress, calculateProgressPercentage, getTotalReadingPagesForDay, getUnitForFormat, separateDeadlines } from '@/lib/deadlineUtils';
 import { ReadingDeadlineInsert, ReadingDeadlineProgressInsert, ReadingDeadlineWithProgress } from '@/types/deadline';
+import dayjs from 'dayjs';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { PaceProvider, usePace } from './PaceProvider';
 
@@ -63,7 +64,11 @@ interface DeadlineContextType {
   overdueCount: number;
   
   // Summary calculations
-  getTotalReadingTimePerDay: () => string;
+  getTotalReadingPagesForDay: () => string;
+  
+  // Progress calculations
+  calculateProgressAsOfStartOfDay: (deadline: ReadingDeadlineWithProgress) => number;
+  calculateProgressForToday: (deadline: ReadingDeadlineWithProgress) => number;
 }
 
 const DeadlineContext = createContext<DeadlineContextType | undefined>(undefined);
@@ -101,6 +106,40 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     
     if (daysLeft <= 0) return remaining;
     return Math.ceil(remaining / daysLeft);
+  };
+
+    // Calculate progress as of the start of today (local time)
+  const calculateProgressAsOfStartOfDay = (deadline: ReadingDeadlineWithProgress): number => {
+    if (!deadline.progress || deadline.progress.length === 0) return 0;
+    
+    // Get the start of today in local time
+    const startOfToday = dayjs().startOf('day').toDate();
+    
+    // Filter progress entries to only include those from before or at the start of today
+    const progressBeforeToday = deadline.progress.filter(progress => {
+      const progressDate = new Date(progress.updated_at || progress.created_at || '');
+      return progressDate <= startOfToday;
+    });
+    
+    if (progressBeforeToday.length === 0) return 0;
+    
+    // Find the most recent progress entry before or at the start of today
+    const latestProgress = progressBeforeToday.reduce((latest, current) => {
+      const currentDate = new Date(current.updated_at || current.created_at || '');
+      const latestDate = new Date(latest.updated_at || latest.created_at || '');
+      return currentDate > latestDate ? current : latest;
+    });
+    
+    return latestProgress.current_progress || 0;
+  };
+
+  // Calculate how much progress was made today (since start of day)
+  const calculateProgressForToday = (deadline: ReadingDeadlineWithProgress): number => {
+    const currentProgress = calculateProgress(deadline);
+    const progressAtStartOfDay = calculateProgressAsOfStartOfDay(deadline);
+    
+    // Return the difference (progress made today)
+    return Math.max(0, currentProgress - progressAtStartOfDay);
   };
 
   // Format the units per day display based on format
@@ -158,7 +197,8 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     } else {
       // Calculate normally for active deadlines
       daysLeft = calculateDaysLeft(deadline.deadline_date);
-      unitsPerDay = calculateUnitsPerDay(deadline.total_quantity, currentProgress, daysLeft, deadline.format);
+      const currentProgressAsOfStartOfDay = calculateProgressAsOfStartOfDay(deadline);
+      unitsPerDay = calculateUnitsPerDay(deadline.total_quantity, currentProgressAsOfStartOfDay, daysLeft, deadline.format);
       
       // Get pace-based calculations
       paceData = getDeadlinePaceStatus(deadline);
@@ -314,9 +354,13 @@ const DeadlineProviderInternal: React.FC<DeadlineProviderProps> = ({ children })
     overdueCount: overdueDeadlines.length,
     
     // Summary calculations
-    getTotalReadingTimePerDay: () => {
-      return getTotalReadingTimePerDay(activeDeadlines, getDeadlineCalculations);
+    getTotalReadingPagesForDay: () => {
+      return getTotalReadingPagesForDay(activeDeadlines, getDeadlineCalculations);
     },
+    
+    // Progress calculations
+    calculateProgressAsOfStartOfDay,
+    calculateProgressForToday,
   };
 
   return (

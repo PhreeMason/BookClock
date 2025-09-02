@@ -9,7 +9,7 @@ const ActiveReads = () => {
     if (isLoading) {
         return (
             <ThemedScrollView>
-                <ThemedView backgroundColor="background" style={styles.container}>
+                <ThemedView backgroundColor="white" style={styles.container}>
                     <ThemedText>Loading active deadlines...</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
@@ -19,7 +19,7 @@ const ActiveReads = () => {
     if (error) {
         return (
             <ThemedScrollView>
-                <ThemedView backgroundColor="background" style={styles.container}>
+                <ThemedView backgroundColor="white" style={styles.container}>
                     <ThemedText color="error" style={styles.errorText}>Error loading deadlines: {error.message}</ThemedText>
                 </ThemedView>
             </ThemedScrollView>
@@ -27,12 +27,8 @@ const ActiveReads = () => {
     }
 
     return (
-        <ThemedScrollView backgroundColor="background">
-            <ThemedView backgroundColor="background" style={styles.container}>
-                <ThemedText
-                    type='semiBold'
-                    color='textMuted'
-                    style={styles.pageTitle}>ACTIVE DEADLINES</ThemedText>
+        <ThemedScrollView backgroundColor="white">
+            <ThemedView backgroundColor="white" style={styles.container}>
                 {activeDeadlines.length > 0 ? (
                     activeDeadlines.map((deadline) => (
                         <DeadlineCard

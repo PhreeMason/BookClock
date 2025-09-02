@@ -16,7 +16,7 @@ const DeadlineViewHeader: React.FC<DeadlineViewHeaderProps> = ({
 }) => {
     const editButton = (
         <TouchableOpacity onPress={onEdit}>
-            <ThemedText type="link">
+            <ThemedText type="link" style={{ color: 'white' }}>
                 Edit
             </ThemedText>
         </TouchableOpacity>

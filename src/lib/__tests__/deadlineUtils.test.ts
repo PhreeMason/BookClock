@@ -4,7 +4,7 @@ import {
     calculateProgress,
     calculateProgressPercentage,
     formatProgressDisplay,
-    getTotalReadingTimePerDay,
+    getTotalReadingPagesForDay,
     getUnitForFormat,
     separateDeadlines,
     sortDeadlines
@@ -369,31 +369,31 @@ describe('deadlineUtils', () => {
     });
   });
 
-  describe('getTotalReadingTimePerDay', () => {
+  describe('getTotalReadingPagesForDay', () => {
     const mockGetDeadlineCalculations = (deadline: ReadingDeadlineWithProgress) => ({
       unitsPerDay: deadline.format === 'audio' ? 30 : 15 // 30 minutes for audio, 15 pages for others
     });
 
     it('should return "No active deadlines" for empty array', () => {
-      const result = getTotalReadingTimePerDay([], mockGetDeadlineCalculations);
+      const result = getTotalReadingPagesForDay([], mockGetDeadlineCalculations);
       expect(result).toBe('No active deadlines');
     });
 
     it('should calculate total time for single audio deadline', () => {
       const deadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'audio', 180);
-      const result = getTotalReadingTimePerDay([deadline], mockGetDeadlineCalculations);
+      const result = getTotalReadingPagesForDay([deadline], mockGetDeadlineCalculations);
       expect(result).toBe('30m/day needed');
     });
 
     it('should calculate total time for single physical deadline', () => {
       const deadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'physical', 300);
-      const result = getTotalReadingTimePerDay([deadline], mockGetDeadlineCalculations);
+      const result = getTotalReadingPagesForDay([deadline], mockGetDeadlineCalculations);
       expect(result).toBe('23m/day needed'); // 15 pages * 1.5 minutes = 22.5 minutes, rounded to 23
     });
 
     it('should calculate total time for single ebook deadline', () => {
       const deadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'ebook', 400);
-      const result = getTotalReadingTimePerDay([deadline], mockGetDeadlineCalculations);
+      const result = getTotalReadingPagesForDay([deadline], mockGetDeadlineCalculations);
       expect(result).toBe('23m/day needed'); // 15 pages * 1.5 minutes = 22.5 minutes, rounded to 23
     });
 
@@ -401,7 +401,7 @@ describe('deadlineUtils', () => {
       const audioDeadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'audio', 180);
       const physicalDeadline = createMockDeadline('2', '2024-01-25T00:00:00Z', 'physical', 300);
       
-      const result = getTotalReadingTimePerDay([audioDeadline, physicalDeadline], mockGetDeadlineCalculations);
+      const result = getTotalReadingPagesForDay([audioDeadline, physicalDeadline], mockGetDeadlineCalculations);
       expect(result).toBe('53m/day needed'); // 30m + (15*1.5)m = 30m + 22.5m = 52.5m, rounded to 53
     });
 
@@ -413,7 +413,7 @@ describe('deadlineUtils', () => {
       const audioDeadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'audio', 180);
       const physicalDeadline = createMockDeadline('2', '2024-01-25T00:00:00Z', 'physical', 300);
       
-      const result = getTotalReadingTimePerDay([audioDeadline, physicalDeadline], mockCalculations);
+      const result = getTotalReadingPagesForDay([audioDeadline, physicalDeadline], mockCalculations);
       expect(result).toBe('2h 38m/day needed'); // 90m + (45*1.5)m = 90m + 67.5m = 157.5m = 2h 37.5m, rounded to 2h 38m
     });
 
@@ -425,7 +425,7 @@ describe('deadlineUtils', () => {
       const audioDeadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'audio', 180);
       const physicalDeadline = createMockDeadline('2', '2024-01-25T00:00:00Z', 'physical', 300);
       
-      const result = getTotalReadingTimePerDay([audioDeadline, physicalDeadline], mockCalculations);
+      const result = getTotalReadingPagesForDay([audioDeadline, physicalDeadline], mockCalculations);
       expect(result).toBe('1h 15m/day needed'); // 45m + (20*1.5)m = 45m + 30m = 75m = 1h 15m
     });
 
@@ -436,7 +436,7 @@ describe('deadlineUtils', () => {
 
       const physicalDeadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'physical', 300);
       
-      const result = getTotalReadingTimePerDay([physicalDeadline], mockCalculations);
+      const result = getTotalReadingPagesForDay([physicalDeadline], mockCalculations);
       expect(result).toBe('19m/day needed'); // 12.7 * 1.5 = 19.05, rounded to 19
     });
 
@@ -446,7 +446,7 @@ describe('deadlineUtils', () => {
       });
 
       const deadline = createMockDeadline('1', '2024-01-20T00:00:00Z', 'physical', 300);
-      const result = getTotalReadingTimePerDay([deadline], mockCalculations);
+      const result = getTotalReadingPagesForDay([deadline], mockCalculations);
       expect(result).toBe('0m/day needed');
     });
   });
