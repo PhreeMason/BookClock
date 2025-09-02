@@ -96,8 +96,8 @@ export default function SettingsScreen() {
                   <ThemedText style={styles.settingText}>Appearance</ThemedText>
                 </View>
                 <IconSymbol name="chevron.right" size={16} color={textMutedColor} />
-              </TouchableOpacity>
-            </ThemedView> */}
+              </TouchableOpacity> */}
+            </ThemedView> 
           </View>
           {/* Sign Out Section */}
           <View style={styles.signOutSection}>

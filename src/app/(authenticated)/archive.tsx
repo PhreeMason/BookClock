@@ -15,7 +15,9 @@ export default function ArchivedDeadlinesScreen() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+        <SafeAreaView 
+        edges={['bottom', 'left', 'right']}
+        style={{ flex: 1, backgroundColor: theme.background }}>
             <ThemedView backgroundColor="background" style={styles.container}>
                 <AppHeader title="Archived Deadlines" onBack={handleBackPress} />
                 <ArchivedDeadlines />

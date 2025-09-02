@@ -1,6 +1,6 @@
-import CustomInput from '@/components/shared/CustomInput';
 import SignInWith from '@/components/auth/SignInWith';
-import { ThemedButton, ThemedText, ThemedView, ThemedKeyboardAvoidingView } from '@/components/themed';
+import CustomInput from '@/components/shared/CustomInput';
+import { ThemedButton, ThemedKeyboardAvoidingView, ThemedText, ThemedView } from '@/components/themed';
 import { isClerkAPIResponseError, useClerk, useSignIn } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'center',
         marginBottom: 40,
+        lineHeight: 38,
     },
     form: {
         gap: 16,

@@ -1,6 +1,6 @@
 import { SimpleTheme, ThemeMode } from '../types';
 
-const theOneTheme: SimpleTheme = {
+const lightTheme: SimpleTheme = {
     text: '#3A3A3A',
     background: '#ffffff',
     primary: '#B8A9D9',
@@ -9,7 +9,7 @@ const theOneTheme: SimpleTheme = {
     isDark: false,
 }
 
-const theOneThemeDark: SimpleTheme = {
+const darkTheme: SimpleTheme = {
     text: '#3A3A3A',
     background: '#ffffff',
     primary: '#B8A9D9',
@@ -19,11 +19,11 @@ const theOneThemeDark: SimpleTheme = {
 }
 
 export const themes: Record<ThemeMode, SimpleTheme> = {
-    theOne: theOneTheme,
-    theOneDark: theOneThemeDark
+    light: lightTheme,
+    dark: darkTheme
 };
 
 export const themeNames: Record<ThemeMode, string> = {
-    theOne: 'The One',
-    theOneDark: 'The One Dark'
+    light: 'light',
+    dark: 'dark'
 };

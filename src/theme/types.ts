@@ -73,7 +73,7 @@ export interface Theme extends SimpleTheme, ComputedColors {
   isDark: boolean;
 }
 
-export type ThemeMode = 'theOneDark' | 'theOne';
+export type ThemeMode = 'light' | 'dark';
 
 export interface ThemeContextValue {
   theme: Theme;
