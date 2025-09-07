@@ -34,13 +34,19 @@ export default function SignInWith({ strategy }: SignInWithProps) {
             // Start the authentication process by calling `startSSOFlow()`
             await signOut()
             
+            const redirectUrl = AuthSession.makeRedirectUri({
+                scheme: 'shelfControl',
+                path: 'sso-callback'
+            });
+            console.log('Redirect URL:', redirectUrl);
+            
             const { createdSessionId, setActive } =
                 await startSSOFlow({
                     strategy,
                     // For web, defaults to current path
                     // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
                     // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
-                    redirectUrl: AuthSession.makeRedirectUri(),
+                    redirectUrl,
                 });
 
             // If sign in was successful, set the active session

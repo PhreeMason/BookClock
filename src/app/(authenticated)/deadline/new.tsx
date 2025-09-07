@@ -113,10 +113,16 @@ const NewDeadLine = () => {
             data.currentMinutes
         );
 
+        // If the user has already made progress in the book, they can specify when they started reading.
+        // This ensures accurate pace calculations - e.g., if they read 100 pages over the past week
+        // before adding the deadline, we track that they've been reading for a week, not that they
+        // read 100 pages instantly today. The startDate gets passed to the progress entry's created_at
+        // field to maintain an accurate reading history.
         const progressDetails = {
             id: '',
             current_progress: finalCurrentProgress,
-            reading_deadline_id: '' // This will be set after the deadline is created
+            reading_deadline_id: '', // This will be set after the deadline is created
+            ...(data.startDate ? { created_at: data.startDate.toISOString() } : {})
         } as any;
 
         addDeadline(
@@ -126,7 +132,8 @@ const NewDeadLine = () => {
                 bookData: data.api_id ? {
                     api_id: data.api_id,
                     ...(data.book_id ? { book_id: data.book_id } : {}),
-                } : undefined
+                } : undefined,
+                startDate: data.startDate
             } as any,
             // Success callback
             () => {
@@ -249,6 +256,7 @@ const NewDeadLine = () => {
                             deadline={watchedValues.deadline}
                             paceEstimate={paceEstimate}
                             watchedValues={watchedValues}
+                            setValue={setValue}
                         />
                     )}
                 </ThemedKeyboardAwareScrollView>

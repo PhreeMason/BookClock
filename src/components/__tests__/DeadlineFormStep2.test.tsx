@@ -108,6 +108,7 @@ const TestComponent = ({
       deadline={deadline}
       paceEstimate={paceEstimate}
       watchedValues={watchedValues}
+      setValue={jest.fn()}
     />
   );
 };

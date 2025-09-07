@@ -321,6 +321,7 @@ const EditDeadline = () => {
                             deadline={watchedValues.deadline}
                             paceEstimate={paceEstimate}
                             watchedValues={watchedValues}
+                            setValue={setValue}
                         />
                     )}
                 </ThemedScrollView>

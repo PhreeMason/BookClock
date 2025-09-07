@@ -343,7 +343,7 @@ describe('deadlineUtils', () => {
     it('should handle null updated_at and created_at values', () => {
       const deadline1 = createMockDeadline('1', '2024-01-20T00:00:00Z');
       deadline1.updated_at = null;
-      deadline1.created_at = null;
+      deadline1.created_at = null as any;
       
       const deadline2 = createMockDeadline('2', '2024-01-20T00:00:00Z');
       deadline2.updated_at = '2024-01-10T00:00:00Z';

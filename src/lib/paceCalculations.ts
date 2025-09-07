@@ -83,7 +83,7 @@ export const processBookProgress = (
   book: ReadingDeadlineWithProgress,
   cutoffTime: number,
   dailyProgress: { [date: string]: number },
-  format?: 'physical' | 'ebook' | 'audio'
+  _format?: 'physical' | 'ebook' | 'audio'
 ): void => {
   if (!book.progress || !Array.isArray(book.progress)) return;
 
@@ -106,16 +106,11 @@ export const processBookProgress = (
   // Handle the first remaining progress entry
   const firstProgress = progress[0];
   const firstDate = new Date(firstProgress.created_at);
-
+  
   if (firstDate.getTime() >= cutoffTime) {
     const dateStr = firstDate.toISOString().slice(0, 10);
     const amount = firstProgress.current_progress - baselineProgress;
-
-    // For audio format, filter out large initial listening sessions (>5 hours)
-    const INITIAL_LISTENING_THRESHOLD = 300; // 5 hours max for initial listening
-    if (format === 'audio' && baselineProgress === 0 && amount > INITIAL_LISTENING_THRESHOLD) {
-      // Skip this entry - it's too large for a single listening session
-    } else if (amount > 0) {
+    if (amount > 0) {
       dailyProgress[dateStr] = (dailyProgress[dateStr] || 0) + amount;
     }
   }

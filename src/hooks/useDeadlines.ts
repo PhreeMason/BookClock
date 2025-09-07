@@ -15,11 +15,13 @@ export const useAddDeadline = () => {
             {
                 deadlineDetails,
                 progressDetails,
-                bookData
+                bookData,
+                startDate
             }: {
                 deadlineDetails: Omit<ReadingDeadlineInsert, 'user_id'>,
                 progressDetails: ReadingDeadlineProgressInsert,
-                bookData?: { api_id: string; book_id?: string }
+                bookData?: { api_id: string; book_id?: string },
+                startDate?: Date
             }) => {
             if (!userId) {
                 throw new Error("User not authenticated");
@@ -109,12 +111,14 @@ export const useAddDeadline = () => {
                 throw new Error(progressError.message);
             }
 
-            // create deadline status entry
+            // Create deadline status entry. If the user specified when they started reading (startDate),
+            // use that for the status created_at to accurately track when they transitioned to "reading" status.
+            // This ensures historical accuracy for users who started reading before adding the deadline.
             const { data: statusData, error: statusError } = await supabase.from('reading_deadline_status')
                 .insert({
                     reading_deadline_id: finalDeadlineId,
                     status: 'reading',
-                    created_at: new Date().toISOString()
+                    created_at: startDate ? startDate.toISOString() : new Date().toISOString()
                 })
                 .select()
                 .single();

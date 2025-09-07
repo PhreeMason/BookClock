@@ -22,7 +22,8 @@ describe('deadlineFormSchema', () => {
     totalMinutes: undefined,
     currentMinutes: undefined,
     currentProgress: 0,
-    flexibility: 'flexible'
+    flexibility: 'flexible',
+    startDate: undefined
   };
 
   describe('bookTitle validation', () => {
@@ -240,6 +241,73 @@ describe('deadlineFormSchema', () => {
       if (!result.success) {
         expect(result.error.issues[0].message).toBe('Minutes must be 0 or greater');
       }
+    });
+  });
+
+  describe('startDate validation', () => {
+    it('should accept a valid past date', () => {
+      const data = { ...validFormData, startDate: new Date('2025-01-10T12:00:00Z') };
+      const result = deadlineFormSchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept today as start date', () => {
+      const data = { ...validFormData, startDate: new Date('2025-01-15T12:00:00Z') };
+      const result = deadlineFormSchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept undefined', () => {
+      const data = { ...validFormData };
+      const result = deadlineFormSchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject future start date', () => {
+      const data = { ...validFormData, startDate: new Date('2025-01-20T12:00:00Z') };
+      const result = deadlineFormSchema.safeParse(data);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe('Start date cannot be in the future');
+      }
+    });
+
+    it('should reject start date after deadline', () => {
+      const data = { 
+        ...validFormData, 
+        deadline: new Date('2025-01-20T12:00:00Z'),
+        startDate: new Date('2025-01-25T12:00:00Z') 
+      };
+      const result = deadlineFormSchema.safeParse(data);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        // When a date is both future AND after deadline, we get the "future" error first
+        expect(result.error.issues[0].message).toBe('Start date cannot be in the future');
+      }
+    });
+
+    it('should reject past start date that is after deadline', () => {
+      const data = { 
+        ...validFormData, 
+        deadline: new Date('2025-01-10T12:00:00Z'), // Deadline in the past
+        startDate: new Date('2025-01-12T12:00:00Z')  // Start date after deadline but still in past
+      };
+      const result = deadlineFormSchema.safeParse(data);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe('Start date must be before the deadline');
+      }
+    });
+
+    it('should accept start date equal to deadline', () => {
+      const sameDate = new Date('2025-01-10T12:00:00Z'); // Use a past date
+      const data = { 
+        ...validFormData, 
+        deadline: sameDate,
+        startDate: sameDate
+      };
+      const result = deadlineFormSchema.safeParse(data);
+      expect(result.success).toBe(true);
     });
   });
 

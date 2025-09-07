@@ -3,8 +3,8 @@ import { ThemedText } from '@/components/themed';
 import { useTheme } from '@/theme';
 import { DeadlineFormData } from '@/lib/deadlineFormSchema';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import React from 'react';
-import { Control, Controller } from 'react-hook-form';
+import React, { useState, useEffect } from 'react';
+import { Control, Controller, useWatch } from 'react-hook-form';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { PrioritySelector } from './PrioritySelector';
 
@@ -19,6 +19,7 @@ interface DeadlineFormStep2Props {
     deadline: Date;
     paceEstimate: string;
     watchedValues: any;
+    setValue: (name: keyof DeadlineFormData, value: any) => void;
 }
 
 export const DeadlineFormStep2 = ({
@@ -31,7 +32,8 @@ export const DeadlineFormStep2 = ({
     onDateChange,
     deadline,
     paceEstimate,
-    watchedValues
+    watchedValues,
+    setValue
 }: DeadlineFormStep2Props) => {
     const { theme } = useTheme();
     const cardColor = theme.surface;
@@ -39,6 +41,43 @@ export const DeadlineFormStep2 = ({
     const dangerColor = theme.danger;
     const primaryColor = theme.primary;
     const dividerColor = theme.textMuted;
+    
+    const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+    
+    // Watch for changes in current progress
+    const currentProgress = useWatch({ control, name: 'currentProgress' });
+    const currentMinutes = useWatch({ control, name: 'currentMinutes' });
+    const startDate = useWatch({ control, name: 'startDate' });
+    
+    // Determine if we should show the start date field
+    const shouldShowStartDate = (currentProgress && currentProgress > 0) || 
+                                (selectedFormat === 'audio' && currentMinutes && currentMinutes > 0);
+    
+    // Set default start date when progress is entered
+    useEffect(() => {
+        if (shouldShowStartDate && !startDate) {
+            // Default to 7 days ago if significant progress, otherwise today
+            const significantProgress = selectedFormat === 'audio' 
+                ? (currentProgress || 0) > 2 || (currentMinutes || 0) > 30
+                : (currentProgress || 0) > 50;
+            
+            const defaultDate = new Date();
+            if (significantProgress) {
+                defaultDate.setDate(defaultDate.getDate() - 7);
+            }
+            setValue('startDate', defaultDate);
+        } else if (!shouldShowStartDate && startDate) {
+            // Clear start date if progress is removed
+            setValue('startDate', undefined);
+        }
+    }, [shouldShowStartDate, startDate, currentProgress, currentMinutes, selectedFormat, setValue]);
+    
+    const onStartDateChange = (_event: any, selectedDate?: Date) => {
+        setShowStartDatePicker(false);
+        if (selectedDate) {
+            setValue('startDate', selectedDate);
+        }
+    };
     
     const getProgressLabel = () => {
         switch (selectedFormat) {
@@ -122,6 +161,50 @@ export const DeadlineFormStep2 = ({
                     How much have you already finished?
                 </ThemedText>
             </View>
+
+            {shouldShowStartDate && (
+                <>
+                    <View style={[styles.sectionDivider, {backgroundColor: dividerColor}]} />
+                    <View>
+                        <ThemedText type="semiBold" style={{marginBottom: 8}}>When did you start reading?</ThemedText>
+                        <Controller
+                            control={control}
+                            name="startDate"
+                            render={({ field: { value } }) => (
+                                <>
+                                    <TouchableOpacity
+                                        style={[styles.dateInput, {backgroundColor: cardColor, borderColor: borderColor}]}
+                                        onPress={() => setShowStartDatePicker(!showStartDatePicker)}
+                                        testID="start-date-picker-button"
+                                    >
+                                        <ThemedText>
+                                            {value ? value.toLocaleDateString('en-US', {
+                                                weekday: 'long',
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            }) : 'Select start date'}
+                                        </ThemedText>
+                                        {showStartDatePicker && (
+                                            <DateTimePicker
+                                                value={value || new Date()}
+                                                mode="date"
+                                                display="inline"
+                                                onChange={onStartDateChange}
+                                                maximumDate={new Date()}
+                                                testID='input-startDate'
+                                            />
+                                        )}
+                                    </TouchableOpacity>
+                                </>
+                            )}
+                        />
+                        <ThemedText color="textMuted" style={{marginTop: 6, lineHeight: 18}}>
+                            Since you've already started, we'll track your progress from this date for accurate pacing
+                        </ThemedText>
+                    </View>
+                </>
+            )}
 
             <View style={[styles.sectionDivider, {backgroundColor: dividerColor}]} />
             <View>
